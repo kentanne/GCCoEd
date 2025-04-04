@@ -21,6 +21,7 @@
           your own pace, with flexible and personalized support to help you reach
           your academic goals.
         </p>
+       
       </div>
       <img class="section-image learners-image" src="@/assets/learners.png" alt="Learners Illustration" />
     </section>
