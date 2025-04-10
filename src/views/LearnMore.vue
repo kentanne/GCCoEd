@@ -110,33 +110,8 @@
           </div>
         </div>
       </div>
-
-      <div class="divider animated-divider"></div>
-
-      <!-- Developers section -->
-      <div class="developers-section">
-        <h2 class="section-title">DEVELOPERS</h2>
-        <div class="developers-container">
-          <div class="developer-card">
-            <div class="card-content">
-              <img src="@/assets/paulo.jpg" alt="Paulo P. Cordova" class="developer-photo">
-              <h3 class="developer-name">PAULO P. CORDOVA</h3>
-              <p class="developer-specialty">Backend Developer</p>
-              <p class="developer-role">Handles the server-side logic, authentication, and database management to ensure secure and efficient platform functionality.</p>
-            </div>
-          </div>
-          <div class="developer-card">
-            <div class="card-content">
-              <img src="@/assets/kent.png" alt="Kent Ann G. Ecal" class="developer-photo">
-              <h3 class="developer-name">KENT ANN G. ECAL</h3>
-              <p class="developer-specialty">Frontend Developer</p>
-              <p class="developer-role">Responsible for designing and developing the user interface using Vue.js, ensuring a seamless and responsive experience.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -152,12 +127,18 @@ export default {
     const activeIcon = ref(0);
     
     const faqs = ref([
-      { question: "Who can use GCCoEd?", answer: "GCCoEd is exclusively available to students of Gordon College. It is designed to help students connect with peers for tutoring and educational support.", open: false },
-      { question: "How do I become a mentor or learner?", answer: "To become a mentor or learner, you need to create two separate accounts using the same email and password — one for each role. This allows you to switch between mentoring and learning as needed.", open: false },
-      { question: "Is there a fee for using GCCoEd?", answer: "No, GCCoEd is completely free for all students. The platform aims to promote peer learning without any financial barriers.", open: false },
-      { question: "How do I schedule a session?", answer: "Once you find a mentor, you can communicate via email to agree on a suitable time for your tutoring session. The platform provides tools to help manage your schedule.", open: false },
-      { question: "What if I need to cancel a session?", answer: "If you need to cancel a session, please inform your mentor as soon as possible to reschedule. Communication is key to ensuring a smooth experience.", open: false }
+      { question: "Who can use GCCoEd?", answer: "GCCoEd is exclusively available to College of Computer Studies students of Gordon College. It is designed to help students connect with peers for tutoring and educational support." },
+      { question: "How do I become a mentor or learner?", answer: "To become a mentor or learner, you need to create two separate accounts using the same email and password — one for each role. This allows you to switch between mentoring and learning as needed." },
+      { question: "Is there a fee to use GCCoEd?", answer: "No, GCCoEd is completely free to use." },
+      { question: "How do I book a session?", answer: "Once you find a mentor, you can schedule a session as long as they are available on your preferred day and time. Simply choose a suitable slot and you're good to go." },
+      { question: "Can I cancel or reschedule a session?", answer: "Yes, you can cancel or reschedule a session through the session details page. However, we encourage timely communication to avoid inconveniencing mentors or learners." },
+      { question: "How does the rating system work?", answer: "After each session, learners can leave a rating and feedback based on their experience. Ratings help maintain quality and allow mentors to improve their tutoring approach." },
+      { question: "Is there a messaging feature?", answer: "Yes, GCCoEd allows users to send messages within the platform. However, instead of a chat system, messages are delivered via email to the recipient, ensuring important details are not missed." },
+      { question: "What types of subjects can I find on GCCoEd?", answer: "GCCoEd covers the subjects offered by the different programs in the Department of College of Computer Studies - Gordon College." },
+      { question: "How secure is GCCoEd?", answer: "GCCoEd uses secure protocols to protect user data. We continuously implement measures to keep your information secure." },
+      { question: "What if I encounter an issue or need help?", answer: "If you face any issues or need assistance, you can reach out through our support feature. We’re here to ensure you have a smooth experience." },
     ]);
+
 
     const toggleFaq = (index) => {
       faqs.value[index].open = !faqs.value[index].open;
@@ -420,7 +401,7 @@ html, body {
   opacity: 0;
   transform: translateY(-10px);
   transition: all 0.3s ease;
-  background-color: #02475e;
+  background-color: #349eb1;
   color: white;
   padding: 8px 16px;
   border-radius: 4px;
@@ -438,7 +419,7 @@ html, body {
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent transparent #02475e transparent;
+  border-color: transparent transparent #349eb1 transparent;
 }
 
 .icon-text.active {
@@ -448,8 +429,8 @@ html, body {
 
 .icon-wrapper:hover .icon-circle {
   transform: translateY(-10px);
-  background-color: #02475e;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: #349eb1;
+  box-shadow: 1px 1px 0 2px rgba(242, 169, 134, 1);
 }
 
 .faq-section {
@@ -496,87 +477,6 @@ html, body {
 .faq-answer.open {
   max-height: 500px;
   padding-bottom: 1rem;
-}
-
-.developers-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  text-align: center;
-}
-
-.developers-container {
-  display: flex;
-  justify-content: center;
-  gap: 100px;
-  flex-wrap: wrap;
-  margin-top: 30px;
-}
-
-.developer-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  width: 350px;
-  padding: 25px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transform: scale(1);
-  z-index: 1;
-}
-
-.developer-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  z-index: 2;
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.developer-photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 5px solid #f0f0f0;
-  margin-bottom: 20px;
-  transition: transform 0.3s ease;
-}
-
-.developer-card:hover .developer-photo {
-  transform: scale(1.05);
-}
-
-.developer-name {
-  font-size: 1.4rem;
-  margin-bottom: 5px;
-  color: #02475e;
-  transition: color 0.3s ease;
-}
-
-.developer-card:hover .developer-name {
-  color: #349eb1;
-}
-
-.developer-specialty {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #349eb1;
-  margin-bottom: 15px;
-  padding: 5px 15px;
-  background: #f0f8ff;
-  border-radius: 20px;
-  display: inline-block;
-}
-
-.developer-role {
-  font-size: 1rem;
-  color: #666;
-  line-height: 1.6;
-  text-align: center;
 }
 
 @keyframes slideInFromLeft {

@@ -128,6 +128,7 @@ export default {
     }
   }
 };
+
 </script>
 
 <style scoped>
@@ -397,7 +398,7 @@ body > * {
 }
 
 .step img {
-  width: 120px;
+  width: 85px;
   transition: transform 0.3s ease;
 }
 
@@ -432,11 +433,12 @@ body > * {
   background-color: #012f41;
 }
 
+/*Join Section*/
 .join-section {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background: url("@/assets/school_bg.jpg") no-repeat center center;
+  background: url("@/assets/school_bg.png") no-repeat center center;
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -452,7 +454,7 @@ body > * {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.561);
   backdrop-filter: blur(5px);
   z-index: 1;
 }
@@ -466,14 +468,9 @@ body > * {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   z-index: 2;
-}
-
-.join-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
 }
 
 .learner-card {
@@ -544,61 +541,4 @@ body > * {
   opacity: 0.9;
 }
 
-@media (max-width: 768px) {
-  .intro-content {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .intro-text h1 {
-    font-size: 4rem;
-  }
-
-  .intro-text p {
-    font-size: 2rem;
-  }
-
-  .join-section {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .join-card {
-    width: 90%;
-  }
-
-  .learners-section,
-  .mentors-section {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .learners-section .content-box,
-  .mentors-section .content-box {
-    order: 0;
-    margin-bottom: 20px;
-  }
-
-  .section-image {
-    margin: 0;
-  }
-
-  .learners-image,
-  .mentors-image {
-    width: 250px;
-  }
-
-  .content-box h2 {
-    font-size: 2.5rem;
-  }
-
-  .content-box p {
-    font-size: 1rem;
-  }
-
-  .step {
-    width: 100%;
-    margin-bottom: 30px;
-  }
-}
 </style>

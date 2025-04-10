@@ -17,7 +17,7 @@
             </div>
             <div class="personal-field">
               <label class="personal-label" for="address">ADDRESS</label>
-              <input type="text" id="address" v-model="address" placeholder="Enter your address" class="personal-input" />
+              <input type="text" id="address" v-model="address" placeholder="Enter your Address" class="personal-input" />
             </div>
             <div class="personal-field">
               <label class="personal-label" for="gender">GENDER</label>
@@ -85,49 +85,18 @@
         <div class="profile-grid">
           <div class="profile-col">
             <div class="profile-field">
-              <label class="profile-label">SUBJECTS OF INTEREST</label>
-              <div class="dropdown-wrapper">
-                <div class="dropdown-trigger" @click="toggleSubjectDropdown">
-                  <input type="text" 
-                        v-model="selectedSubjectCategory" 
-                        placeholder="Select subject category" 
-                        class="profile-input"
-                        readonly />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-show="showCategories" class="dropdown-menu categories">
-                  <div v-for="category in categories" 
-                      :key="category.type"
-                      @click="selectCategory(category)"
-                      @mouseenter="showSubjects(category.type)"
-                      class="dropdown-item">
-                    {{ category.name }}
-                    <span class="count-badge" v-if="selectedSubjectsCount[category.type] > 0">
-                      ({{ selectedSubjectsCount[category.type] }})
-                    </span>
-                  </div>
-                </div>
-                
-                <div v-show="showSubjectsDropdown" 
-                    class="dropdown-menu subjects"
-                    @mouseleave="showSubjectsDropdown = false">
-                  <div v-if="currentSubjects.length > 0">
-                    <div v-for="subject in currentSubjects" 
-                        :key="subject" 
-                        class="dropdown-item subject-item">
-                      <input type="checkbox" 
-                            :id="'subject-'+subject" 
-                            :value="subject" 
-                            v-model="selectedSubjects"
-                            @click.stop />
-                      <label :for="'subject-'+subject">{{ subject }}</label>
-                    </div>
-                  </div>
-                  <div v-else class="dropdown-item no-subjects">
-                    No subjects available
-                  </div>
-                </div>
+              <label class="profile-label" for="subjects">SUBJECTS OF INTEREST</label>
+              <div class="subj-dropdown">
+              <div class="dropdown-container" @click="toggleDropdown('subjects')">
+                <input type="text" v-model="selectedSubjectCategory" placeholder="Select subject category" class="profile-input" readonly />
+                <i class="fas fa-chevron-down dropdown-icon"></i>
               </div>
+              <div v-if="dropdownOpen.subjects" class="dropdown-options">
+                <div class="dropdown-option" @click="openSubjectsModal('core')">Core Subjects</div>
+                <div class="dropdown-option" @click="openSubjectsModal('gec')">General Education Course</div>
+                <div class="dropdown-option" @click="openSubjectsModal('peNstp')">Physical Education & NSTP</div>
+              </div>
+            </div>
             </div>
             <div class="profile-field">
               <label class="profile-label" for="availability-days">DAYS OF AVAILABILITY</label>
@@ -223,6 +192,38 @@
         </div>
       </div>
 
+      <!-- Subjects Modal -->
+      <div v-if="showSubjectsModal" class="SJmodal-overlay" @click="closeSubjectsModal">
+        <div class="SJmodal-content" @click.stop>
+          <h3>Select Subjects</h3>
+          <hr>
+          <div class="subjects-container">
+            <div v-if="selectedSubjectCategory === 'core'" class="subjects-column">
+              <h4>Core Subjects</h4>
+              <div v-for="(subject, index) in availableSubjects.coreSubjects" :key="index" class="checkbox-container">
+                <input type="checkbox" :id="'core-' + subject" :value="subject" v-model="selectedSubjects" />
+                <label :for="'core-' + subject">{{ subject }}</label>
+              </div>
+            </div>
+            <div v-if="selectedSubjectCategory === 'gec'" class="subjects-column">
+              <h4>General Education Course</h4>
+              <div v-for="(subject, index) in availableSubjects.gecSubjects" :key="index" class="checkbox-container">
+                <input type="checkbox" :id="'gec-' + subject" :value="subject" v-model="selectedSubjects" />
+                <label :for="'gec-' + subject">{{ subject }}</label>
+              </div>
+            </div>
+            <div v-if="selectedSubjectCategory === 'peNstp'" class="subjects-column">
+              <h4>Physical Education & NSTP</h4>
+              <div v-for="(subject, index) in availableSubjects.peNstpSubjects" :key="index" class="checkbox-container">
+                <input type="checkbox" :id="'pe-' + subject" :value="subject" v-model="selectedSubjects" />
+                <label :for="'pe-' + subject">{{ subject }}</label>
+              </div>
+            </div>
+          </div>
+          <button class="done-button" @click="confirmSubjects">Done</button>
+        </div>
+      </div>
+
       <!-- Step Indicator -->
       <div class="step-indicator-container">
         <div class="step-indicator">
@@ -265,22 +266,8 @@ export default {
       goals: '',
       profileImage: null,
       profilePictureName: '',
-      
-      categories: [
-        { type: 'core', name: 'Core Subjects' },
-        { type: 'gec', name: 'General Education Course' },
-        { type: 'peNstp', name: 'Physical Education & NSTP' }
-      ],
-      showCategories: false,
-      showSubjectsDropdown: false,
-      currentSubjects: [],
+      showSubjectsModal: false,
       selectedSubjectCategory: '',
-      selectedSubjectsCount: {
-        core: 0,
-        gec: 0,
-        peNstp: 0
-      },
-
       dropdownOpen: {
         gender: false,
         yearLevel: false,
@@ -288,92 +275,36 @@ export default {
         modality: false,
         availability: false,
         learningStyle: false,
-        sessionDuration: false
-      }
+        sessionDuration: false,
+        subjects: false,
+      },
+      programs: [
+        "Bachelor of Science in Information Technology (BSIT)",
+        "Bachelor of Science in Computer Science (BSCS)",
+        "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)"
+      ],
     };
   },
-
   computed: {
     availabilityDaysDisplay() {
       return this.selectedDays.join(', ') || 'Select available days';
     },
     learningStyleDisplay() {
       return this.selectedsessionStyles.join(', ') || 'Select learning style(s)';
-    },
-    isFormComplete() {
-      if (this.currentStep === 1) {
-        return this.fullName.trim() && 
-               this.gender && 
-               (this.gender !== 'Other' || this.otherGender.trim()) && 
-               this.yearLevel && 
-               this.program && 
-               this.contactNumber?.length === 11 && 
-               this.address.trim();
-      }
-      return this.selectedSubjects.length > 0 && 
-             this.modality && 
-             this.selectedDays.length > 0 && 
-             this.selectedsessionStyles.length > 0 && 
-             this.sessionDuration && 
-             this.bio.trim() && 
-             this.goals.trim() && 
-             this.profileImage;
     }
   },
-
   methods: {
-    toggleSubjectDropdown() {
-      this.showCategories = !this.showCategories;
-      this.showSubjectsDropdown = false;
-    },
-    
-    selectCategory(category) {
-      this.selectedSubjectCategory = category.name;
-      this.showCategories = false;
-      this.showSubjects(category.type);
-      this.updateSelectedCounts();
-    },
-    
-    showSubjects(categoryType) {
-      switch(categoryType) {
-        case 'core':
-          this.currentSubjects = this.availableSubjects.coreSubjects;
-          break;
-        case 'gec':
-          this.currentSubjects = this.availableSubjects.gecSubjects;
-          break;
-        case 'peNstp':
-          this.currentSubjects = this.availableSubjects.peNstpSubjects;
-          break;
-      }
-      this.showSubjectsDropdown = true;
-    },
-
-    updateSelectedCounts() {
-      this.selectedSubjectsCount.core = this.selectedSubjects.filter(sub => 
-        this.availableSubjects.coreSubjects.includes(sub)
-      ).length;
-      
-      this.selectedSubjectsCount.gec = this.selectedSubjects.filter(sub => 
-        this.availableSubjects.gecSubjects.includes(sub)
-      ).length;
-      
-      this.selectedSubjectsCount.peNstp = this.selectedSubjects.filter(sub => 
-        this.availableSubjects.peNstpSubjects.includes(sub)
-      ).length;
-    },
-
     validateForm() {
       const errors = [];
       
       if (this.currentStep === 1) {
-        if (!this.fullName.trim()) errors.push('Full Name is required');
+        if (!this.fullName) errors.push('Full Name is required');
         if (!this.gender) errors.push('Gender is required');
-        if (this.gender === 'Other' && !this.otherGender.trim()) errors.push('Please specify your gender');
+        if (this.gender === 'Other' && !this.otherGender) errors.push('Please specify your gender');
         if (!this.yearLevel) errors.push('Year Level is required');
         if (!this.program) errors.push('Program is required');
-        if (!this.contactNumber || this.contactNumber.length !== 11) errors.push('Valid Contact Number is required (11 digits)');
-        if (!this.address.trim()) errors.push('Address is required');
+        if (!this.contactNumber || this.contactNumber.length < 11) errors.push('Valid Contact Number is required (11 digits)');
+        if (!this.address) errors.push('Address is required');
       }
       
       if (this.currentStep === 2) {
@@ -382,8 +313,8 @@ export default {
         if (this.selectedDays.length === 0) errors.push('At least one day of availability is required');
         if (this.selectedsessionStyles.length === 0) errors.push('At least one learning style is required');
         if (!this.sessionDuration) errors.push('Preferred Session Duration is required');
-        if (!this.bio.trim()) errors.push('Short Bio is required');
-        if (!this.goals.trim()) errors.push('Learning goals is required');
+        if (!this.bio) errors.push('Short Bio is required');
+        if (!this.goals) errors.push('Learning goals is required');
         if (!this.profileImage) errors.push('Profile Picture is required');
       }
       
@@ -395,71 +326,52 @@ export default {
         this.dropdownOpen[key] = key === type ? !this.dropdownOpen[key] : false;
       }
     },
-    
     selectGender(selectedGender) {
       this.gender = selectedGender;
       this.dropdownOpen.gender = false;
     },
-    
     selectYearLevel(selectedYear) {
       this.yearLevel = selectedYear;
       this.dropdownOpen.yearLevel = false;
     },
-    
     selectProgram(selectedProgram) {
       this.program = selectedProgram;
       this.dropdownOpen.program = false;
       this.updateAvailableSubjects();
     },
-    
     selectModality(selectedModality) {
       this.modality = selectedModality;
       this.dropdownOpen.modality = false;
     },
-    
     selectSessionDuration(duration) {
       this.sessionDuration = duration;
       this.dropdownOpen.sessionDuration = false;
     },
-    
     nextStep() {
-      const validationErrors = this.validateForm();
-      
-      if (validationErrors.length > 0) {
-        alert('Please complete all required fields before proceeding:\n\n' + validationErrors.join('\n'));
-        return;
-      }
-      
       if (this.currentStep < this.totalSteps) {
+        const validationErrors = this.validateForm();
+        
+        if (validationErrors.length > 0) {
+          alert('Please complete all required fields before proceeding:\n\n' + validationErrors.join('\n'));
+          return;
+        }
+        
         this.currentStep++;
       } else {
         this.submitLearnerInfo();
       }
     },
-    
     goToStep(step) {
       if (step <= this.currentStep) {
         this.currentStep = step;
       }
     },
-    
     uploadProfilePicture() {
       this.$refs.profileInput.click();
     },
-    
     handleProfileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        if (!file.type.match('image.*')) {
-          alert('Please select an image file');
-          return;
-        }
-        
-        if (file.size > 2000000) {
-          alert('File size should be less than 2MB');
-          return;
-        }
-        
         this.profilePictureName = file.name;
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -468,7 +380,16 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    
+    openSubjectsModal(category) {
+      this.selectedSubjectCategory = category;
+      this.showSubjectsModal = true;
+    },
+    closeSubjectsModal() {
+      this.showSubjectsModal = false;
+    },
+    confirmSubjects() {
+      this.closeSubjectsModal();
+    },
     updateAvailableSubjects() {
       switch (this.program) {
         case "Bachelor of Science in Information Technology (BSIT)":
@@ -499,30 +420,9 @@ export default {
 
         case "Bachelor of Science in Computer Science (BSCS)":
           this.availableSubjects = {
-            coreSubjects: ["Computer Programming 1", "Computer Programming 2", "Data Structures and Algorithms",
-              "Algorithms and Complexity 1", "Software Engineering 1", "Software Engineering 2",
-              "Operating Systems", "Object-Oriented Programming", "Information Management 1",
-              "Discrete Structures 1", "Discrete Structures 2", "Principles of Statistics and Probability",
-              "Graphics and Visual Computing", "Automata Theory", "Intelligent Systems",
-              "Programming Languages", "Parallel and Distributed Computing",
-              "Architecture and Organization", "Information Assurance and Security",
-              "CS Thesis Writing 1", "CS Thesis Writing 2", 
-              "CS Elective 1", "CS Elective 2", "CS Elective 3", "CS Elective 4", "CS Elective 5",
-              "CS Seminars and Educational Trips"
-             ],
-            gecSubjects: [ "Introduction to Computing", "PC Troubleshooting with Basic Electronics",
-              "Understanding the SELF", "Readings in Philippine History with Indigenous People Studies",
-              "The Life and Works of Jose Rizal", "People and Earth’s Ecosystem",
-              "Mathematics in the Modern World", "Science, Technology and Society",
-              "Reading Visual Arts", "Art Appreciation", "Purposive Communication",
-             "Ethics", "The Contemporary World With Peace Studies"
-          ],
-            peNstpSubjects: ["National Service Training Program 1",
-              "National Service Training Program 2",
-              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
-              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
-              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
+            coreSubjects: ["Algorithms", "Operating Systems", "Software Engineering"],
+            gecSubjects: ["Ethics", "Critical Thinking"],
+            peNstpSubjects: ["National Service Training Program", "Physical Education"]
           };
           break;
 
@@ -541,24 +441,14 @@ export default {
             peNstpSubjects: []
           };
       }
-      this.updateSelectedCounts();
     },
-    
     validateContactNumber() {
       this.contactNumber = this.contactNumber.replace(/\D/g, '');
-      
       if (this.contactNumber.length > 11) {
         this.contactNumber = this.contactNumber.slice(0, 11);
       }
     },
-    
     async submitLearnerInfo() {
-      const finalValidationErrors = this.validateForm();
-      if (finalValidationErrors.length > 0) {
-        alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
-        return;
-      }
-
       try {
         const formData = {
           personalInfo: {
@@ -586,22 +476,6 @@ export default {
 
       } catch (error) {
         console.error('Data collection error:', error);
-        alert('An error occurred while submitting your information. Please try again.');
-      }
-    }
-  },
-
-  watch: {
-    selectedSubjects: {
-      handler() {
-        this.updateSelectedCounts();
-      },
-      deep: true
-    },
-    
-    program(newVal) {
-      if (newVal) {
-        this.updateAvailableSubjects();
       }
     }
   }
@@ -626,6 +500,7 @@ html, body {
   color: white;
 }
 
+/* Container */
 .learnerinfo-container {
   background-image: url("@/assets/bg.png");
   position: fixed;
@@ -668,7 +543,7 @@ html, body {
   min-height: 550px;
   max-height: 650px;
   padding: 1.5rem;
-  background: rgba(0, 89, 105, 0.546);
+  background: rgba(6, 102, 120, 0.5);
   border-radius: 40px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 8px rgba(170, 10, 10, 0.1);
@@ -676,6 +551,7 @@ html, body {
   flex-direction: column;
 }
 
+/* Personal Information Step */
 .title {
   color: #02475E;
   font-size: 1.6rem;
@@ -708,8 +584,8 @@ html, body {
   color: #02475E;
   font-weight: 500;
   font-size: 0.85rem;
-  margin-bottom: 0.6rem;
-  margin-left: 0.3rem;
+  margin-bottom: 0.3rem;
+  margin-left: 0.rem;
 }
 
 .personal-input,
@@ -718,18 +594,16 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
+  background: rgb(255, 255, 255);
   width: 100%;
   transition: all 0.2s ease;
   text-align: left;
-  color: white;
-  font-weight: 600;
 }
 
 .personal-input::placeholder,
 .profile-input::placeholder,
 .gender-specify::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(30, 72, 108, 0.683);
   font-size: 0.80rem;
 }
 
@@ -741,13 +615,15 @@ html, body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
+/* Dropdown Styles */
 .gender-dropdown,
 .year-dropdown,
 .program-dropdown,
 .subjmodality-dropdown,
 .availability-dropdown,
 .learning-style-dropdown,
-.session-duration-dropdown {
+.session-duration-dropdown,
+.subj-dropdown {
   position: relative;
   width: 100%;
 }
@@ -763,7 +639,7 @@ html, body {
   padding: 0.7rem 30px 0.7rem 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
+  background: rgb(255, 255, 255);
   font-size: 0.85rem;
   width: 100%;
   transition: all 0.2s ease;
@@ -778,17 +654,14 @@ html, body {
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.90rem;
+  font-size: 0.85rem;
 }
 
 .dropdown-option {
-  padding: 7px 13px;
+  padding: 0.5rem;
   cursor: pointer;
-  color: #02475E;
+  color: #32809a;
   transition: background-color 0.2s;
-  display: flex;
-  align-items: center; 
-  gap: 13px; 
 }
 
 .dropdown-option:hover {
@@ -799,117 +672,39 @@ html, body {
   color: white;
   font-size: 10px;
   position: absolute;
-  right: 15px;
+  right: 13px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-
-/* Double Dropdown Styles */
-.dropdown-wrapper {
-  position: relative;
+/* Checkbox Dropdown */
+.availability-options,
+.learning-style-options {
+  padding: 0.5rem;
   width: 100%;
 }
 
-.dropdown-trigger {
-  position: relative;
-  cursor: pointer;
+.availability-option,
+.learning-style-option {
   display: flex;
   align-items: center;
-  width: 100%;
-}
-
-.dropdown-trigger input {
-  border: none;
-  outline: none;
-  width: 100%;
-  cursor: pointer;
-  background: transparent;
-  padding: 0.7rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
-  color: white;
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.dropdown-trigger input::placeholder {
-  color: rgba(255, 250, 250, 0.683);
-}
-
-.dropdown-menu {
-  position: absolute;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 100;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.categories {
-  width: 100%;
-  top: 100%;
-  left: 0;
-  margin-top: 1px;
-  font-size: 13px
-}
-
-.subjects {
-  width: 300px;
-  top: 0;
-  left: calc(100% + 2px);
-}
-
-.dropdown-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background 0.2s;
+  padding: 0.5rem;
   color: #02475E;
 }
 
-.dropdown-item:hover {
-  background: #f5f5f5;
+.availability-option input[type="checkbox"],
+.learning-style-option input[type="checkbox"] {
+  margin-right: 0.5rem;
 }
 
-.subject-item {
-  display: flex;
-  align-items: center;
-  font-size: 10px;
-}
-
-.subject-item input[type="checkbox"] {
-  margin-right: 10px;
+.availability-option label,
+.learning-style-option label {
   cursor: pointer;
+  color: #02475E;
+  font-size: 0.85rem;
 }
 
-.subject-item label {
-  cursor: pointer;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.no-subjects {
-  color: #999;
-  font-style: italic;
-}
-
-.dropdown-menu {
-  z-index: 1000;
-}
-
-.count-badge {
-  background-color: #02475E;
-  color: white;
-  border-radius: 10px;
-  padding: 2px 6px;
-  font-size: 0.7em;
-  margin-left: 5px;
-}
-
+/* Profile Information Step*/
 .profile-grid {
   display: flex;
   gap: 2rem;
@@ -943,7 +738,7 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
+  background: rgba(219, 220, 224, 0.382);
   color: white;
   font-size: 0.85rem;
   width: 100%;
@@ -952,7 +747,7 @@ html, body {
 }
 
 .profile-input::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .profile-input:focus {
@@ -967,15 +762,10 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
+  background: rgba(219, 220, 224, 0.382);
   color: white;
   font-size: 0.85rem;
   width: 100%;
-}
-
-.profile-textarea::placeholder{
-  color: rgba(255, 250, 250, 0.683);
-  font-weight: 500;
 }
 
 .profile-textarea:focus {
@@ -984,6 +774,28 @@ html, body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
+.profile-bottom {
+  width: 90%;
+  margin-left: 3rem;
+  margin-top: 1rem;
+  padding-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-bottom-grid {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.profile-bottom-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+}
+
+/* Profile Picture Upload */
 .upload-container {
   display: flex;
   justify-content: space-between;
@@ -1047,7 +859,7 @@ html, body {
   padding: 0.9rem;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 25px;
-  transition: background-color 2s;
+  transition: background-color 5s;
   color: #f9fbfb;
   background: linear-gradient(to bottom, #02475E, #066678);
 }
@@ -1055,7 +867,93 @@ html, body {
 .choose-file-container:hover {
   background: rgba(12, 32, 87, 0.568);
 }
+/* Subjects Modal */
+.SJmodal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.SJmodal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 350px;
+  max-height: 80%;
+  overflow-y: auto;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.SJmodal-content h3 {
+  text-align: center;
+  color: rgb(9, 9, 80);
+  margin-bottom: 10px;
+}
+
+.subjects-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.subjects-column {
+  flex: 1;
+  margin: 0 15px;
+  color: #155577;
+  font-size: 0.8rem;
+}
+
+.subjects-column h4 {
+  margin-bottom: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #155577;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.checkbox-container input {
+  margin-right: 8px;
+}
+
+.checkbox-container label {
+  color: #155577;
+  font-size: 0.8rem;
+}
+
+.done-button {
+  background-color: #155577;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 120px;
+  align-self: center;
+  margin-top: 20px;
+}
+
+.done-button:hover {
+  background-color: #032c58;
+}
+
+/* Step Indicator */
 .step-indicator-container {
   position: absolute;
   bottom: 15px;
@@ -1089,6 +987,7 @@ html, body {
   background-color: rgba(2, 71, 94, 0.6);
 }
 
+/* Next/Submit Button */
 .next-button { 
   position: fixed;
   bottom: 15px;
@@ -1120,6 +1019,7 @@ html, body {
   font-weight: 900;
 }
 
+/* Pahabol kjfhhksvbfsv */
 .gender-specify {
   padding: 0.7rem;
   border-radius: 20px;
@@ -1140,10 +1040,4 @@ html, body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
-.validation-error {
-  color: #ff6b6b;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  margin-left: 0.5rem;
-}
 </style>
