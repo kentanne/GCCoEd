@@ -16,12 +16,8 @@
               <input type="text" id="full-name" v-model="fullName" placeholder="Enter your full name (FN MI LN)" class="personal-input" />
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="city">CITY/MUNICIPALITY</label>
-              <input type="text" id="city" v-model="city" placeholder="Enter your city/municipality" class="personal-input" />
-            </div>
-            <div class="personal-field">
-              <label class="personal-label" for="barangay">BARANGAY</label>
-              <input type="text" id="barangay" v-model="barangay" placeholder="Enter your barangay" class="personal-input" />
+              <label class="personal-label" for="address">ADDRESS</label>
+              <input type="text" id="address" v-model="address" placeholder="Enter your address" class="personal-input" />
             </div>
             <div class="personal-field">
               <label class="personal-label" for="gender">GENDER</label>
@@ -60,26 +56,10 @@
               </div>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="department">DEPARTMENT </label>
-              <div class="department-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('department')">
-                  <input type="text" v-model="department" placeholder="Select your department" class="personal-input" readonly />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.department" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectDepartment('College of Allied Health Studies (CAHS)')">College of Allied Health Studies (CAHS)</div>
-                  <div class="dropdown-option" @click="selectDepartment('College of Business and Accountancy (CBA)')">College of Business and Accountancy (CBA)</div>
-                  <div class="dropdown-option" @click="selectDepartment('College of Computer Studies (CCS)')">College of Computer Studies (CCS)</div>
-                  <div class="dropdown-option" @click="selectDepartment('College of Education, Arts, and Sciences (CEAS)')">College of Education, Arts, and Sciences (CEAS)</div>
-                  <div class="dropdown-option" @click="selectDepartment('College of Hospitality and Tourism Management (CHTM)')">College of Hospitality and Tourism Management (CHTM)</div>
-                </div>
-              </div>
-            </div>
-            <div class="personal-field">
               <label class="personal-label" for="program">PROGRAM </label>
               <div class="program-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('program')" :disabled="!department">
-                  <input type="text" v-model="program" placeholder="Select your program" class="personal-input" readonly :disabled="!department" />
+                <div class="dropdown-container" @click="toggleDropdown('program')">
+                  <input type="text" v-model="program" placeholder="Select your program" class="personal-input" readonly />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.program" class="dropdown-options">
@@ -103,7 +83,48 @@
           <div class="profile-col">
             <div class="profile-field">
               <label class="profile-label" for="subjects">SUBJECTS OFFERED</label>
-              <button @click="openSubjectsModal" class="profile-input" :disabled="!program">Select Subjects</button>
+              <div class="dropdown-wrapper">
+                <div class="dropdown-trigger" @click="toggleSubjectDropdown">
+                  <input type="text" 
+                        v-model="selectedSubjectCategory" 
+                        placeholder="Select subject category" 
+                        class="profile-input"
+                        readonly />
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div v-show="showCategories" class="dropdown-menu categories">
+                  <div v-for="category in categories" 
+                      :key="category.type"
+                      @click="selectCategory(category)"
+                      @mouseenter="showSubjects(category.type)"
+                      class="dropdown-item">
+                    {{ category.name }}
+                    <span class="count-badge" v-if="selectedSubjectsCount[category.type] > 0">
+                      ({{ selectedSubjectsCount[category.type] }})
+                    </span>
+                  </div>
+                </div>
+                
+                <div v-show="showSubjectsDropdown" 
+                    class="dropdown-menu subjects"
+                    @mouseleave="showSubjectsDropdown = false">
+                  <div v-if="currentSubjects.length > 0">
+                    <div v-for="subject in currentSubjects" 
+                        :key="subject" 
+                        class="dropdown-item subject-item">
+                      <input type="checkbox" 
+                            :id="'subject-'+subject" 
+                            :value="subject" 
+                            v-model="selectedSubjects"
+                            @click.stop />
+                      <label :for="'subject-'+subject">{{ subject }}</label>
+                    </div>
+                  </div>
+                  <div v-else class="dropdown-item no-subjects">
+                    No subjects available
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="profile-field">
               <label class="profile-label" for="modality">TEACHING MODALITY </label>
@@ -153,11 +174,11 @@
             <div class="profile-field">
               <label class="profile-label" for="teaching-style">TEACHING STYLE </label>
               <div class="teaching-style-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('teachingStyle')">
-                  <input type="text" id="teaching-style" v-model="teachingStyleDisplay" placeholder="Select teaching style(s)" class="profile-input" readonly />
+                <div class="dropdown-container" @click="toggleDropdown('learningStyle')">
+                  <input type="text" id="teaching-style" v-model="learningStyleDisplay" placeholder="Select teaching style(s)" class="profile-input" readonly />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div v-if="dropdownOpen.teachingStyle" class="dropdown-options teaching-style-options">
+                <div v-if="dropdownOpen.learningStyle" class="dropdown-options teaching-style-options">
                   <div v-for="style in sessionStyles" :key="style" class="dropdown-option teaching-style-option">
                     <input type="checkbox" :id="'style-' + style" :value="style" v-model="selectedsessionStyles" @click.stop />
                     <label :for="'style-' + style">{{ style }}</label>
@@ -232,36 +253,6 @@
         </div>
       </div>
 
-      <!-- Subjects Modal -->
-      <div v-if="showSubjectsModal" class="SJmodal-overlay" @click="closeSubjectsModal">
-        <div class="SJmodal-content" @click.stop>
-          <h3>Select Subjects</h3>
-          <div class="subjects-container">
-            <div class="subjects-column">
-              <h4>Core Subjects</h4>
-              <div v-for="(subject, index) in availableSubjects.coreSubjects" :key="index" class="checkbox-container">
-                <input type="checkbox" :id="'core-' + subject" :value="subject" v-model="selectedSubjects" />
-                <label :for="'core-' + subject">{{ subject }}</label>
-              </div>
-            </div>
-            <div class="subjects-column">
-              <h4>General Education Course</h4>
-              <div v-for="(subject, index) in availableSubjects.gecSubjects" :key="index" class="checkbox-container">
-                <input type="checkbox" :id="'gec-' + subject" :value="subject" v-model="selectedSubjects" />
-                <label :for="'gec-' + subject">{{ subject }}</label>
-              </div>
-            </div>
-            <div class="subjects-column">
-              <h4>Physical Education & NSTP</h4>
-              <div v-for="(subject, index) in availableSubjects.peNstpSubjects" :key="index" class="checkbox-container">
-                <input type="checkbox" :id="'pe-' + subject" :value="subject" v-model="selectedSubjects" />
-                <label :for="'pe-' + subject">{{ subject }}</label>
-              </div>
-            </div>
-          </div>
-          <button class="done-button" @click="confirmSubjects">Done</button>
-        </div>
-      </div>
 
       <!-- File List Modal -->
       <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
@@ -316,82 +307,160 @@ export default {
       gender: '',
       otherGender: '',
       yearLevel: '',
-      department: '',
       program: '',
       contactNumber: '',
-      city: '',
-      barangay: '',
+      address: '',
       selectedSubjects: [],
-      availableSubjects: [],
+      availableSubjects: {
+        coreSubjects: [],
+        gecSubjects: [],
+        peNstpSubjects: []
+      },
       modality: '',
       selectedDays: [],
       daysOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       bio: '',
-      proficiency: '',
+      proficiency: '', 
       selectedsessionStyles: [],
-      sessionStyles: ['Lecture-Based', 'Interactive Discussion (hands-on)','Q&A Session','Demonstration', 'Project-based', 'Step-by-step process'],
-
+      sessionStyles: ['Lecture-Based', 'Interactive Discussion (hands-on)', 'Q&A Session', 'Demonstration', 'Project-based', 'Step-by-step process'],
       sessionDuration: '',
-      experience: '',
+      experience: '', 
       profileImage: null,
       profilePictureName: '',
-      credentials: [],
-      showFileList: false,
-      showSubjectsModal: false,
-      showStatusPopup: false,
-      isSubmitted: false,
+      credentials: [], 
+      showFileList: false, 
+      
+      categories: [
+        { type: 'core', name: 'Core Subjects' },
+        { type: 'gec', name: 'General Education Course' },
+        { type: 'peNstp', name: 'Physical Education & NSTP' }
+      ],
+      showCategories: false,
+      showSubjectsDropdown: false,
+      currentSubjects: [],
+      selectedSubjectCategory: '',
+      selectedSubjectsCount: {
+        core: 0,
+        gec: 0,
+        peNstp: 0
+      },
+
       dropdownOpen: {
         gender: false,
         yearLevel: false,
-        department: false,
         program: false,
         modality: false,
-        proficiency: false,
+        proficiency: false, 
         availability: false,
-        teachingStyle: false,
-        sessionDuration: false,
+        learningStyle: false,
+        sessionDuration: false
       },
-      programs: [],
-      coreSubjects: [],
-      gecSubjects: [],
-      peNstpSubjects: [],
+      programs: [
+        "Bachelor of Science in Information Technology (BSIT)",
+        "Bachelor of Science in Computer Science (BSCS)",
+        "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)"
+      ],
+      showStatusPopup: false, 
+      isSubmitted: false 
     };
   },
+
   computed: {
     availabilityDaysDisplay() {
       return this.selectedDays.join(', ') || 'Select available days';
     },
-    teachingStyleDisplay() {
+    learningStyleDisplay() { 
       return this.selectedsessionStyles.join(', ') || 'Select teaching style(s)';
+    },
+    isFormComplete() {
+      if (this.currentStep === 1) {
+        return this.fullName.trim() && 
+               this.gender && 
+               (this.gender !== 'Other' || this.otherGender.trim()) && 
+               this.yearLevel && 
+               this.program && 
+               this.contactNumber?.length === 11 && 
+               this.address.trim();
+      }
+      return this.selectedSubjects.length > 0 && 
+             this.modality && 
+             this.selectedDays.length > 0 && 
+             this.selectedsessionStyles.length > 0 && 
+             this.proficiency &&
+             this.sessionDuration && 
+             this.bio.trim() && 
+             this.experience.trim() && 
+             this.profileImage &&
+             this.credentials.length > 0; 
     }
   },
+
   methods: {
+    toggleSubjectDropdown() {
+      this.showCategories = !this.showCategories;
+      this.showSubjectsDropdown = false;
+    },
+    
+    selectCategory(category) {
+      this.selectedSubjectCategory = category.name;
+      this.showCategories = false;
+      this.showSubjects(category.type);
+      this.updateSelectedCounts();
+    },
+    
+    showSubjects(categoryType) {
+      switch(categoryType) {
+        case 'core':
+          this.currentSubjects = this.availableSubjects.coreSubjects;
+          break;
+        case 'gec':
+          this.currentSubjects = this.availableSubjects.gecSubjects;
+          break;
+        case 'peNstp':
+          this.currentSubjects = this.availableSubjects.peNstpSubjects;
+          break;
+      }
+      this.showSubjectsDropdown = true;
+    },
+
+    updateSelectedCounts() {
+      this.selectedSubjectsCount.core = this.selectedSubjects.filter(sub => 
+        this.availableSubjects.coreSubjects.includes(sub)
+      ).length;
+      
+      this.selectedSubjectsCount.gec = this.selectedSubjects.filter(sub => 
+        this.availableSubjects.gecSubjects.includes(sub)
+      ).length;
+      
+      this.selectedSubjectsCount.peNstp = this.selectedSubjects.filter(sub => 
+        this.availableSubjects.peNstpSubjects.includes(sub)
+      ).length;
+    },
+
     validateForm() {
       const errors = [];
       
       if (this.currentStep === 1) {
-        if (!this.fullName) errors.push('Full Name is required');
+        if (!this.fullName.trim()) errors.push('Full Name is required');
         if (!this.gender) errors.push('Gender is required');
-        if (this.gender === 'Other' && !this.otherGender) errors.push('Please specify your gender');
+        if (this.gender === 'Other' && !this.otherGender.trim()) errors.push('Please specify your gender');
         if (!this.yearLevel) errors.push('Year Level is required');
-        if (!this.department) errors.push('Department is required');
         if (!this.program) errors.push('Program is required');
-        if (!this.contactNumber || this.contactNumber.length < 11) errors.push('Valid Contact Number is required (11 digits)');
-        if (!this.city) errors.push('City/Municipality is required');
-        if (!this.barangay) errors.push('Barangay is required');
+        if (!this.contactNumber || this.contactNumber.length !== 11) errors.push('Valid Contact Number is required (11 digits)');
+        if (!this.address.trim()) errors.push('Address is required');
       }
       
       if (this.currentStep === 2) {
         if (this.selectedSubjects.length === 0) errors.push('At least one subject is required');
         if (!this.modality) errors.push('Teaching Modality is required');
         if (this.selectedDays.length === 0) errors.push('At least one day of availability is required');
-        if (!this.proficiency) errors.push('Proficiency Level is required');
         if (this.selectedsessionStyles.length === 0) errors.push('At least one teaching style is required');
+        if (!this.proficiency) errors.push('Proficiency level is required'); 
         if (!this.sessionDuration) errors.push('Preferred Session Duration is required');
-        if (!this.bio) errors.push('Short Bio is required');
-        if (!this.experience) errors.push('Tutoring Experience is required');
+        if (!this.bio.trim()) errors.push('Short Bio is required');
+        if (!this.experience.trim()) errors.push('Tutoring experience is required');
         if (!this.profileImage) errors.push('Profile Picture is required');
-        if (this.credentials.length === 0) errors.push('At least one credential is required');
+        if (this.credentials.length === 0) errors.push('At least one credential is required'); 
       }
       
       return errors;
@@ -402,68 +471,76 @@ export default {
         this.dropdownOpen[key] = key === type ? !this.dropdownOpen[key] : false;
       }
     },
+    
     selectGender(selectedGender) {
       this.gender = selectedGender;
       this.dropdownOpen.gender = false;
     },
+    
     selectYearLevel(selectedYear) {
       this.yearLevel = selectedYear;
       this.dropdownOpen.yearLevel = false;
     },
-    selectDepartment(selectedDepartment) {
-      this.department = selectedDepartment;
-      this.dropdownOpen.department = false;
-      this.updatePrograms();
-    },
+    
     selectProgram(selectedProgram) {
       this.program = selectedProgram;
       this.dropdownOpen.program = false;
       this.updateAvailableSubjects();
     },
+    
     selectModality(selectedModality) {
       this.modality = selectedModality;
       this.dropdownOpen.modality = false;
     },
-    selectProficiency(selectedProficiency) {
+    
+    selectProficiency(selectedProficiency) { 
       this.proficiency = selectedProficiency;
       this.dropdownOpen.proficiency = false;
     },
+    
     selectSessionDuration(duration) {
       this.sessionDuration = duration;
       this.dropdownOpen.sessionDuration = false;
     },
-    handleGenderChange() {
-      if (this.gender === 'Other') {
-        this.otherGender = '';
-      } else {
-        this.otherGender = '';
-      }
-    },
+    
     nextStep() {
+      const validationErrors = this.validateForm();
+      
+      if (validationErrors.length > 0) {
+        alert('Please complete all required fields before proceeding:\n\n' + validationErrors.join('\n'));
+        return;
+      }
+      
       if (this.currentStep < this.totalSteps) {
-        const validationErrors = this.validateForm();
-        
-        if (validationErrors.length > 0) {
-          alert('Please complete all required fields before proceeding:\n\n' + validationErrors.join('\n'));
-          return;
-        }
-        
         this.currentStep++;
       } else {
-        this.submitApplication();
+        this.submitApplication(); 
       }
     },
+    
     goToStep(step) {
       if (step <= this.currentStep) {
         this.currentStep = step;
       }
     },
+    
     uploadProfilePicture() {
       this.$refs.profileInput.click();
     },
+    
     handleProfileUpload(event) {
       const file = event.target.files[0];
       if (file) {
+        if (!file.type.match('image.*')) {
+          alert('Please select an image file');
+          return;
+        }
+        
+        if (file.size > 2000000) {
+          alert('File size should be less than 2MB');
+          return;
+        }
+        
         this.profilePictureName = file.name;
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -472,183 +549,31 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    uploadCredentials() {
+    
+    uploadCredentials() { 
       this.$refs.credentialInput.click();
     },
-    handleCredentialUpload(event) {
+    
+    handleCredentialUpload(event) { 
       const files = Array.from(event.target.files);
       this.credentials.push(...files);
     },
-    deleteCredential(index) {
+    
+    deleteCredential(index) { 
       this.credentials.splice(index, 1);
     },
-    toggleFileList() {
-      this.showFileList = true;
+    
+    toggleFileList() { 
+      this.showFileList = !this.showFileList;
     },
-    closeFileList() {
+    
+    closeFileList() { 
       this.showFileList = false;
     },
-    openSubjectsModal() {
-      if (!this.program) {
-        alert("Please select a program first.");
-        return;
-      }
-      this.showSubjectsModal = true;
-    },
-    closeSubjectsModal() {
-      this.showSubjectsModal = false;
-    },
-    confirmSubjects() {
-      this.closeSubjectsModal();
-    },
-    updatePrograms() {
-      switch (this.department) {
-        case "College of Allied Health Studies (CAHS)": 
-          this.programs = ["Bachelor of Science in Nursing", "Bachelor of Science in Midwifery"]; break;
-        case "College of Business and Accountancy (CBA)": 
-          this.programs = ["Bachelor of Science in Accountancy", "Bachelor of Science in Business Administration Major in Financial Management", "Bachelor of Science in Business Administration Major in Human Resource Management", "Bachelor of Science in Business Administration Major in Marketing Management", "Bachelor of Science in Customs Administration"]; break;
-        case "College of Computer Studies (CCS)": 
-          this.programs = ["Bachelor of Science in Computer Science", "Bachelor of Science in Entertainment and Multimedia Computing", "Bachelor of Science in Information Technology"]; break;
-        case "College of Education, Arts, and Sciences (CEAS)": 
-          this.programs = ["Bachelor of Arts in Communication", "Bachelor of Early Childhood Education", "Bachelor of Culture and Arts Education", "Bachelor of Physical Education", "Bachelor of Elementary Education (General Education)", "Bachelor of Secondary Education major in English", "Bachelor of Secondary Education major in Filipino", "Bachelor of Secondary Education major in Mathematics", "Bachelor of Secondary Education major in Social Studies", "Bachelor of Secondary Education major in Sciences", "Teacher Certificate Program (TCP)"]; break;
-        case "College of Hospitality and Tourism Management (CHTM)": 
-          this.programs = ["Bachelor of Science in Hospitality Management", "Bachelor of Science in Tourism Management"];
-          break;
-        default:
-          this.programs = [];
-      }
-      this.program = '';
-    },
+    
     updateAvailableSubjects() {
       switch (this.program) {
-        case "Bachelor of Science in Nursing":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Anatomy", "Physiology", "Nursing Fundamentals", "Pharmacology", 
-              "Medical-Surgical Nursing", "Pediatric Nursing", "Maternal and Child Nursing", 
-              "Community Health Nursing", "Mental Health Nursing"
-            ],
-            gecSubjects: [
-              "Art Appreciation", "Ethics", "Psychology"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 1"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Midwifery":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Midwifery Theory", "Maternal Health", "Newborn Care"
-            ],
-            gecSubjects: [
-              "Ethics", "Health Education"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 2"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Accountancy":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Financial Accounting", "Cost Accounting", "Taxation"
-            ],
-            gecSubjects: [
-              "Business Law", "Economics"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 3"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Business Administration Major in Financial Management":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Financial Management", "Investment Analysis", "Corporate Finance"
-            ],
-            gecSubjects: [
-              "Marketing Principles", "Business Ethics"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 4"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Business Administration Major in Human Resource Management":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Human Resource Management", "Organizational Behavior", "Labor Relations"
-            ],
-            gecSubjects: [
-              "Business Communication", "Psychology"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 1"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Business Administration Major in Marketing Management":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Marketing Principles", "Consumer Behavior", "Digital Marketing"
-            ],
-            gecSubjects: [
-              "Advertising", "Sales Management"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 2"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Customs Administration":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Customs Laws", "Tariff and Trade", "Customs Procedures"
-            ],
-            gecSubjects: [
-              "International Trade", "Business Law"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 3"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Computer Science":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Data Structures", "Algorithms", "Database Management"
-            ],
-            gecSubjects: [
-              "Software Engineering", "Web Development"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 4"
-            ]
-          };
-          break;
-
-        case "Bachelor of Science in Entertainment and Multimedia Computing":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Game Development", "Animation", "Multimedia Design"
-            ],
-            gecSubjects: [
-              "Digital Media", "Graphic Design"
-            ],
-            peNstpSubjects: [
-              "National Service Training Program", "Physical Activities Toward Health and Fitness 1"
-            ]
-          };
-          break;
-        case "Bachelor of Science in Information Technology":
+        case "Bachelor of Science in Information Technology (BSIT)":
           this.availableSubjects = {
             coreSubjects: ["Application Development and Emerging Technologies", "Business Analytics", "Computer Programming 1", "Computer Programming 2", 
               "Data Structures and Algorithms", "Digital Design with Multimedia Systems", "Discrete Structures 1", "Event Driven Programming", 
@@ -660,196 +585,151 @@ export default {
               "Quantitative Methods (Inc. Modelling & Simulation)", "Social Issues and Professional Practice in Computing", 
               "System Administration and Maintenance", "Systems Integration and Architecture 1"
             ],
-            gecSubjects: [
-              "Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
+            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
               "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
               "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
               "The Life and Works of Rizal", "Understanding the Self"
             ],
-            peNstpSubjects: [
-              "National Service Training Program with Anti-Smoking and Environmental Education", 
+            peNstpSubjects: ["National Service Training Program with Anti-Smoking and Environmental Education", 
               "National Service Training Program with GAD and Peace Education", 
               "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency", 
               "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities", 
               "Physical Activities Toward Health and Fitness 3 (PATHFit 3)", 
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"
-            ]
-          };
-          break;
-        case "Bachelor of Arts in Communication":
-          this.availableSubjects = {
-            coreSubjects: ["Public Speaking", "Media Studies", "Interpersonal Communication"],
-            gecSubjects: ["Ethics", "Digital Media"],
-            peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 1"]
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
           };
           break;
 
-        case "Bachelor of Early Childhood Education":
+        case "Bachelor of Science in Computer Science (BSCS)":
           this.availableSubjects = {
-            coreSubjects: ["Child Development", "Curriculum Planning", "Classroom Management"],
-            gecSubjects: ["Family and Community Relations", "Creative Arts"],
-            peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 2"]
+            coreSubjects: ["Computer Programming 1", "Computer Programming 2", "Data Structures and Algorithms",
+              "Algorithms and Complexity 1", "Software Engineering 1", "Software Engineering 2",
+              "Operating Systems", "Object-Oriented Programming", "Information Management 1",
+              "Discrete Structures 1", "Discrete Structures 2", "Principles of Statistics and Probability",
+              "Graphics and Visual Computing", "Automata Theory", "Intelligent Systems",
+              "Programming Languages", "Parallel and Distributed Computing",
+              "Architecture and Organization", "Information Assurance and Security",
+              "CS Thesis Writing 1", "CS Thesis Writing 2", 
+              "CS Elective 1", "CS Elective 2", "CS Elective 3", "CS Elective 4", "CS Elective 5",
+              "CS Seminars and Educational Trips"
+             ],
+            gecSubjects: [ "Introduction to Computing", "PC Troubleshooting with Basic Electronics",
+              "Understanding the SELF", "Readings in Philippine History with Indigenous People Studies",
+              "The Life and Works of Jose Rizal", "People and Earth’s Ecosystem",
+              "Mathematics in the Modern World", "Science, Technology and Society",
+              "Reading Visual Arts", "Art Appreciation", "Purposive Communication",
+             "Ethics", "The Contemporary World With Peace Studies"
+          ],
+            peNstpSubjects: ["National Service Training Program 1",
+              "National Service Training Program 2",
+              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
+              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
+              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
           };
           break;
 
-        case "Bachelor of Culture and Arts Education":
+        case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
           this.availableSubjects = {
-            coreSubjects: ["Art Education", "Cultural Studies", "Creative Arts"],
-            gecSubjects: ["History of Art", "Music Appreciation"],
-            peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 3"]
+            coreSubjects: ["Game Development", "Animation", "Multimedia Design"],
+            gecSubjects: ["Art Appreciation", "Digital Media"],
+            peNstpSubjects: ["National Service Training Program", "Physical Education"]
           };
           break;
 
-        case "Bachelor of Physical Education":
+        default:
           this.availableSubjects = {
-            coreSubjects: ["Sports Science", "Physical Fitness", "Coaching"],
-            gecSubjects: ["Health Education", "Recreation Management"],
-            peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 4"]
+            coreSubjects: [],
+            gecSubjects: [],
+            peNstpSubjects: []
           };
-          break;
+      }
+      this.updateSelectedCounts();
+    },
+    
+    validateContactNumber() {
+      this.contactNumber = this.contactNumber.replace(/\D/g, '');
+      
+      if (this.contactNumber.length > 11) {
+        this.contactNumber = this.contactNumber.slice(0, 11);
+      }
+    },
+    
+    async submitApplication() {
+      const finalValidationErrors = this.validateForm();
+      if (finalValidationErrors.length > 0) {
+        alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
+        return;
+      }
 
-        case "Bachelor of Elementary Education (General Education)":
-          this.availableSubjects = {
-            coreSubjects: ["Teaching Strategies", "Child Psychology", "Literacy Education"],
-            gecSubjects: ["Mathematics for Teachers", "Science for Teachers"],
-            peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 1"]
-          };
-          break;
+      try {
+        const formData = {
+          personalInfo: {
+            fullName: this.fullName,
+            gender: this.gender === 'Other' ? this.otherGender : this.gender,
+            yearLevel: this.yearLevel,
+            program: this.program,
+            contactNumber: this.contactNumber,
+            address: this.address,
+            subjects: this.selectedSubjects
+          },
+          profileInfo: {
+            modality: this.modality,
+            availabilityDays: this.selectedDays,
+            bio: this.bio,
+            proficiency: this.proficiency, 
+            learningStyles: this.selectedsessionStyles, 
+            sessionDuration: this.sessionDuration,
+            experience: this.experience, 
+            profileImage: this.profileImage,
+            credentials: this.credentials 
+          }
+        };
 
-        case "Bachelor of Secondary Education major in English":
-          this.availableSubjects = {
-            coreSubjects: ["Teaching English", "Literature", "Language Arts"],
-            gecSubjects: ["Creative Writing","Literature", "Language Arts"]
-          };
-            break;
+        console.log('Mentor application submitted:', formData);
+        this.sendEmailToAdmin(formData);
+        this.showStatusPopup = true;
+        this.isSubmitted = true;
 
-case "Bachelor of Secondary Education major in Filipino":
-  this.availableSubjects = {
-    coreSubjects: ["Teaching Filipino", "Filipino Literature", "Language and Culture"],
-    gecSubjects: ["Translation Studies", "Filipino History"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 3"]
-  };
-  break;
-
-case "Bachelor of Secondary Education major in Mathematics":
-  this.availableSubjects = {
-    coreSubjects: ["Teaching Mathematics", "Statistics", "Calculus"],
-    gecSubjects: ["Mathematics for Teachers", "Mathematical Reasoning"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 4"]
-  };
-  break;
-
-case "Bachelor of Secondary Education major in Social Studies":
-  this.availableSubjects = {
-    coreSubjects: ["Teaching Social Studies", "History", "Geography"],
-    gecSubjects: ["Civics", "Economics"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 1"]
-  };
-  break;
-
-case "Bachelor of Secondary Education major in Sciences":
-  this.availableSubjects = {
-    coreSubjects: ["Teaching Science", "Biology", "Chemistry"],
-    gecSubjects: ["Environmental Science", "Physics for Teachers"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 2"]
-  };
-  break;
-
-case "Teacher Certificate Program (TCP)":
-  this.availableSubjects = {
-    coreSubjects: ["Teaching Methodologies", "Classroom Management", "Assessment"],
-    gecSubjects: ["Educational Psychology", "Curriculum Development"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 3"]
-  };
-  break;
-
-case "Bachelor of Science in Hospitality Management":
-  this.availableSubjects = {
-    coreSubjects: ["Food and Beverage Management", "Hotel Operations", "Event Management"],
-    gecSubjects: ["Marketing Principles", "Business Law"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 4"]
-  };
-  break;
-
-case "Bachelor of Science in Tourism Management":
-  this.availableSubjects = {
-    coreSubjects: ["Tourism Planning", "Travel Management", "Sustainable Tourism"],
-    gecSubjects: ["Hospitality Marketing", "Cultural Heritage Management"],
-    peNstpSubjects: ["National Service Training Program", "Physical Activities Toward Health and Fitness 1"]
-  };
-  break;
-default:
-  this.availableSubjects = [];
-}
-},
-validateContactNumber() {
-this.contactNumber = this.contactNumber.replace(/\D/g, '');
-if (this.contactNumber.length > 11) {
-this.contactNumber = this.contactNumber.slice(0, 11);
-}
-},
-
-
-async submitApplication() {
-const validationErrors = this.validateForm();
-
-if (validationErrors.length > 0) {
-alert('Please complete all required fields:\n\n' + validationErrors.join('\n'));
-return;
-}
-
-try {
-const formData = {
-  personalInfo: {
-    fullName: this.fullName,
-    gender: this.gender === 'Other' ? this.otherGender : this.gender,
-    yearLevel: this.yearLevel,
-    department: this.department,
-    program: this.program,
-    contactNumber: this.contactNumber,
-    city: this.city,
-    barangay: this.barangay,
-    subjects: this.selectedSubjects
+      } catch (error) {
+        console.error('Application submission error:', error);
+        alert('An error occurred while submitting your application. Please try again.');
+      }
+    },
+    
+    sendEmailToAdmin(formData) { 
+      console.log('Sending email to admin with application data:', formData);
+    },
+    
+    closeStatusPopup() { 
+      this.showStatusPopup = false;
+    },
+    
+    proceedToHome() {
+      this.$router.push('/');
+    }
   },
-  profileInfo: {
-    modality: this.modality,
-    availabilityDays: this.selectedDays,
-    bio: this.bio,
-    proficiency: this.proficiency,
-    sessionStyles: this.selectedsessionStyles,
-    sessionDuration: this.sessionDuration,
-    experience: this.experience,
-    profileImage: this.profileImage,
-    credentials: this.credentials
+
+  watch: {
+    selectedSubjects: {
+      handler() {
+        this.updateSelectedCounts();
+      },
+      deep: true
+    },
+    
+    program(newVal) {
+      if (newVal) {
+        this.updateAvailableSubjects();
+      }
+    },
+    
+    gender(newVal) {
+      if (newVal !== 'Other') {
+        this.otherGender = '';
+      }
+    }
   }
-};
-
-console.log('Form submitted', formData);
-
-this.sendEmailToAdmin(formData);
-
-this.showStatusPopup = true;
-this.isSubmitted = true;
-
-} catch (error) {
-console.error('Error submitting application:', error);
-alert('There was an error submitting your application. Please try again.');
 }
-},
-
-sendEmailToAdmin(formData) {
-console.log('Sending email to admin with application data:', formData);
-},
-
-closeStatusPopup() {
-this.showStatusPopup = false;
-},
-
-proceedToHome() {
-this.$router.push('/');
-}
-}
-};
 </script>
 
 
@@ -872,7 +752,6 @@ html, body {
   color: white;
 }
 
-/* Container */
 .mentorinfo-container {
   background-image: url("@/assets/bg.png");
   position: fixed;
@@ -915,7 +794,7 @@ html, body {
   min-height: 550px;
   max-height: 650px;
   padding: 1.5rem;
-  background: rgba(6, 102, 120, 0.5);
+  background: rgba(0, 89, 105, 0.546);
   border-radius: 40px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 8px rgba(170, 10, 10, 0.1);
@@ -923,7 +802,6 @@ html, body {
   flex-direction: column;
 }
 
-/* Personal Information Step */
 .title {
   color: #02475E;
   font-size: 1.6rem;
@@ -943,7 +821,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 2rem;
+  gap: 3.2rem;
   padding: 0 1rem;
 }
 
@@ -956,8 +834,8 @@ html, body {
   color: #02475E;
   font-weight: 500;
   font-size: 0.85rem;
-  margin-bottom: 0.3rem;
-  margin-left: 0.5rem;
+  margin-bottom: 0.6rem;
+  margin-left: 0.3rem;
 }
 
 .personal-input,
@@ -966,18 +844,19 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(219, 220, 224, 0.382);
-  color: white;
-  font-size: 0.85rem;
+  background: rgba(215, 217, 230, 0.293);
   width: 100%;
   transition: all 0.2s ease;
   text-align: left;
+  color: white;
+  font-weight: 600;
 }
 
 .personal-input::placeholder,
 .profile-input::placeholder,
 .gender-specify::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 250, 250, 0.683);
+  font-size: 0.80rem;
 }
 
 .personal-input:focus,
@@ -988,10 +867,8 @@ html, body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
-/* Dropdown Styles */
 .gender-dropdown,
 .year-dropdown,
-.department-dropdown,
 .program-dropdown,
 .subjmodality-dropdown,
 .proficiency-dropdown,
@@ -1013,11 +890,11 @@ html, body {
   padding: 0.7rem 30px 0.7rem 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(219, 220, 224, 0.382);
-  color: white;
+  background: rgba(215, 217, 230, 0.293);
   font-size: 0.85rem;
   width: 100%;
   transition: all 0.2s ease;
+  color: white;
 }
 
 .dropdown-options {
@@ -1029,14 +906,17 @@ html, body {
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.85rem;
+  font-size: 0.90rem;
 }
 
 .dropdown-option {
-  padding: 0.5rem;
+  padding: 7px 13px;
   cursor: pointer;
   color: #02475E;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center; 
+  gap: 13px; 
 }
 
 .dropdown-option:hover {
@@ -1047,39 +927,116 @@ html, body {
   color: white;
   font-size: 10px;
   position: absolute;
-  right: 13px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-/* Checkbox Dropdown */
-.availability-options,
-.teaching-style-options {
-  padding: 0.5rem;
+/* Double Dropdown Styles */
+.dropdown-wrapper {
+  position: relative;
   width: 100%;
 }
 
-.availability-option,
-.teaching-style-option {
+.dropdown-trigger {
+  position: relative;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0.5rem;
-  color: #02475E;
+  width: 100%;
 }
 
-.availability-option input[type="checkbox"],
-.teaching-style-option input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
-
-.availability-option label,
-.teaching-style-option label {
+.dropdown-trigger input {
+  border: none;
+  outline: none;
+  width: 100%;
   cursor: pointer;
-  color: #02475E;
+  background: transparent;
+  padding: 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 217, 230, 0.293);
+  color: white;
   font-size: 0.85rem;
+  text-align: left;
 }
 
-/* Profile Information Step*/
+.dropdown-trigger input::placeholder {
+  color: rgba(255, 250, 250, 0.683);
+}
+
+.dropdown-menu {
+  position: absolute;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.categories {
+  width: 100%;
+  top: 100%;
+  left: 0;
+  margin-top: 1px;
+  font-size: 13px
+}
+
+.subjects {
+  width: 300px;
+  top: 0;
+  left: calc(100% + 2px);
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #02475E;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+.subject-item input[type="checkbox"] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.subject-item label {
+  cursor: pointer;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-subjects {
+  color: #999;
+  font-style: italic;
+}
+
+.dropdown-menu {
+  z-index: 1000;
+}
+
+.count-badge {
+  background-color: #02475E;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  margin-left: 5px;
+}
+
 .profile-grid {
   display: flex;
   gap: 2rem;
@@ -1092,7 +1049,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 1rem;
+  gap: 1.5rem;
   padding: 0 1rem;
 }
 
@@ -1113,7 +1070,7 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(219, 220, 224, 0.382);
+  background: rgba(215, 217, 230, 0.293);
   color: white;
   font-size: 0.85rem;
   width: 100%;
@@ -1122,7 +1079,7 @@ html, body {
 }
 
 .profile-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 250, 250, 0.683);
 }
 
 .profile-input:focus {
@@ -1137,10 +1094,15 @@ html, body {
   padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(219, 220, 224, 0.382);
+  background: rgba(215, 217, 230, 0.293);
   color: white;
   font-size: 0.85rem;
   width: 100%;
+}
+
+.profile-textarea::placeholder{
+  color: rgba(255, 250, 250, 0.683);
+  font-weight: 500;
 }
 
 .profile-textarea:focus {
@@ -1175,11 +1137,10 @@ html, body {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
-  margin-left: 1.5rem;
+  margin-left: 2.5rem;
   gap: 2.5rem;
 }
 
-/* Profile Picture Upload */
 .profile-picture-upload {
   flex: 1;
 }
@@ -1192,12 +1153,12 @@ html, body {
 .upload-controls {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .profile-preview-container {
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
@@ -1220,18 +1181,23 @@ html, body {
 .upload-text {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1.3rem;
   cursor: pointer;
+  color:#ffffff
+}
+
+.file-name {
+  font-size: 15px;
 }
 
 .choose-file-container {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 0.8rem;
+  padding: 0.9rem;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 25px;
-  transition: background-color 1s;
+  transition: background-color 2s;
   color: #f9fbfb;
   background: linear-gradient(to bottom, #02475E, #066678);
 }
@@ -1263,50 +1229,7 @@ html, body {
   font-size: 13px;
 }
 
-/* File List */
-.file-list {
-  margin-top: 0.5rem;
-  list-style: none;
-  padding: 0;
-}
-
-.file-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-}
-
-.file-list button {
-  background: transparent;
-  border: none;
-  color: rgba(255, 100, 100, 0.8);
-  cursor: pointer;
-  padding: 0.2rem;
-}
-
-.file-list button:hover {
-  color: #ff4d4d;
-}
-
-.file-name {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Credentials Modal */
+/* File List Modal */
 .Credmodal-overlay {
   position: fixed;
   top: 0;
@@ -1325,7 +1248,7 @@ html, body {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 350px;
   max-height: 80%;
   overflow-y: auto;
   color: black;
@@ -1340,6 +1263,40 @@ html, body {
   margin-bottom: 10px;
 }
 
+.file-list {
+  margin-top: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.file-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #02475E;
+}
+
+.file-list button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 100, 100, 0.8);
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.file-list button:hover {
+  color: #ff4d4d;
+}
+
 .close-button {
   background-color: #155577;
   color: white;
@@ -1348,7 +1305,7 @@ html, body {
   border-radius: 5px;
   cursor: pointer;
   width: 120px;
-  align-self: flex-end;
+  align-self: center;
   margin-top: 20px;
 }
 
@@ -1356,89 +1313,62 @@ html, body {
   background-color: #032c58;
 }
 
-/* Subjects Modal */
-.SJmodal-overlay {
+/* Status Popup */
+.status-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 40px;
   z-index: 1000;
 }
 
-.SJmodal-content {
+.status-popup-content {
   background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 800px;
-  max-height: 80%;
-  overflow-y: auto;
-  color: black;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border-radius: 8px;
+  width: 500px;
+  height: 220px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.SJmodal-content h3 {
+.status-popup-content h3 {
   text-align: center;
-  color: rgb(9, 9, 80);
-  margin-bottom: 10px;
-}
-
-.subjects-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin: 20px 0;
-}
-
-.subjects-column {
-  flex: 1;
-  margin: 0 15px;
-  color: #155577;
-  font-size: 0.7rem;
-}
-
-.subjects-column h4 {
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  color: #155577;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.checkbox-container input {
-  margin-right: 8px;
-}
-
-.checkbox-container label {
-  color: #155577;
-  font-size: 0.7rem;
-}
-
-.done-button {
-  background-color: #155577;
   color: white;
+  background-color: #02475E;
   padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 120px;
-  align-self: flex-end;
-  margin-top: 20px;
+  border-radius:5px;
+  margin-bottom: 23px;
 }
 
-.done-button:hover {
-  background-color: #032c58;
+.status-text {
+  color: #02475E;
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 0 20px;
+  line-height: 1.5;
+}
+
+.proceed-button {
+  background-color: #02475E;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.proceed-button:hover {
+  background-color: #033140;
 }
 
 /* Step Indicator */
@@ -1507,74 +1437,6 @@ html, body {
   font-weight: 900;
 }
 
-
-/* Status Popup */
-.status-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  border-radius: 40px;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.status-popup-content {
-  background: white;
-  border: 1px solid #02475E;
-  border-radius: 10px;
-  width: 500px;
-  max-width: 500px;
-  max-height: 250px;
-  height: 250px;
-  color: #02475E;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.status-popup-content h3 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #ffffff;
-  font-size: 1.2rem;
-  background-color: #02475E;
-  border-radius: 6px;
-  padding: 9px;
-}
-
-.status-text {
-  margin-top: 50px;
-  font-style: italic;
-  color: #155577;
-  padding-left: 30px;
-  padding-right: 30px;
-  text-align: center;
-  font-size: 15px;
-}
-
-.proceed-button {
-  background-color: #19638b;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  width: 200px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-top: 50px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.proceed-button:hover {
-  background-color: #033140;
-}
-
-/* Pahabol kjfhhksvbfsv */
 .gender-specify {
   padding: 0.7rem;
   border-radius: 20px;
@@ -1595,4 +1457,36 @@ html, body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
+.validation-error {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.availability-options,
+.teaching-style-options {
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.availability-option,
+.teaching-style-option {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  color: #02475E;
+}
+
+.availability-option input[type="checkbox"],
+.teaching-style-option input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.availability-option label,
+.teaching-style-option label {
+  cursor: pointer;
+  color: #02475E;
+  font-size: 0.85rem;
+}
 </style>

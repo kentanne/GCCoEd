@@ -120,7 +120,7 @@ main {
   justify-content: center;
   flex-grow: 1;
   width: 100%;
-  gap: 7rem;
+  gap: 10rem;
   margin-top: 5rem;
 }
 
@@ -142,7 +142,7 @@ main {
   gap: 1rem;
   text-align: center;
   width: 100%;
-  height: 550px;
+  height: 560px;
   background: rgba(6, 102, 120, 0.4);
   padding: 2rem;
   border-radius: 30px;
@@ -160,14 +160,14 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 85%;
+  width: 95%;
   border-radius: 25px;
 }
 
 .input-field {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.7rem;
   width: 100%;
 }
 
@@ -176,7 +176,7 @@ form {
   font-weight: 500;
   text-align: left;
   padding-left: 0.5rem;
-  color:#2d5e7f;
+  color:#ffffff;
 }
 
 .input-with-icon {
@@ -188,7 +188,7 @@ form {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(165, 161, 161, 0.9);
   cursor: pointer;
 }
 
@@ -198,21 +198,20 @@ input {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
   font-size: 0.95rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255);
   outline: none;
   transition: 0.3s;
 }
 
 input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(62, 81, 90, 0.7);
   font-family: "Montserrat", sans-serif;
   font-size: 13px;
 }
 
 input:focus {
   border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 8px rgba(34, 42, 194, 0.5);
+  box-shadow: 0 0 8px rgb(242, 168, 134);
 }
 
 .custom-select {
@@ -259,28 +258,29 @@ input:focus {
 
 .custom-select select:focus {
   border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 8px rgba(34, 42, 194, 0.5);
+  box-shadow: 0 0 8px rgb(242, 168, 134);
 }
 
 button {
-  background: linear-gradient(to right, #4a98cc, #073544);
-  color: white;
+  background: #ffffff;
+  color: #1c6b79;
   border: none;
   padding: 0.8rem;
   border-radius: 9999px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: bold;
   width: 50%;
   text-align: center;
   display: block;
   margin: 0.5rem auto 0;
   transition: 0.3s;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 button:hover {
-  background: linear-gradient(to right, #073544, #4a98cc);
-  transform: scale(1.05);
+  background: #319cb0;
+  transform: scale(1);
 }
 
 .switch-link {
@@ -289,7 +289,7 @@ button:hover {
 }
 
 .switch-link a {
-  color: #155577;
+  color: #2b617e;
   text-decoration: none;
 }
 

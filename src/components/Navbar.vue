@@ -157,7 +157,7 @@ header {
   background: transparent;
   border: 1px solid white;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.65rem 1rem;
   border-radius: 9999px;
   font-family: "Inter", sans-serif;
   cursor: pointer;
