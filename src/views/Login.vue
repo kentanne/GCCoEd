@@ -34,6 +34,7 @@
 <script>
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
+import axios from "axios";
 
 export default {
   name: "LoginComponent",
@@ -48,7 +49,29 @@ export default {
   },
   methods: {
     login() {
-      console.log("Logging in with:", this.email, this.password);
+      const loginData = {
+        email: this.email,
+        password: this.password,
+      };
+
+      axios.post('http://127.0.0.1:8000/api/login', loginData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      })
+      .then(response => {
+        console.log("Login successful:", response.data);
+        if(response.user_role === "learner") {
+            this.$router.push('/learner');
+        } else if(response.user_role === "mentor") {
+            this.$router.push('/mentor');
+        } else if(response.user_role === "admin") {
+            this.$router.push('/admin');
+        } else {
+            console.error("Unknown user role:", response.data.user_role);
+        }
+      })
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;

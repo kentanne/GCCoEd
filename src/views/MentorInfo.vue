@@ -298,6 +298,9 @@
 </template>
 
 <script>
+import { registrationStore } from '@/stores/registrationStore.js'; // Adjust the import path as necessary
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -656,36 +659,67 @@ export default {
     
     async submitApplication() {
       const finalValidationErrors = this.validateForm();
+      const store = registrationStore();
+      console.log("Store data:", store.registrationData);
+
       if (finalValidationErrors.length > 0) {
         alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
         return;
       }
 
-      try {
-        const formData = {
-          personalInfo: {
-            fullName: this.fullName,
-            gender: this.gender === 'Other' ? this.otherGender : this.gender,
-            yearLevel: this.yearLevel,
-            program: this.program,
-            contactNumber: this.contactNumber,
-            address: this.address,
-            subjects: this.selectedSubjects
-          },
-          profileInfo: {
-            modality: this.modality,
-            availabilityDays: this.selectedDays,
-            bio: this.bio,
-            proficiency: this.proficiency, 
-            learningStyles: this.selectedsessionStyles, 
-            sessionDuration: this.sessionDuration,
-            experience: this.experience, 
-            profileImage: this.profileImage,
-            credentials: this.credentials 
-          }
-        };
 
-        console.log('Mentor application submitted:', formData);
+      try {
+        const formData = new FormData(); // Use FormData for file uploads
+        formData.append('email', store.registrationData.email); // Corrected property
+        formData.append('password', store.registrationData.password); // Corrected property
+        formData.append('password_confirmation', store.registrationData.password_confirmation); // Corrected property
+        formData.append('role', store.registrationData.role); // Corrected property
+        formData.append('name', this.fullName);
+        formData.append('gender', this.gender === 'Other' ? this.otherGender : this.gender);
+        formData.append('year', this.yearLevel);
+        formData.append('course', this.program);
+        formData.append('phoneNum', this.contactNumber);
+        formData.append('address', this.address);
+        formData.append('subjects', JSON.stringify(this.selectedSubjects)); // Convert array to JSON string
+        formData.append('learn_modality', this.modality);
+        formData.append('availability', JSON.stringify(this.selectedDays)); // Convert array to JSON string
+        formData.append('bio', this.bio);
+        formData.append('teach_sty', JSON.stringify(this.selectedsessionStyles)); // Convert array to JSON string
+        formData.append('prefSessDur', this.sessionDuration);
+        formData.append('exp', this.goals);
+        formData.append('proficiency', this.proficiency); // Added proficiency level
+        formData.append('credentials', JSON.stringify(this.credentials.map(file => file.name))); // Convert array to JSON string
+
+        // Ensure profileImage is a file
+        if (this.$refs.profileInput.files[0]) {
+          formData.append('image', this.$refs.profileInput.files[0]);
+        } else {
+          throw new Error('Profile image is missing or invalid.');
+        }
+
+        this.credentials.forEach((file, index) => {
+          formData.append(`credentials[${index}]`, file);
+        });
+
+        // console.log('FormData contents:');
+        // for (const [key, value] of formData.entries()) {
+        //   console.log(`${key}:`, value);
+        // }
+
+        axios.post('http://127.0.0.1:8000/api/mentor/register', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'accept': 'application/json'
+          }
+        })
+        .then(response => {
+          console.log('ge')
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+        // console.log('Mentor application submitted:', formData);
         this.sendEmailToAdmin(formData);
         this.showStatusPopup = true;
         this.isSubmitted = true;
