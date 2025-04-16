@@ -7,6 +7,6 @@
   
   <script>
   export default {
-    name: 'MentorDashboard'
+    name: 'MentorPage'
   }
   </script>
