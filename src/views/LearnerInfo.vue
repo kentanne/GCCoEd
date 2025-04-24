@@ -54,7 +54,7 @@
                   <div class="dropdown-option" @click="selectYearLevel('4th Year')">4th Year</div>
                 </div>
               </div>
-            </div>
+            </div>  
             <div class="personal-field">
               <label class="personal-label" for="program">PROGRAM </label>
               <div class="program-dropdown">
@@ -237,6 +237,19 @@
 </template>
 
 <script>
+import { registrationStore } from '@/stores/registrationStore';
+import axios from 'axios';
+
+axios.defaults.withCredentials = true; // Enable sending cookies with requests
+axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
+
 export default {
   data() {
     return {
@@ -322,6 +335,13 @@ export default {
   },
 
   methods: {
+    async csrf(){
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie').then(response => {
+        console.log("CSRF cookie set");
+      }).catch(error => {
+        console.error("Error setting CSRF cookie:", error);
+      });
+    },
     toggleSubjectDropdown() {
       this.showCategories = !this.showCategories;
       this.showSubjectsDropdown = false;
@@ -554,41 +574,66 @@ export default {
     
     async submitLearnerInfo() {
       const finalValidationErrors = this.validateForm();
+      const store = registrationStore();
+
       if (finalValidationErrors.length > 0) {
         alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
         return;
       }
 
       try {
-        const formData = {
-          personalInfo: {
-            fullName: this.fullName,
-            gender: this.gender === 'Other' ? this.otherGender : this.gender,
-            yearLevel: this.yearLevel,
-            program: this.program,
-            contactNumber: this.contactNumber,
-            address: this.address,
-            subjects: this.selectedSubjects
-          },
-          profileInfo: {
-            modality: this.modality,
-            availabilityDays: this.selectedDays,
-            bio: this.bio,
-            learningStyles: this.selectedsessionStyles, 
-            sessionDuration: this.sessionDuration,
-            goals: this.goals,
-            profileImage: this.profileImage
-          }
-        };
+        const formData = new FormData(); // Use FormData for file uploads
+        formData.append('email', store.registrationData.email); // Corrected property
+        formData.append('password', store.registrationData.password); // Corrected property
+        formData.append('password_confirmation', store.registrationData.password_confirmation); // Corrected property
+        formData.append('role', store.registrationData.role); // Corrected property
+        formData.append('name', this.fullName);
+        formData.append('gender', this.gender === 'Other' ? this.otherGender : this.gender);
+        formData.append('year', this.yearLevel);
+        formData.append('course', this.program);
+        formData.append('phoneNum', this.contactNumber);
+        formData.append('address', this.address);
+        formData.append('subjects', this.selectedSubjects); // Convert array to JSON string
+        formData.append('learn_modality', this.modality);
+        formData.append('availability', this.selectedDays); // Convert array to JSON string
+        formData.append('bio', this.bio);
+        formData.append('learn_sty', this.selectedsessionStyles); // Convert array to JSON string
+        formData.append('prefSessDur', this.sessionDuration);
+        formData.append('goals', this.goals);
 
-        console.log('Learner data collected:', formData);
-        this.$router.push('/login');
+        // Ensure profileImage is a file
+        if (this.$refs.profileInput.files[0]) {
+          formData.append('image', this.$refs.profileInput.files[0]);
+        } else {
+          throw new Error('Profile image is missing or invalid.');
+        }
+
+        await axios.post('http://localhost:8000/api/learner/register', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'accept': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+          }
+        })
+        .then(response => {
+          console.log('ge')
+        })
+        .catch(error => {
+          console.error(error);
+        });
+        // this.$router.push('/login');
 
       } catch (error) {
         console.error('Data collection error:', error);
         alert('An error occurred while submitting your information. Please try again.');
       }
+
+      
     }
+  },
+  
+  mounted() {
+    this.csrf();
   },
 
   watch: {

@@ -34,6 +34,18 @@
 <script>
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
+// import api from "../axios.js"; // Adjust the path as necessary
+import axios from 'axios';
+
+axios.defaults.withCredentials = true; // Enable sending cookies with requests
+axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
 
 export default {
   name: "LoginComponent",
@@ -47,12 +59,43 @@ export default {
     };
   },
   methods: {
-    login() {
-      console.log("Logging in with:", this.email, this.password);
+    async csrf(){
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie').then(response => {
+        console.log("CSRF cookie set");
+      }).catch(error => {
+        console.error("Error setting CSRF cookie:", error);
+      });
+    },
+    async login() {
+      const loginData = {
+        email: this.email,
+        password: this.password,
+      };
+
+      await axios.post('http://localhost:8000/api/login', loginData, 
+      {headers: {
+        'Content-Type': 'application/json',
+        "X-XSRF-TOKEN": getCookie('XSRF-TOKEN')
+      }})
+      .then(response => {
+        console.log("Login successful:", response.data);
+        if(response.data.user_role === "learner") {
+            this.$router.push('/learner');
+        } else if(response.data.user_role === "mentor") {
+            this.$router.push('/mentor');
+        } else if(response.data.user_role === "admin") {
+            this.$router.push('/admin');
+        } else {
+            console.error("Unknown user role:", response.data.user_role);
+        }
+      })
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
+  },
+  mounted() {
+    this.csrf(); // Call the csrf method when the component is mounted
   },
 };
 </script>

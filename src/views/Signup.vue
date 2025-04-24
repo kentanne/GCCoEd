@@ -25,7 +25,7 @@
             <label>CONFIRM PASSWORD</label>
             <div class="input-with-icon">
               <i class="fas" :class="confirmPasswordVisible ? 'fa-eye' : 'fa-eye-slash'" @click="toggleConfirmPasswordVisibility"></i>
-              <input :type="confirmPasswordVisible ? 'text' : 'password'" v-model="confirmPassword" placeholder="Confirm your password" required />
+              <input :type="confirmPasswordVisible ? 'text' : 'password'" v-model="password_confirmation" placeholder="Confirm your password" required />
             </div>
           </div>
           <div class="input-field">
@@ -52,6 +52,7 @@
 <script>
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
+import { registrationStore } from "@/stores/registrationStore";
 
 export default {
   name: "SignupComponent",
@@ -61,7 +62,7 @@ export default {
       logo,
       email: "",
       password: "",
-      confirmPassword: "",
+      password_confirmation: "",
       role: "",
       passwordVisible: false,
       confirmPasswordVisible: false,
@@ -69,7 +70,25 @@ export default {
   },
   methods: {
     signup() {
-      console.log("Signing up with:", this.email, this.password, this.confirmPassword, this.role);
+      const store = registrationStore();
+
+      store.passAndMail(
+        {
+          email: this.email,
+          password: this.password,
+          password_confirmation: this.password_confirmation,
+          role: this.role
+        }
+      )
+      
+      console.log("Store data after signup:", store.registrationData); // Debugging
+      
+      if(this.role === "learner") {
+        this.$router.push("/learner-info");
+      }
+      if(this.role === "mentor") {
+        this.$router.push("/mentor-info");
+      }
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
@@ -77,6 +96,7 @@ export default {
     toggleConfirmPasswordVisibility() {
       this.confirmPasswordVisible = !this.confirmPasswordVisible;
     },
+
   },
 };
 </script>
