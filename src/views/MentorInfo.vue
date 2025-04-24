@@ -299,7 +299,17 @@
 
 <script>
 import { registrationStore } from '@/stores/registrationStore.js'; // Adjust the import path as necessary
-import axios from 'axios';
+import axios, { Axios } from 'axios';
+
+axios.default.withCredentials = true; // Enable sending cookies with requests
+axios.default.withXSRFToken = true; // Enable CSRF token handling
+
+function getCookie(name){
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
 
 export default {
   data() {
@@ -399,6 +409,13 @@ export default {
   },
 
   methods: {
+    async csrf(){
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie').then(response => {
+        console.log("CSRF cookie set");
+      }).catch(error => {
+        console.error("Error setting CSRF cookie:", error);
+      });
+    },
     toggleSubjectDropdown() {
       this.showCategories = !this.showCategories;
       this.showSubjectsDropdown = false;
@@ -660,7 +677,7 @@ export default {
     async submitApplication() {
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
-      console.log("Store data:", store.registrationData);
+      // console.log("Store data:", store.registrationData);
 
       if (finalValidationErrors.length > 0) {
         alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
@@ -701,17 +718,12 @@ export default {
           formData.append(`credentials[${index}]`, file);
         });
 
-        // console.log('FormData contents:');
-        // for (const [key, value] of formData.entries()) {
-        //   console.log(`${key}:`, value);
-        // }
-
-        axios.post('http://127.0.0.1:8000/api/mentor/register', formData, {
+        await axios.post('http://localhost:8000/api/mentor/register', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-            'accept': 'application/json'
-          }
-        })
+            'accept': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+          }})
         .then(response => {
           console.log('ge')
         })
@@ -741,6 +753,10 @@ export default {
     proceedToHome() {
       this.$router.push('/');
     }
+  },
+
+  mounted(){
+    this.csrf();
   },
 
   watch: {
