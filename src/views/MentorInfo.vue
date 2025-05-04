@@ -621,7 +621,8 @@ export default {
 
         case "Bachelor of Science in Computer Science (BSCS)":
           this.availableSubjects = {
-            coreSubjects: ["Computer Programming 1", "Computer Programming 2", "Data Structures and Algorithms",
+            coreSubjects: ["Computer Programming 1", "Computer Programming 2",  "Introduction to Computing", 
+              "PC Troubleshooting with Basic Electronics","Data Structures and Algorithms",
               "Algorithms and Complexity 1", "Software Engineering 1", "Software Engineering 2",
               "Operating Systems", "Object-Oriented Programming", "Information Management 1",
               "Discrete Structures 1", "Discrete Structures 2", "Principles of Statistics and Probability",
@@ -632,12 +633,10 @@ export default {
               "CS Elective 1", "CS Elective 2", "CS Elective 3", "CS Elective 4", "CS Elective 5",
               "CS Seminars and Educational Trips"
              ],
-            gecSubjects: [ "Introduction to Computing", "PC Troubleshooting with Basic Electronics",
-              "Understanding the SELF", "Readings in Philippine History with Indigenous People Studies",
-              "The Life and Works of Jose Rizal", "People and Earth’s Ecosystem",
-              "Mathematics in the Modern World", "Science, Technology and Society",
-              "Reading Visual Arts", "Art Appreciation", "Purposive Communication",
-             "Ethics", "The Contemporary World With Peace Studies"
+            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
+              "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
+              "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
+              "The Life and Works of Rizal", "Understanding the Self"
           ],
             peNstpSubjects: ["National Service Training Program 1",
               "National Service Training Program 2",
@@ -650,9 +649,25 @@ export default {
 
         case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
           this.availableSubjects = {
-            coreSubjects: ["Game Development", "Animation", "Multimedia Design"],
-            gecSubjects: ["Art Appreciation", "Digital Media"],
-            peNstpSubjects: ["National Service Training Program", "Physical Education"]
+            coreSubjects: ["Introduction to EM Computing", "Computer Programming 1", "PC Troubleshooting with Basic Electronics", "Computer Programming 2", 
+            "Usability, HCI, UI Design", "Free Hand and Digital Drawing", "Data Structures and Algorithms", "Information Management 1", "Introduction to Game Design and Development", 
+            "Computer Graphics Programming", "Image and Video Processing", "Script Writing and Storyboard Design", "Applications Development and Emerging Technologies",
+            "Principles of 2D Animation", "Audio Design and Sound Engineering Modelling and Rigging", "Texture and Mapping", "Social Issues and Professional Practice in Computing", 
+            "Lighting and Effects", "Principles of 3D Animation", "Design and Production Process", "Advanced Sound Production", "Advanced 2D Animation", "EMC Professional Elective 1",
+            "Research Methods", "Advanced 3D Animation and Scripting", "Compositing and Rendering", "EMC Professional Elective 2", "Animation Design and Production", "EMC Professional Elective 3",
+            "Computing Seminars and Educational Trips"
+            ],
+            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
+              "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
+              "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
+              "The Life and Works of Rizal", "Understanding the Self"
+            ],
+            peNstpSubjects: ["National Service Training Program with Anti-Smoking and Environmental Education", 
+              "National Service Training Program with GAD and Peace Education", 
+              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency", 
+              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities", 
+              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)", 
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
           };
           break;
 
