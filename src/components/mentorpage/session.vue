@@ -19,8 +19,8 @@ const props = defineProps({
 });
 
 const todaySchedule = ref([]);
-
 const upcommingSchedule = ref([]);
+const selectedSessionID = ref(null);
 
 const isMessage = ref(false);
 const activePopup = ref({
@@ -90,6 +90,7 @@ const handleOptionClick = (option, item, event) => {
       sendReminder(item);
       break;
     case "reschedule":
+      selectedSessionID.value = item.id;
       break;
     case "cancel":
       alert(`Cancel ${item.subject}`);
@@ -191,7 +192,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel</p>
+                      <p class="option-text">Cancel Session</p>
                     </div>
                   </div>
                 </transition>
@@ -277,7 +278,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">Reschedule</p>
                     </div>
                     <div
                       class="popup-option"
@@ -339,7 +340,10 @@ onUnmounted(() => {
   </div>
 
   <div v-if="reschedIsOpen" class="message-pop-up">
-    <RescheduleDialog @close="reschedIsOpen = false" @reschedule="reschedule"/>
+    <RescheduleDialog 
+    :id = "selectedSessionID"
+    @close="reschedIsOpen = false" 
+    @reschedule="reschedule"/>
   </div>
 
 </template>

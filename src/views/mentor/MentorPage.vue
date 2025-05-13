@@ -8,125 +8,179 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 
-function getCookie(name){
+function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) return parts.pop().split(";").shift();
   return null;
 }
 
 const loggedUserDets = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/api/mentor/details", {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    }).then((response) => {
-      
-      console.log("User details fetched successfully:", response.data);
-      if (response.status === 200) {
-        userName.value = response.data.user.name;
-        proficiency.value = response.data.ment.proficiency;
-        //starFilled.value = response.data.ment.starFilled;
-        yearLevel.value = response.data.ment.year;
-        program.value = response.data.ment.course;
-        days.value = JSON.parse(response.data.ment.availability);
-        duration.value = response.data.ment.prefSessDur;
-        bio.value = response.data.ment.bio;
-        courseCard.value = JSON.parse(response.data.ment.subjects);
-        profilePic.value = response.data.ment.image;
-        loggedUserId.value = response.data.user.id;
-      } else {
-        throw new Error("Failed to fetch user details");
-      }
-    }).catch((error) => {
-      console.error("Error fetching user details:", error);
-    });
+    await axios
+      .get("http://localhost:8000/api/mentor/details", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("User details fetched successfully:", response.data);
+        if (response.status === 200) {
+          // Store data in unified userData ref
+          userData.value = {
+            user: response.data.user,
+            ment: {
+              ...response.data.ment,
+              availability: JSON.parse(response.data.ment.availability),
+              subjects: JSON.parse(response.data.ment.subjects),
+              teach_sty: JSON.parse(response.data.ment.teach_sty),
+            },
+          };
+        } else {
+          throw new Error("Failed to fetch user details");
+        }
+      });
   } catch (error) {
     console.error("Error fetching user details:", error);
     return null;
   }
-}
+};
 
 const learnersProfile = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/api/mentor/users", {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    }).then((response) => {
-      console.log("Learner profiles fetched successfully:", response.data);
-      if (response.status === 200) {
-        users.value = response.data;
-        // // users.value.userName = response.data.name;
-        // return response.data;
-      } else {
-        throw new Error("Failed to fetch learner profiles");
-      }
-    }).catch((error) => {
-      console.error("Error fetching learner profiles:", error);
-    });
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/users", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Learner profiles fetched successfully:", response.data);
+        if (response.status === 200) {
+          users.value = response.data;
+          // // users.value.userName = response.data.name;
+          // return response.data;
+        } else {
+          throw new Error("Failed to fetch learner profiles");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching learner profiles:", error);
+      });
   } catch (error) {
     console.error("Error fetching learner profiles:", error);
     return null;
   }
-}
+};
 
-const sessionInfo = async() => {
-  try{
-    const sessionDeets = await axios.get(`http://localhost:8000/api/mentor/schedule`, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
-      },
-    }).then((response) => {
-      console.log('session details:', response.data)
-      todaySchedule.value = response.data.schedules_today;
-      upcommingSchedule.value = response.data.upcoming_schedules;
-    })
-  } catch (error){
-    console.error('Error fetching session details:', error)
-    return null
+const sessionInfo = async () => {
+  try {
+    const sessionDeets = await axios
+      .get(`http://localhost:8000/api/mentor/schedule`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("session details:", response.data);
+        todaySchedule.value = response.data.schedules_today;
+        upcommingSchedule.value = response.data.upcoming_schedules;
+      });
+  } catch (error) {
+    console.error("Error fetching session details:", error);
+    return null;
   }
-}
+};
 
-const loggedUserId = ref();
-const userName = ref();
-const proficiency = ref();
-const profilePic = ref();
+const getFeedbacks = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/getFeedback", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Feedbacks:", response.data);
+        feedbacks.value = response.data.feedbacks;
+      });
+    // return response.data
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error);
+    return null;
+  }
+};
+
+const getFiles = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/files", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Files:", response.data);
+        files.value = response.data.files;
+      });
+    // return response.data
+  } catch (error) {
+    console.error("Error fetching files:", error);
+    return null;
+  }
+};
+
+// Replace multiple refs with a single userData ref
+const userData = ref({
+  user: {
+    id: null,
+    name: "",
+    email: "",
+    role: "",
+  },
+  ment: {
+    address: "",
+    proficiency: "",
+    year: "",
+    course: "",
+    availability: [],
+    prefSessDur: "",
+    bio: "",
+    subjects: [],
+    image: "",
+    phoneNum: "",
+    teach_sty: [],
+    credentials: [],
+  },
+});
+
+// Keep other independent refs
+const department = ref("College of Computer Studies");
+const users = ref([]);
 const todaySchedule = ref([]);
 const upcommingSchedule = ref([]);
-
-const bio = ref();
-
-const starFilled = ref();
-const yearLevel = ref();
-const program = ref();
-const department = ref("Department of Computer Science");
-
-const days = ref([]);
-const duration = ref();
-
+const feedbacks = ref([]);
+const files = ref([]);
 const isEdit = ref(false);
-const users = ref([]);
 const confirmLogout = ref(false);
 const isHelp = ref(false);
-
-const openHelp = () => {
-  isHelp.value = !isHelp.value;
-};
-
-const openLogoutDialog = () => {
-  confirmLogout.value = !confirmLogout.value;
-};
+const showAllCourses = ref(false);
+const searchQuery = ref("");
 
 const activeComponent = ref("main");
 const switchComponent = (component) => {
@@ -151,19 +205,29 @@ const filesView = defineAsyncComponent(() =>
   import("../../components/mentorpage/files.vue")
 );
 
+const fileManageView = defineAsyncComponent(() =>
+  import("../../components/mentorpage/fileManage.vue")
+);
+
+const openLogoutDialog = () => {
+  confirmLogout.value = true;
+};
+
 const componentMap = {
   main: mainView,
   session: sessionView,
   records: recordsView,
   files: filesView,
+  fileManage: fileManageView,
 };
 
-const courseCard = ref([]);
-
-const displayedCourses = computed(() => courseCard.value.slice(0, 5));
-const remainingCoursesCount = computed(() => Math.max(courseCard.value.length - 5, 0));
-const remainingCourses = computed(() => courseCard.value.slice(5)); 
-const showAllCourses = ref(false);
+const displayedCourses = computed(() =>
+  userData.value.ment.subjects.slice(0, 5)
+);
+const remainingCoursesCount = computed(() =>
+  Math.max(userData.value.ment.subjects.length - 5, 0)
+);
+const remainingCourses = computed(() => userData.value.ment.subjects.slice(5));
 
 const toggleShowAllCourses = () => {
   showAllCourses.value = !showAllCourses.value;
@@ -172,8 +236,6 @@ const toggleShowAllCourses = () => {
 const openEditInformation = () => {
   isEdit.value = !isEdit.value;
 };
-
-const searchQuery = ref("");
 
 const filteredUsers = computed(() => {
   return users.value.filter((user) => {
@@ -192,26 +254,35 @@ const handleLogout = () => {
   confirmLogout.value = false;
 };
 
-onMounted( async () => {
+onMounted(async () => {
   console.log("test kung namamount");
   await loggedUserDets();
   await learnersProfile();
   await sessionInfo();
+  await getFeedbacks();
+  await getFiles();
   // users.value = learnersProfile();
 });
 </script>
 
 <template>
-  <!-- sidebar -->
   <div class="sidebar">
     <div class="upper-element">
       <div>
         <h1>Hi, Mentor!</h1>
-        <img :src="'http://localhost:8000/api/image/' + profilePic || 'http://placehold.co/600x400'" alt="profile-pic" />
+        <img
+          :src="
+            'http://localhost:8000/api/image/' + userData.ment.image ||
+            'http://placehold.co/600x400'
+          "
+          alt="profile-pic"
+        />
       </div>
       <div>
-        <h2>{{ userName }}</h2>
-        <i><p>{{ proficiency }}</p></i>
+        <h2>{{ userData.user.name }}</h2>
+        <i
+          ><p>{{ userData.ment.proficiency }}</p></i
+        >
         <div class="stars">
           <span class="filledStar" v-for="i in 5" :key="i">
             <span v-if="i <= starFilled">★</span>
@@ -225,7 +296,7 @@ onMounted( async () => {
       <div class="bio-container">
         <h1>BIO</h1>
         <div>
-          <p>{{ bio }}</p>
+          <p>{{ userData.ment.bio }}</p>
         </div>
       </div>
       <div class="user-information">
@@ -233,7 +304,7 @@ onMounted( async () => {
         <div class="lines">
           <h3>Year Level:</h3>
           <div>
-            <p>{{ yearLevel }}</p>
+            <p>{{ userData.ment.year }}</p>
           </div>
         </div>
         <div class="lines">
@@ -245,7 +316,7 @@ onMounted( async () => {
         <div class="lines">
           <h3>Program:</h3>
           <div>
-            <p>{{ program }}</p>
+            <p>{{ userData.ment.course }}</p>
           </div>
         </div>
       </div>
@@ -255,14 +326,19 @@ onMounted( async () => {
           <h3>Days:</h3>
           <div>
             <ul>
-              <li v-for="(day, index) in days" :key="index">{{ day }}</li>
+              <li
+                v-for="(day, index) in userData.ment.availability"
+                :key="index"
+              >
+                {{ day }}
+              </li>
             </ul>
           </div>
         </div>
         <div class="lines">
           <h3>Duration:</h3>
           <div>
-            <p>{{ duration }}</p>
+            <p>{{ userData.ment.prefSessDur }}</p>
           </div>
         </div>
       </div>
@@ -280,8 +356,8 @@ onMounted( async () => {
               </div>
             </div>
           </div>
-          <div 
-            v-if="remainingCoursesCount > 0" 
+          <div
+            v-if="remainingCoursesCount > 0"
             class="course-card remaining-courses"
             @click="toggleShowAllCourses"
           >
@@ -292,12 +368,12 @@ onMounted( async () => {
             </div>
           </div>
         </div>
-        
+
         <div v-if="showAllCourses" class="all-courses-popup">
           <div class="popup-content">
             <div class="popup-courses">
-              <div 
-                v-for="(course, index) in courseCard" 
+              <div
+                v-for="(course, index) in userData.ment.subjects"
                 :key="index"
                 class="popup-course"
               >
@@ -319,7 +395,7 @@ onMounted( async () => {
   <Transition name="fade">
     <div v-if="!isHelp" class="help-section">
       <div @click="openHelp" class="help">
-        <img src="/help.svg" alt="help" />				
+        <img src="/help.svg" alt="help" />
         <p>Help</p>
       </div>
     </div>
@@ -329,20 +405,24 @@ onMounted( async () => {
   <div class="topbar">
     <div class="topbar-left">
       <div @click="switchComponent('main')" class="topbar-options">
-        <img src="/main.svg" alt="main" />
+        <img src="/main.svg" alt="Main" />
         <p>Main</p>
       </div>
       <div @click="switchComponent('session')" class="topbar-options">
-        <img src="/calendar.svg" alt="calendar" />
+        <img src="/calendar.svg" alt="Session" />
         <p>Sessions</p>
       </div>
       <div @click="switchComponent('records')" class="topbar-options">
-        <img src="/records.svg" alt="record" />
+        <img src="/records.svg" alt="Records" />
         <p>Records</p>
       </div>
       <div @click="switchComponent('files')" class="topbar-options">
-        <img src="/files.svg" alt="notes" />
+        <img src="/uploadCloud.svg" alt="Upload" />
         <p>Files</p>
+      </div>
+      <div @click="switchComponent('fileManage')" class="topbar-options">
+        <img src="/files.svg" alt="Files" />
+        <p>File Manager</p>
       </div>
       <div @click="openLogoutDialog" class="topbar-options">
         <img src="/logout.svg" alt="logout" />
@@ -367,21 +447,20 @@ onMounted( async () => {
       :is="componentMap[activeComponent] || mainView"
       :schedule="todaySchedule"
       :upcomingSchedule="upcommingSchedule"
+      :feedbacks="feedbacks"
+      :files="files"
     />
   </div>
 
   <Transition name="fade" mode="out-in">
     <div v-if="isEdit" class="edit-information-popup">
-      <Information @close="openEditInformation" />
+      <Information :userData="userData" @close="openEditInformation" />
     </div>
   </Transition>
 
   <Transition name="fade" mode="out-in">
     <div v-if="confirmLogout" class="logout-popup">
-      <logoutDialog
-        @close="confirmLogout = false"
-        @logout="handleLogout"
-      />
+      <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
   </Transition>
 
@@ -390,7 +469,7 @@ onMounted( async () => {
       <help @close="isHelp = false" />
     </div>
   </Transition>
-  </template>
+</template>
 
 <style scoped>
 @import "@/assets/mentorpage/mentor.css";

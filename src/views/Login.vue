@@ -12,13 +12,27 @@
         <form @submit.prevent="login">
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
-            <input type="email" v-model="email" placeholder="Enter your email" required />
+            <input
+              type="email"
+              v-model="email"
+              placeholder="Enter your email"
+              required
+            />
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
             <div class="input-with-icon">
-              <i class="fas" :class="passwordVisible ? 'fa-eye' : 'fa-eye-slash'  " @click="togglePasswordVisibility"></i>
-              <input :type="passwordVisible ? 'text' : 'password'" v-model="password" placeholder="Enter your password" required />
+              <i
+                class="fas"
+                :class="passwordVisible ? 'fa-eye' : 'fa-eye-slash'"
+                @click="togglePasswordVisibility"
+              ></i>
+              <input
+                :type="passwordVisible ? 'text' : 'password'"
+                v-model="password"
+                placeholder="Enter your password"
+                required
+              />
             </div>
           </div>
           <button type="submit">Login</button>
@@ -35,17 +49,17 @@
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
 // import api from "../axios.js"; // Adjust the path as necessary
-import axios from 'axios';
+import axios from "axios";
 
 axios.defaults.withCredentials = true; // Enable sending cookies with requests
 axios.defaults.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  }
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
 
 export default {
   name: "LoginComponent",
@@ -59,43 +73,63 @@ export default {
     };
   },
   methods: {
-    async csrf(){
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie').then(response => {
-        console.log("CSRF cookie set");
-      }).catch(error => {
+    async csrf() {
+      try {
+        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        console.log("CSRF cookie set successfully");
+        return true;
+      } catch (error) {
         console.error("Error setting CSRF cookie:", error);
-      });
+        return false;
+      }
     },
     async login() {
-      const loginData = {
-        email: this.email,
-        password: this.password,
-      };
+      try {
+        // Set CSRF token before login attempt
+        const csrfSet = await this.csrf();
+        if (!csrfSet) {
+          console.error("Failed to set CSRF token");
+          return;
+        }
 
-      await axios.post('http://localhost:8000/api/login', loginData, 
-      {headers: {
-        'Content-Type': 'application/json',
-        "X-XSRF-TOKEN": getCookie('XSRF-TOKEN')
-      }})
-      .then(response => {
+        const loginData = {
+          email: this.email,
+          password: this.password,
+        };
+
+        const response = await axios.post(
+          "http://localhost:8000/api/login",
+          loginData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+            },
+          }
+        );
+
         console.log("Login successful:", response.data);
-        if(response.data.user_role === "learner") {
-            this.$router.push('/learner');
-        } else if(response.data.user_role === "mentor") {
-            this.$router.push('/mentor');
-        } else if(response.data.user_role === "admin") {
-            this.$router.push('/admin');
-        } else {
+
+        switch (response.data.user_role) {
+          case "learner":
+            this.$router.push("/learner");
+            break;
+          case "mentor":
+            this.$router.push("/mentor");
+            break;
+          case "admin":
+            this.$router.push("/admin");
+            break;
+          default:
             console.error("Unknown user role:", response.data.user_role);
         }
-      })
+      } catch (error) {
+        console.error("Login failed:", error);
+      }
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
-  },
-  mounted() {
-    this.csrf(); // Call the csrf method when the component is mounted
   },
 };
 </script>
@@ -110,7 +144,8 @@ export default {
   font-family: "Montserrat", sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -198,7 +233,7 @@ form {
   font-weight: 400;
   text-align: left;
   padding-left: 0.5rem;
-  color:#ffffff;
+  color: #ffffff;
 }
 
 .input-with-icon {
@@ -260,7 +295,7 @@ button:hover {
   transform: scale(1);
 }
 
- .switch-link {
+.switch-link {
   color: white;
   font-size: 1rem;
   font-weight: 400;
@@ -280,7 +315,7 @@ button:hover {
   .main-image img {
     width: 600px;
   }
-  
+
   .main-content {
     max-width: 420px;
   }
