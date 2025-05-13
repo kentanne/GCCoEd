@@ -1,88 +1,77 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import Message from "./message.vue";
+import RescheduleDialog from "./RescheduleDialog.vue";
+import axios from "axios";
 
-const todaySchedule = ref([
-  {
-    subject: "Discrete Structures",
-    name: "Paulo Cordova",
-    data: "11/23/25",
-    time: "8:00 AM - 10:00 AM",
-    location: "Library, Room 101",
-  },
-  {
-    subject: "Data Structures",
-    name: "Aisha Patel",
-    data: "11/23/25",
-    time: "10:00 AM - 12:00 PM",
-    location: "Library, Room 102",
-  },
-  {
-    subject: "Software Engineering",
-    name: "Rafael Gutierrez",
-    data: "11/23/25",
-    time: "1:00 PM - 3:00 PM",
-    location: "Library, Room 103",
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-  },
-]);
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-const upcommingSchedule = ref([
-  {
-    subject: "Discrete Structures",
-    name: "Paulo Cordova",
-    data: "11/23/25",
-    time: "8:00 AM - 10:00 AM",
-    location: "Library, Room 101",
+const props = defineProps({
+  schedule: {
+    type: Array,
+    required: false,
   },
-  {
-    subject: "Data Structures",
-    name: "Aisha Patel",
-    data: "11/23/25",
-    time: "10:00 AM - 12:00 PM",
-    location: "Library, Room 102",
+  upcomingSchedule: {
+    type: Array,
+    required: false,
   },
-  {
-    subject: "Software Engineering",
-    name: "Rafael Gutierrez",
-    data: "11/23/25",
-    time: "1:00 PM - 3:00 PM",
-    location: "Library, Room 103",
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-  },
-]);
+});
+
+const todaySchedule = ref([]);
+const upcommingSchedule = ref([]);
+const selectedSessionID = ref(null);
 
 const isMessage = ref(false);
 const activePopup = ref({
   type: null,
   index: null,
 });
+
+function getCookie(name){
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+const sendReminder = async (item) => {
+  try {
+    const response = await axios.post("http://localhost:8000/api/send/session/reminder/" + item.id, {
+      withCredentials: true,
+      header: {
+        'Content-Type': "application/json",
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+      }
+    });
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error sending reminder:", error);
+  }
+};
+
+const cancelSession = async (item) => {
+  try {
+    const response = await axios.post("http://localhost:8000/api/send/session/cancel/" + item.id, {
+      withCredentials: true,
+      header: {
+        'Content-Type': "application/json",
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+      }
+    })
+    .then((response) => {
+      console.log(response.data);
+      todaySchedule.value = todaySchedule.value.filter((session) => session.id !== item.id);
+      upcommingSchedule.value = upcommingSchedule.value.filter((session) => session.id !== item.id);
+      alert("Session cancelled successfully!");
+    });
+  
+  } catch (error) {
+    console.error("Error cancelling session:", error);
+  }
+};
 
 const togglePopup = (type, index, event) => {
   event.stopPropagation();
@@ -98,12 +87,14 @@ const handleOptionClick = (option, item, event) => {
   switch (option) {
     case "remind":
       alert(`Set reminder for ${item.subject}`);
+      sendReminder(item);
       break;
     case "reschedule":
-      alert(`Reschedule ${item.subject}`);
+      selectedSessionID.value = item.id;
       break;
     case "cancel":
       alert(`Cancel ${item.subject}`);
+      cancelSession(item);
       break;
   }
   activePopup.value = { type: null, index: null };
@@ -122,8 +113,12 @@ const closePopups = () => {
   activePopup.value = { type: null, index: null };
 };
 
+const reschedIsOpen = ref(false);
+
 onMounted(() => {
   document.addEventListener('click', closePopups);
+  todaySchedule.value = props.schedule;
+  upcommingSchedule.value = props.upcomingSchedule;
 });
 
 onUnmounted(() => {
@@ -185,7 +180,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">Reschedule</p>
                     </div>
                     <div
                       class="popup-option"
@@ -197,7 +192,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel</p>
+                      <p class="option-text">Cancel Session</p>
                     </div>
                   </div>
                 </transition>
@@ -205,11 +200,11 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.name }}</h2>
+              <h2>{{ item.learner.name }}</h2>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
-              <p>{{ item.data }}</p>
+              <p>{{ item.date }}</p>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
@@ -283,7 +278,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">Reschedule</p>
                     </div>
                     <div
                       class="popup-option"
@@ -303,11 +298,11 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.name }}</h2>
+              <h2>{{ item.learner.name }}</h2>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
-              <p>{{ item.data }}</p>
+              <p>{{ item.date }}</p>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
@@ -343,6 +338,14 @@ onUnmounted(() => {
       </div>
     </Transition>
   </div>
+
+  <div v-if="reschedIsOpen" class="message-pop-up">
+    <RescheduleDialog 
+    :id = "selectedSessionID"
+    @close="reschedIsOpen = false" 
+    @reschedule="reschedule"/>
+  </div>
+
 </template>
 
 <style scoped>
