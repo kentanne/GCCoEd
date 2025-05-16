@@ -1,127 +1,48 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import Message from "./message.vue";
+import RescheduleDialog from "./RescheduleDialog.vue";
+import axios from "axios";
 
-const todaySchedule = ref([
-  {
-    subject: "Discrete Structures",
-    name: "Paulo Cordova",
-    data: "11/23/25",
-    time: "8:00 AM - 10:00 AM",
-    location: "Library, Room 101",
-    files: [
-      { name: "Lecture Notes.pdf", url: "/files/lecture_notes.pdf" },
-      { name: "Assignment.pdf", url: "/files/assignment.pdf" }
-    ]
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
+const props = defineProps({
+  schedule: {
+    type: Array,
+    required: false,
   },
-  {
-    subject: "Data Structures",
-    name: "Aisha Patel",
-    data: "11/23/25",
-    time: "10:00 AM - 12:00 PM",
-    location: "Library, Room 102",
-    files: [
-      { name: "Lecture Notes.pdf", url: "/files/lecture_notes.pdf" },
-      { name: "Assignment.pdf", url: "/files/assignment.pdf" }
-    ]
+  upcomingSchedule: {
+    type: Array,
+    required: false,
+  },
+});
 
-  },
-  {
-    subject: "Software Engineering",
-    name: "Rafael Gutierrez",
-    data: "11/23/25",
-    time: "1:00 PM - 3:00 PM",
-    location: "Library, Room 103",
-    files: [
-      { name: "Lecture Notes.pdf", url: "/files/lecture_notes.pdf" },
-      { name: "Assignment.pdf", url: "/files/assignment.pdf" }
-    ]
-
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-    files: [
-      { name: "Lecture Notes.pdf", url: "/files/lecture_notes.pdf" },
-      { name: "Assignment.pdf", url: "/files/assignment.pdf" }
-    ]
-
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-    files: [
-      { name: "Lecture Notes.pdf", url: "/files/lecture_notes.pdf" },
-      { name: "Assignment.pdf", url: "/files/assignment.pdf" }
-    ]
-
-  },
-]);
-
-const upcommingSchedule = ref([
-  {
-    subject: "Discrete Structures",
-    name: "Paulo Cordova",
-    data: "11/23/25",
-    time: "8:00 AM - 10:00 AM",
-    location: "Library, Room 101",
-    files: [
-      { name: "Syllabus.pdf", url: "/files/syllabus.pdf" },
-      { name: "Reading Materials.zip", url: "/files/reading_materials.zip" }
-    ]
-  },
-  {
-    subject: "Data Structures",
-    name: "Aisha Patel",
-    data: "11/23/25",
-    time: "10:00 AM - 12:00 PM",
-    location: "Library, Room 102",
-    files: [
-      { name: "Syllabus.pdf", url: "/files/syllabus.pdf" },
-      { name: "Reading Materials.zip", url: "/files/reading_materials.zip" }
-    ]
-  },
-  {
-    subject: "Software Engineering",
-    name: "Rafael Gutierrez",
-    data: "11/23/25",
-    time: "1:00 PM - 3:00 PM",
-    location: "Library, Room 103",
-    files: [
-      { name: "Syllabus.pdf", url: "/files/syllabus.pdf" },
-      { name: "Reading Materials.zip", url: "/files/reading_materials.zip" }
-    ]
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-    files: [
-      { name: "Syllabus.pdf", url: "/files/syllabus.pdf" },
-      { name: "Reading Materials.zip", url: "/files/reading_materials.zip" }
-    ]
-  },
-  {
-    subject: "Database Management",
-    name: "Nina Thompson",
-    data: "11/23/25",
-    time: "3:00 PM - 5:00 PM",
-    location: "Library, Room 104",
-    files: [
-      { name: "Syllabus.pdf", url: "/files/syllabus.pdf" },
-      { name: "Reading Materials.zip", url: "/files/reading_materials.zip" }
-    ]
-  },
-]);
+const cancelSession = async (item) => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/send/session/cancel/" + item.id, {
+        withCredentials: true,
+        header: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        todaySchedule.value = todaySchedule.value.filter(
+          (session) => session.id !== item.id
+        );
+        upcommingSchedule.value = upcommingSchedule.value.filter(
+          (session) => session.id !== item.id
+        );
+        alert("Session cancelled successfully!");
+      });
+  } catch (error) {
+    console.error("Error cancelling session:", error);
+  }
+};
 
 const isMessage = ref(false);
 const isFileModalOpen = ref(false);
@@ -130,6 +51,9 @@ const activePopup = ref({
   type: null,
   index: null,
 });
+const todaySchedule = ref([]);
+const upcommingSchedule = ref([]);
+const selectedSessionID = ref(null);
 
 const openFileModal = (files, event) => {
   event.stopPropagation();
@@ -154,7 +78,8 @@ const handleOptionClick = (option, item, event) => {
   event.stopPropagation();
   switch (option) {
     case "reschedule":
-      alert(`Reschedule ${item.subject}`);
+      selectedSessionID.value = item.id;
+      reschedIsOpen.value = true;
       break;
     case "cancel":
       alert(`Cancel ${item.subject}`);
@@ -176,16 +101,19 @@ const closePopups = () => {
   activePopup.value = { type: null, index: null };
 };
 
+const reschedIsOpen = ref(false);
+
 onMounted(() => {
-  document.addEventListener('click', closePopups);
+  document.addEventListener("click", closePopups);
+  todaySchedule.value = props.schedule;
+  upcommingSchedule.value = props.upcomingSchedule;
+  console.log("props: ", props);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', closePopups);
+  document.removeEventListener("click", closePopups);
 });
 </script>
-
-
 
 <template>
   <div class="session-wrapper">
@@ -215,21 +143,26 @@ onUnmounted(() => {
                 />
                 <transition name="fade" mode="out-in">
                   <div
-                    v-if="activePopup.type === 'today' && activePopup.index === index"
+                    v-if="
+                      activePopup.type === 'today' &&
+                      activePopup.index === index
+                    "
                     class="popup-menu"
                     @click.stop
                   >
                     <div
                       class="popup-option"
-                      @click="handleOptionClick('remind', item, $event)"
+                      @click="handleOptionClick('reschedule', item, $event)"
                     >
                       <font-awesome-icon
-                        icon="fa-bell"
+                        icon="fa-calendar-alt"
                         size="1x"
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">
+                        Reschedule
+                      </p>
                     </div>
                     <div
                       class="popup-option"
@@ -241,7 +174,7 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel</p>
+                      <p class="option-text">Cancel Session</p>
                     </div>
                   </div>
                 </transition>
@@ -249,11 +182,15 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.name }}</h2>
+              <h2>{{ item.mentor.user.name }}</h2>
             </div>
             <div class="info">
-              <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
-              <p>{{ item.data }}</p>
+              <font-awesome-icon
+                icon="fa-calendar-alt"
+                size="2x"
+                color="#0084ce"
+              />
+              <p>{{ item.date }}</p>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
@@ -287,7 +224,7 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-        
+
         <!-- Upcoming Schedule -->
         <div class="session-card">
           <h1>UPCOMING</h1>
@@ -308,7 +245,10 @@ onUnmounted(() => {
                 />
                 <transition name="fade" mode="out-in">
                   <div
-                    v-if="activePopup.type === 'upcoming' && activePopup.index === index"
+                    v-if="
+                      activePopup.type === 'upcoming' &&
+                      activePopup.index === index
+                    "
                     class="popup-menu"
                     @click.stop
                   >
@@ -317,13 +257,15 @@ onUnmounted(() => {
                       @click="handleOptionClick('remind', item, $event)"
                     >
                       <font-awesome-icon
-                        icon="fa-bell"
+                        icon="fa-calendar-alt"
                         size="1x"
                         color="#066678"
                         class="option-icon"
                       />
 
-                      <p class="option-text">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">
+                        Reschedule
+                      </p>
                     </div>
                     <div
                       class="popup-option"
@@ -343,11 +285,15 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.name }}</h2>
+              <h2>{{ item.mentor.user.name }}</h2>
             </div>
             <div class="info">
-              <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
-              <p>{{ item.data }}</p>
+              <font-awesome-icon
+                icon="fa-calendar-alt"
+                size="2x"
+                color="#0084ce"
+              />
+              <p>{{ item.date }}</p>
             </div>
             <div class="info">
               <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
@@ -401,7 +347,11 @@ onUnmounted(() => {
             </button>
           </div>
           <div class="file-list">
-            <div v-for="(file, index) in currentFiles" :key="index" class="file-item">
+            <div
+              v-for="(file, index) in currentFiles"
+              :key="index"
+              class="file-item"
+            >
               <font-awesome-icon icon="fa-file" class="file-icon" />
               <span class="file-name">{{ file.name }}</span>
               <a :href="file.url" download class="download-button">
@@ -413,6 +363,14 @@ onUnmounted(() => {
         </div>
       </div>
     </Transition>
+
+    <div v-if="reschedIsOpen" class="message-pop-up">
+      <RescheduleDialog
+        :id="selectedSessionID"
+        @close="reschedIsOpen = false"
+        @reschedule="reschedule"
+      />
+    </div>
   </div>
 </template>
 
@@ -600,7 +558,8 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.envelope, .file-icon {
+.envelope,
+.file-icon {
   width: 25px !important;
   cursor: pointer;
   position: relative;
@@ -650,7 +609,6 @@ onUnmounted(() => {
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: solid 2px rgb(47, 47, 103);
-
 }
 
 .file-modal-header {
@@ -722,5 +680,4 @@ onUnmounted(() => {
 .download-button:hover {
   background-color: #0c434d;
 }
-
 </style>

@@ -28,23 +28,26 @@ const activePopup = ref({
   index: null,
 });
 
-function getCookie(name){
+function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) return parts.pop().split(";").shift();
   return null;
 }
 
 const sendReminder = async (item) => {
   try {
-    const response = await axios.post("http://localhost:8000/api/send/session/reminder/" + item.id, {
-      withCredentials: true,
-      header: {
-        'Content-Type': "application/json",
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+    const response = await axios.post(
+      "http://localhost:8000/api/send/session/reminder/" + item.id,
+      {
+        withCredentials: true,
+        header: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
       }
-    });
+    );
     console.log(response.data);
   } catch (error) {
     console.error("Error sending reminder:", error);
@@ -53,21 +56,25 @@ const sendReminder = async (item) => {
 
 const cancelSession = async (item) => {
   try {
-    const response = await axios.post("http://localhost:8000/api/send/session/cancel/" + item.id, {
-      withCredentials: true,
-      header: {
-        'Content-Type': "application/json",
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
-      }
-    })
-    .then((response) => {
-      console.log(response.data);
-      todaySchedule.value = todaySchedule.value.filter((session) => session.id !== item.id);
-      upcommingSchedule.value = upcommingSchedule.value.filter((session) => session.id !== item.id);
-      alert("Session cancelled successfully!");
-    });
-  
+    const response = await axios
+      .post("http://localhost:8000/api/send/session/cancel/" + item.id, {
+        withCredentials: true,
+        header: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        todaySchedule.value = todaySchedule.value.filter(
+          (session) => session.id !== item.id
+        );
+        upcommingSchedule.value = upcommingSchedule.value.filter(
+          (session) => session.id !== item.id
+        );
+        alert("Session cancelled successfully!");
+      });
   } catch (error) {
     console.error("Error cancelling session:", error);
   }
@@ -116,13 +123,13 @@ const closePopups = () => {
 const reschedIsOpen = ref(false);
 
 onMounted(() => {
-  document.addEventListener('click', closePopups);
+  document.addEventListener("click", closePopups);
   todaySchedule.value = props.schedule;
   upcommingSchedule.value = props.upcomingSchedule;
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', closePopups);
+  document.removeEventListener("click", closePopups);
 });
 </script>
 
@@ -154,7 +161,10 @@ onUnmounted(() => {
                 />
                 <transition name="fade" mode="out-in">
                   <div
-                    v-if="activePopup.type === 'today' && activePopup.index === index"
+                    v-if="
+                      activePopup.type === 'today' &&
+                      activePopup.index === index
+                    "
                     class="popup-menu"
                     @click.stop
                   >
@@ -180,7 +190,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text" @click="reschedIsOpen = true">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">
+                        Reschedule
+                      </p>
                     </div>
                     <div
                       class="popup-option"
@@ -200,10 +212,14 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.learner.name }}</h2>
+              <h2>{{ item.learner.user.name }}</h2>
             </div>
             <div class="info">
-              <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
+              <font-awesome-icon
+                icon="fa-calendar-alt"
+                size="2x"
+                color="#0084ce"
+              />
               <p>{{ item.date }}</p>
             </div>
             <div class="info">
@@ -231,7 +247,7 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-        
+
         <!-- Upcoming Schedule -->
         <div class="session-card">
           <h1>UPCOMING</h1>
@@ -252,7 +268,10 @@ onUnmounted(() => {
                 />
                 <transition name="fade" mode="out-in">
                   <div
-                    v-if="activePopup.type === 'upcoming' && activePopup.index === index"
+                    v-if="
+                      activePopup.type === 'upcoming' &&
+                      activePopup.index === index
+                    "
                     class="popup-menu"
                     @click.stop
                   >
@@ -278,7 +297,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text" @click="reschedIsOpen = true">Reschedule</p>
+                      <p class="option-text" @click="reschedIsOpen = true">
+                        Reschedule
+                      </p>
                     </div>
                     <div
                       class="popup-option"
@@ -298,10 +319,14 @@ onUnmounted(() => {
             </div>
             <div class="info name">
               <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.learner.name }}</h2>
+              <h2>{{ item.learner.user.name }}</h2>
             </div>
             <div class="info">
-              <font-awesome-icon icon="fa-calendar-alt" size="2x" color="#0084ce" />
+              <font-awesome-icon
+                icon="fa-calendar-alt"
+                size="2x"
+                color="#0084ce"
+              />
               <p>{{ item.date }}</p>
             </div>
             <div class="info">
@@ -340,12 +365,12 @@ onUnmounted(() => {
   </div>
 
   <div v-if="reschedIsOpen" class="message-pop-up">
-    <RescheduleDialog 
-    :id = "selectedSessionID"
-    @close="reschedIsOpen = false" 
-    @reschedule="reschedule"/>
+    <RescheduleDialog
+      :id="selectedSessionID"
+      @close="reschedIsOpen = false"
+      @reschedule="reschedule"
+    />
   </div>
-
 </template>
 
 <style scoped>

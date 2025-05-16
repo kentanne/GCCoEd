@@ -12,27 +12,46 @@
         <div class="personal-grid">
           <div class="personal-col">
             <div class="personal-field">
-              <label class="personal-label" for="full-name">FULL NAME</label>
+              <!-- For Full Name -->
+              <label class="personal-label required" for="full-name"
+                >FULL NAME</label
+              >
               <input
                 type="text"
                 id="full-name"
                 v-model="fullName"
+                @input="validateField('fullName', fullName)"
+                @blur="validateField('fullName', fullName)"
                 placeholder="Enter your full name (FN MI LN)"
                 class="personal-input"
+                :class="{ error: validationErrors.fullName }"
               />
+              <span v-if="validationErrors.fullName" class="validation-message">
+                {{ validationErrors.fullName }}
+              </span>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="address">ADDRESS</label>
+              <!-- For Address -->
+              <label class="personal-label required" for="address"
+                >ADDRESS</label
+              >
               <input
                 type="text"
                 id="address"
                 v-model="address"
+                @input="validateField('address', address)"
+                @blur="validateField('address', address)"
                 placeholder="Enter your address"
                 class="personal-input"
+                :class="{ error: validationErrors.address }"
               />
+              <span v-if="validationErrors.address" class="validation-message">
+                {{ validationErrors.address }}
+              </span>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="gender">GENDER</label>
+              <!-- For Gender -->
+              <label class="personal-label required" for="gender">GENDER</label>
               <div class="gender-dropdown">
                 <div
                   class="dropdown-container"
@@ -74,6 +93,9 @@
                   placeholder="Specify your gender"
                 />
               </div>
+              <span v-if="validationErrors.gender" class="validation-message">
+                {{ validationErrors.gender }}
+              </span>
             </div>
           </div>
           <div class="personal-col">
@@ -139,34 +161,61 @@
                 </div>
                 <div v-if="dropdownOpen.program" class="dropdown-options">
                   <div
-                    v-for="prog in programs"
-                    :key="prog"
                     class="dropdown-option"
-                    @click="selectProgram(prog)"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Information Technology (BSIT)'
+                      )
+                    "
                   >
-                    {{ prog }}
+                    Bachelor of Science in Information Technology (BSIT)
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Computer Science (BSCS)'
+                      )
+                    "
+                  >
+                    Bachelor of Science in Computer Science (BSCS)
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)'
+                      )
+                    "
+                  >
+                    Bachelor of Science in Entertainment and Multimedia
+                    Computing (BSEMC)
                   </div>
                 </div>
               </div>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="contact-number"
-                >CONTACT NUMBER
-              </label>
+              <!-- For Contact Number -->
+              <label class="personal-label required" for="contact-number"
+                >CONTACT NUMBER</label
+              >
               <input
                 type="text"
                 id="contact-number"
                 v-model="contactNumber"
-                @input="validateContactNumber"
+                @input="validateField('contactNumber', contactNumber)"
+                @blur="validateField('contactNumber', contactNumber)"
                 placeholder="Enter your contact number (11 digits)"
                 class="personal-input"
+                :class="{ error: validationErrors.contactNumber }"
                 maxlength="11"
               />
-              <small
-                v-if="contactNumber.length > 0 && contactNumber.length < 11"
-                class="validation-error"
-                >Contact number must be 11 digits</small
+              <span
+                v-if="validationErrors.contactNumber"
+                class="validation-message"
               >
+                {{ validationErrors.contactNumber }}
+              </span>
             </div>
           </div>
         </div>
@@ -178,44 +227,49 @@
         <div class="profile-grid">
           <div class="profile-col">
             <div class="profile-field">
-              <label class="profile-label" for="subjects"
-                >SUBJECTS OFFERED</label
-              >
-              <div class="dropdown-wrapper">
-                <div class="dropdown-trigger" @click="toggleSubjectDropdown">
-                  <input
-                    type="text"
-                    v-model="selectedSubjectCategory"
-                    placeholder="Select subject category"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-show="showCategories" class="dropdown-menu categories">
-                  <div
-                    v-for="category in categories"
-                    :key="category.type"
-                    @click="selectCategory(category)"
-                    @mouseenter="showSubjects(category.type)"
-                    class="dropdown-item"
-                  >
-                    {{ category.name }}
-                    <span
-                      class="count-badge"
-                      v-if="selectedSubjectsCount[category.type] > 0"
-                    >
-                      ({{ selectedSubjectsCount[category.type] }})
-                    </span>
-                  </div>
-                </div>
-
-                <div
-                  v-show="showSubjectsDropdown"
-                  class="dropdown-menu subjects"
-                  @mouseleave="showSubjectsDropdown = false"
+              <!-- For Subjects Offered -->
+              <label class="profile-label required">SUBJECTS OFFERED</label>
+              <div class="profile-field">
+                <label class="profile-label required"
+                  >SUBJECTS OF INTEREST</label
                 >
-                  <div v-if="currentSubjects.length > 0">
+                <div class="dropdown-wrapper">
+                  <div class="dropdown-trigger" @click="toggleSubjectDropdown">
+                    <input
+                      type="text"
+                      :placeholder="
+                        selectedSubjects.length
+                          ? `${selectedSubjects.length} subjects selected`
+                          : 'Select subjects'
+                      "
+                      readonly
+                      class="profile-input"
+                      :class="{ error: validationErrors.selectedSubjects }"
+                    />
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                  </div>
+
+                  <div v-if="showCategories" class="dropdown-menu categories">
+                    <div
+                      v-for="category in categories"
+                      :key="category.type"
+                      class="dropdown-item"
+                      @click="selectCategory(category)"
+                    >
+                      {{ category.name }}
+                      <span
+                        v-if="selectedSubjectsCount[category.type]"
+                        class="count-badge"
+                      >
+                        {{ selectedSubjectsCount[category.type] }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    v-if="showSubjectsDropdown"
+                    class="dropdown-menu subjects"
+                  >
                     <div
                       v-for="subject in currentSubjects"
                       :key="subject"
@@ -223,24 +277,34 @@
                     >
                       <input
                         type="checkbox"
-                        :id="'subject-' + subject"
+                        :id="subject"
                         :value="subject"
                         v-model="selectedSubjects"
-                        @click.stop
+                        @change="updateSelectedCounts"
                       />
-                      <label :for="'subject-' + subject">{{ subject }}</label>
+                      <label :for="subject">{{ subject }}</label>
+                    </div>
+                    <div
+                      v-if="currentSubjects.length === 0"
+                      class="dropdown-item no-subjects"
+                    >
+                      No subjects available
                     </div>
                   </div>
-                  <div v-else class="dropdown-item no-subjects">
-                    No subjects available
-                  </div>
                 </div>
+                <span
+                  v-if="validationErrors.selectedSubjects"
+                  class="validation-message"
+                >
+                  {{ validationErrors.selectedSubjects }}
+                </span>
               </div>
             </div>
             <div class="profile-field">
-              <label class="profile-label" for="modality"
-                >TEACHING MODALITY
-              </label>
+              <!-- For Teaching Modality -->
+              <label class="profile-label required" for="modality"
+                >TEACHING MODALITY</label
+              >
               <div class="subjmodality-dropdown">
                 <div
                   class="dropdown-container"
@@ -279,8 +343,8 @@
             </div>
             <div class="profile-field">
               <label class="profile-label" for="availability-days"
-                >DAYS OF AVAILABILITY
-              </label>
+                >DAYS OF AVAILABILITY</label
+              >
               <div class="availability-dropdown">
                 <div
                   class="dropdown-container"
@@ -448,28 +512,44 @@
           <div class="profile-bottom-grid">
             <div class="profile-bottom-col">
               <div class="profile-field">
-                <label class="profile-label" for="bio">SHORT BIO</label>
+                <!-- For Bio -->
+                <label class="profile-label required" for="bio"
+                  >SHORT BIO</label
+                >
                 <textarea
                   id="bio"
                   v-model="bio"
-                  placeholder="Tell us about yourself"
-                  rows="2"
+                  @input="validateField('bio', bio)"
+                  @blur="validateField('bio', bio)"
+                  placeholder="Tell us about yourself (50-500 characters)"
+                  rows="4"
                   class="profile-textarea"
+                  :class="{ error: validationErrors.bio }"
                 ></textarea>
+                <span v-if="validationErrors.bio" class="validation-message">
+                  {{ validationErrors.bio }}
+                </span>
               </div>
             </div>
             <div class="profile-bottom-col">
               <div class="profile-field">
-                <label class="profile-label" for="experience"
+                <!-- For Experience -->
+                <label class="profile-label required" for="experience"
                   >TUTORING EXPERIENCE</label
                 >
                 <textarea
-                  id="experience"
+                  id="goals"
                   v-model="experience"
-                  placeholder="Describe your tutoring experience"
-                  rows="2"
+                  @input="validateField('experience', experience)"
+                  @blur="validateField('experience', experience)"
+                  placeholder="Describe your tutoring experience (50-500 characters)"
+                  rows="4"
                   class="profile-textarea"
+                  :class="{ error: validationErrors.goals }"
                 ></textarea>
+                <span v-if="validationErrors.goals" class="validation-message">
+                  {{ validationErrors.goals }}
+                </span>
               </div>
             </div>
           </div>
@@ -693,6 +773,47 @@ export default {
       ],
       showStatusPopup: false,
       isSubmitted: false,
+      validationErrors: {
+        fullName: "",
+        address: "",
+        gender: "",
+        yearLevel: "",
+        program: "",
+        contactNumber: "",
+        selectedSubjects: "",
+        modality: "",
+        selectedDays: "",
+        selectedsessionStyles: "",
+        sessionDuration: "",
+        bio: "",
+        goals: "",
+        profileImage: "",
+      },
+      validationRules: {
+        fullName: {
+          pattern: /^[a-zA-Z\s.]{5,50}$/,
+          message:
+            "Full name should contain only letters, spaces, and periods (5-50 characters)",
+        },
+        address: {
+          minLength: 10,
+          message: "Address should be at least 10 characters long",
+        },
+        contactNumber: {
+          pattern: /^09\d{9}$/,
+          message: "Contact number should start with 09 and have 11 digits",
+        },
+        bio: {
+          minLength: 50,
+          maxLength: 500,
+          message: "Bio should be between 50-500 characters",
+        },
+        goals: {
+          minLength: 50,
+          maxLength: 500,
+          message: "Goals should be between 50-500 characters",
+        },
+      },
     };
   },
 
@@ -1222,6 +1343,54 @@ export default {
     proceedToHome() {
       this.$router.push("/");
     },
+
+    validateField(field, value) {
+      const rules = this.validationRules[field];
+      if (!rules) return;
+
+      if (rules.pattern && !rules.pattern.test(value)) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      if (rules.minLength && value.length < rules.minLength) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      if (rules.maxLength && value.length > rules.maxLength) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      this.validationErrors[field] = "";
+      return true;
+    },
+
+    validateSelections() {
+      // Subjects validation
+      if (this.selectedSubjects.length === 0) {
+        this.validationErrors.selectedSubjects =
+          "Please select at least one subject";
+      } else {
+        this.validationErrors.selectedSubjects = "";
+      }
+
+      // Days validation
+      if (this.selectedDays.length === 0) {
+        this.validationErrors.selectedDays = "Please select at least one day";
+      } else {
+        this.validationErrors.selectedDays = "";
+      }
+
+      // Learning styles validation
+      if (this.selectedsessionStyles.length === 0) {
+        this.validationErrors.selectedsessionStyles =
+          "Please select at least one learning style";
+      } else {
+        this.validationErrors.selectedsessionStyles = "";
+      }
+    },
   },
 
   mounted() {
@@ -1229,23 +1398,38 @@ export default {
   },
 
   watch: {
+    fullName(newVal) {
+      this.validateField("fullName", newVal);
+    },
+    address(newVal) {
+      this.validateField("address", newVal);
+    },
+    contactNumber(newVal) {
+      this.validateField("contactNumber", newVal);
+    },
+    bio(newVal) {
+      this.validateField("bio", newVal);
+    },
+    experience(newVal) {
+      this.validateField("experience", newVal);
+    },
     selectedSubjects: {
       handler() {
-        this.updateSelectedCounts();
+        this.validateSelections();
       },
       deep: true,
     },
-
-    program(newVal) {
-      if (newVal) {
-        this.updateAvailableSubjects();
-      }
+    selectedDays: {
+      handler() {
+        this.validateSelections();
+      },
+      deep: true,
     },
-
-    gender(newVal) {
-      if (newVal !== "Other") {
-        this.otherGender = "";
-      }
+    selectedsessionStyles: {
+      handler() {
+        this.validateSelections();
+      },
+      deep: true,
     },
   },
 };
@@ -2006,5 +2190,34 @@ body {
   cursor: pointer;
   color: #02475e;
   font-size: 0.85rem;
+}
+
+.required::after {
+  content: "*";
+  color: #ff6b6b;
+  margin-left: 4px;
+}
+
+.validation-message {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
+.personal-input.error,
+.profile-input.error,
+.profile-textarea.error {
+  border-color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+/* Update the existing validation-error class */
+.validation-error {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="signup-container">
     <Navbar />
 
-    <main>
+    <!-- <main>
       <div class="main-image">
         <img alt="Illustration" :src="logo" />
       </div>
@@ -12,27 +12,52 @@
         <form @submit.prevent="signup">
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
-            <input type="email" v-model="email" placeholder="Enter your email" required />
+            <input
+              type="email"
+              v-model="email"
+              placeholder="Enter your email"
+              required
+            />
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
             <div class="input-with-icon">
-              <i class="fas" :class="passwordVisible ? 'fa-eye' : 'fa-eye-slash'" @click="togglePasswordVisibility"></i>
-              <input :type="passwordVisible ? 'text' : 'password'" v-model="password" placeholder="Enter your password" required />
+              <i
+                class="fas"
+                :class="passwordVisible ? 'fa-eye' : 'fa-eye-slash'"
+                @click="togglePasswordVisibility"
+              ></i>
+              <input
+                :type="passwordVisible ? 'text' : 'password'"
+                v-model="password"
+                placeholder="Enter your password"
+                required
+              />
             </div>
           </div>
           <div class="input-field">
             <label>CONFIRM PASSWORD</label>
             <div class="input-with-icon">
-              <i class="fas" :class="confirmPasswordVisible ? 'fa-eye' : 'fa-eye-slash'" @click="toggleConfirmPasswordVisibility"></i>
-              <input :type="confirmPasswordVisible ? 'text' : 'password'" v-model="password_confirmation" placeholder="Confirm your password" required />
+              <i
+                class="fas"
+                :class="confirmPasswordVisible ? 'fa-eye' : 'fa-eye-slash'"
+                @click="toggleConfirmPasswordVisibility"
+              ></i>
+              <input
+                :type="confirmPasswordVisible ? 'text' : 'password'"
+                v-model="password_confirmation"
+                placeholder="Confirm your password"
+                required
+              />
             </div>
           </div>
           <div class="input-field">
             <label>ROLE</label>
             <div class="custom-select">
               <select v-model="role" required>
-                <option value="" disabled selected class="placeholder-option">Select your role</option>
+                <option value="" disabled selected class="placeholder-option">
+                  Select your role
+                </option>
                 <option value="learner">Learner</option>
                 <option value="mentor">Mentor</option>
               </select>
@@ -45,7 +70,56 @@
           Already have an account? <router-link to="/login">Login</router-link>
         </p>
       </div>
-    </main>
+    </main> -->
+
+    <section class="join-section" id="get-started">
+      <div class="join-card learner-card">
+        <h3>Join as</h3>
+        <h2>LEARNER</h2>
+        <ul>
+          <li>
+            <i class="fas fa-check"></i> Find mentors for various subjects and
+            skills.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Schedule learning sessions at your
+            convenience.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Get guidance from experienced peers.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Improve your knowledge with structured
+            sessions.
+          </li>
+        </ul>
+        <button class="join-btn" @click="signUpAsLearner">
+          Join as LEARNER
+        </button>
+      </div>
+      <div class="join-card mentor-card">
+        <h3>Join as</h3>
+        <h2>MENTOR</h2>
+        <ul>
+          <li>
+            <i class="fas fa-check"></i> Share your knowledge and expertise.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Set your availability and manage
+            sessions.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Help fellow students enhance their
+            learning.
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Build leadership and teaching
+            experience.
+          </li>
+        </ul>
+        <button class="join-btn" @click="signUpAsMentor">Join as MENTOR</button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -60,35 +134,49 @@ export default {
   data() {
     return {
       logo,
-      email: "",
-      password: "",
-      password_confirmation: "",
+      // email: "",
+      // password: "",
+      // password_confirmation: "",
       role: "",
-      passwordVisible: false,
-      confirmPasswordVisible: false,
+      // passwordVisible: false,
+      // confirmPasswordVisible: false,
     };
   },
   methods: {
     signup() {
       const store = registrationStore();
 
-      store.passAndMail(
-        {
-          email: this.email,
-          password: this.password,
-          password_confirmation: this.password_confirmation,
-          role: this.role
-        }
-      )
-      
+      store.passAndMail({
+        // email: this.email,
+        // password: this.password,
+        // password_confirmation: this.password_confirmation,
+        role: this.role,
+      });
+
       console.log("Store data after signup:", store.registrationData); // Debugging
-      
-      if(this.role === "learner") {
+
+      if (this.role === "learner") {
         this.$router.push("/learner-info");
       }
-      if(this.role === "mentor") {
+      if (this.role === "mentor") {
         this.$router.push("/mentor-info");
       }
+    },
+    signUpAsLearner() {
+      const store = registrationStore();
+      store.passAndMail({
+        role: "learner",
+      });
+
+      this.$router.push("/learner-info");
+    },
+    signUpAsMentor() {
+      const store = registrationStore();
+      store.passAndMail({
+        role: "mentor",
+      });
+
+      this.$router.push("/mentor-info");
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
@@ -96,7 +184,6 @@ export default {
     toggleConfirmPasswordVisibility() {
       this.confirmPasswordVisible = !this.confirmPasswordVisible;
     },
-
   },
 };
 </script>
@@ -111,7 +198,8 @@ export default {
   font-family: "Montserrat", sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -119,7 +207,7 @@ html, body {
   color: white;
 }
 
-.signup-container{
+.signup-container {
   background-image: url("@/assets/bg.png");
   position: fixed;
   top: 0;
@@ -192,11 +280,11 @@ form {
 }
 
 .input-field label {
-  font-size: 0.80rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-align: left;
   padding-left: 0.5rem;
-  color:#ffffff;
+  color: #ffffff;
 }
 
 .input-with-icon {
@@ -260,7 +348,7 @@ input:focus {
   top: 50%;
   right: 1rem;
   transform: translateY(-50%);
-  pointer-events : none;
+  pointer-events: none;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.8rem;
 }
@@ -321,9 +409,116 @@ button:hover {
   .main-image img {
     width: 600px;
   }
-  
+
   .main-content {
     max-width: 420px;
   }
+}
+
+.join-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: url("@/assets/school_bg.png") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 80px 5%;
+}
+
+.join-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.561);
+  backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
+.join-card {
+  width: 350px;
+  height: 480px;
+  margin-top: 6rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.learner-card {
+  background: #02475e;
+  color: white;
+}
+
+.mentor-card {
+  background: white;
+  color: #02475e;
+}
+
+.join-card h3 {
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+.join-card h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.join-card ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 2.5rem;
+}
+
+.join-card ul li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.join-card ul li i {
+  margin-right: 25px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.join-btn {
+  display: center;
+  width: 60%;
+  padding: 10px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.learner-card .join-btn {
+  background: white;
+  color: #02475e;
+}
+
+.mentor-card .join-btn {
+  background: #02475e;
+  color: white;
+}
+
+.join-btn:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
 }
 </style>

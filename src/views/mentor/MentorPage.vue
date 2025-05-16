@@ -37,6 +37,7 @@ const loggedUserDets = async () => {
               availability: JSON.parse(response.data.ment.availability),
               subjects: JSON.parse(response.data.ment.subjects),
               teach_sty: JSON.parse(response.data.ment.teach_sty),
+              rating_ave: response.data.ment.rating_ave || 0, // Add this line
             },
           };
         } else {
@@ -166,6 +167,8 @@ const userData = ref({
     phoneNum: "",
     teach_sty: [],
     credentials: [],
+    exp: "",
+    rating_ave: 0, // Add this default value
   },
 });
 
@@ -285,7 +288,9 @@ onMounted(async () => {
         >
         <div class="stars">
           <span class="filledStar" v-for="i in 5" :key="i">
-            <span v-if="i <= starFilled">★</span>
+            <span v-if="i <= Math.round(userData?.ment?.rating_ave || 0)"
+              >★</span
+            >
             <span v-else>☆</span>
           </span>
         </div>

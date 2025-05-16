@@ -13,7 +13,7 @@
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
             <input
-              type="email"
+              type="text"
               v-model="email"
               placeholder="Enter your email"
               required
@@ -39,6 +39,9 @@
         </form>
         <p class="switch-link">
           Don't have an account? <router-link to="/signup">Sign up</router-link>
+        </p>
+        <p class="switch-link">
+          <router-link to="/forgot-password">Forgot Password?</router-link>
         </p>
       </div>
     </main>
@@ -93,7 +96,7 @@ export default {
         }
 
         const loginData = {
-          email: this.email,
+          login: this.email,
           password: this.password,
         };
 
@@ -111,6 +114,9 @@ export default {
         console.log("Login successful:", response.data);
 
         switch (response.data.user_role) {
+          case null:
+            this.$router.push("/signup");
+            break;
           case "learner":
             this.$router.push("/learner");
             break;
