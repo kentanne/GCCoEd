@@ -21,12 +21,22 @@
                 v-if="item.type === 'text'"
                 type="text"
                 v-model="personalData[toCamelCase(item.field)]"
+                :class="{
+                  'input-error': validationErrors[toCamelCase(item.field)],
+                }"
                 :placeholder="
                   getPlaceholder(item.field, 'personal') ||
                   `Enter your ${item.field.toLowerCase()}`
                 "
                 class="standard-input"
               />
+
+              <span
+                v-if="validationErrors[toCamelCase(item.field)]"
+                class="error-message"
+              >
+                {{ validationErrors[toCamelCase(item.field)] }}
+              </span>
 
               <!-- Generic Select Dropdown -->
               <div
@@ -359,13 +369,28 @@
             <textarea
               v-model="profileData[toCamelCase(item.field)]"
               class="fixed-textarea"
+              :class="{
+                'input-error': validationErrors[toCamelCase(item.field)],
+              }"
               :placeholder="
                 getPlaceholder(item.field, 'profile') ||
                 (item.field === 'Short Bio'
                   ? 'Tell us about yourself'
                   : 'Describe your tutoring experience')
               "
+              @input="
+                validateField(
+                  toCamelCase(item.field),
+                  profileData[toCamelCase(item.field)]
+                )
+              "
             ></textarea>
+            <span
+              v-if="validationErrors[toCamelCase(item.field)]"
+              class="error-message"
+            >
+              {{ validationErrors[toCamelCase(item.field)] }}
+            </span>
           </div>
         </div>
       </div>
@@ -468,6 +493,8 @@ const personalData = reactive({
 });
 const profileData = reactive({
   courseOffered: [],
+  shortBio: "",
+  tutoringExperience: "",
 });
 const dropdownOpen = reactive({});
 
@@ -518,7 +545,7 @@ const teachingStyleOptions = ref([
 ]);
 
 const inputFieldPersonalInformation = ref([
-  { field: "Full Name", type: "text" },
+  // { field: "Full Name", type: "text" },
   { field: "Year Level", type: "select", options: yearLevelOptions },
   { field: "Program", type: "select", options: programOptions },
   { field: "Address", type: "text" },
@@ -876,6 +903,96 @@ const getPlaceholder = (field, section) => {
 
   return mappings[section][field];
 };
+
+const validationErrors = reactive({
+  contactNumber: "",
+  address: "",
+  shortBio: "",
+  tutoringExperience: "",
+});
+
+// const validateInputs = () => {
+//   let isValid = true;
+
+//   const requiredFields = {
+//     contactNumber: personalData.contactNumber,
+//     address: personalData.address,
+//     shortBio: profileData.shortBio,
+//     tutoringExperience: profileData.tutoringExperience,
+//   };
+
+//   for (const field in validationErrors) {
+//     if (!requiredFields[field]?.toString().trim()) {
+//       validationErrors[field] = "This field is required.";
+//       isValid = false;
+//     } else {
+//       validationErrors[field] = "";
+//     }
+//   }
+
+//   return isValid;
+// };
+
+function validateField(field, value) {
+  const trimmedValue = value.trim();
+
+  // No required fields, so empty means no error
+  if (trimmedValue === "") {
+    delete validationErrors[field];
+    return;
+  }
+
+  switch (field) {
+    case "shortBio":
+      if (trimmedValue.length < 20) {
+        validationErrors[field] = "Short Bio should be at least 20 characters.";
+      } else {
+        delete validationErrors[field];
+      }
+      break;
+
+    case "tutoringExperience":
+      if (trimmedValue.length < 10) {
+        validationErrors[field] =
+          "Tutoring Experience should be at least 10 characters.";
+      } else {
+        delete validationErrors[field];
+      }
+      break;
+
+    case "contactNumber":
+      if (trimmedValue.length !== 11) {
+        validationErrors[field] = "Contact Number should be 11 digits.";
+      } else if (!/^\d+$/.test(trimmedValue)) {
+        validationErrors[field] = "Contact Number should contain only digits.";
+      } else {
+        delete validationErrors[field];
+      }
+      break;
+
+    case "address": {
+      if (trimmedValue.length < 10) {
+        validationErrors[field] = "Address should be at least 10 characters.";
+      } else {
+        delete validationErrors[field];
+      }
+      break;
+    }
+
+    default:
+      delete validationErrors[field];
+  }
+}
+
+watch(
+  personalData,
+  (newData) => {
+    for (const key in newData) {
+      validateField(key, newData[key]);
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
@@ -1131,5 +1248,19 @@ const getPlaceholder = (field, section) => {
   border-radius: 10px;
   cursor: pointer;
   font-size: 16px;
+}
+
+/* Style for invalid input or textarea */
+.input-error {
+  border-color: #f87171; /* Tailwind red-400 */
+  background-color: #fff1f2; /* Tailwind red-50 */
+  outline: none;
+}
+
+/* Error message styling */
+.error-message {
+  color: #ef4444; /* Tailwind red-500 */
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 0.25rem;
 }
 </style>
