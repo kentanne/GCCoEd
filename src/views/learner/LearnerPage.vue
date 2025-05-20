@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <script setup>
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
@@ -36,18 +35,6 @@ const activeComponent = ref("main");
 const switchComponent = (component) => {
   if (activeComponent.value !== component) {
     activeComponent.value = component;
-=======
-<template>
-    <div>
-      <h1>This is the LEARNER Dashboard</h1>
-      <p>Only learners should see this page</p>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'LearnerPage'
->>>>>>> origin/main
   }
 };
 
