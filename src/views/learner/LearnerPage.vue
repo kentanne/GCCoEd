@@ -2,21 +2,134 @@
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
 import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
+import axios from "axios";
 
-const userName = ref("John Doe Mendoza");
-const yearLevel = ref(2);
-const program = ref("BSCS");
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-const bio = ref(
-  "Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis"
-);
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
 
-const goals = ref(
-  "Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis"
-);
+const getLearnerDets = async () => {
+  try {
+    await axios
+      .get("http://localhost:8000/api/learner/details", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("User details fetched successfully:", response.data);
+        if (response.status === 200) {
+          // Store data in unified userData ref
+          userData.value = {
+            user: response.data.user,
+            learn: {
+              ...response.data.learn,
+              availability: JSON.parse(response.data.learn.availability),
+              subjects: JSON.parse(response.data.learn.subjects),
+              learn_sty: JSON.parse(response.data.learn.learn_sty),
+            },
+          };
+        } else {
+          throw new Error("Failed to fetch user details");
+        }
+      });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return null;
+  }
+};
 
-const days = ref("MONDAY-TUESDAY");
-const duration = ref(2);
+const sessionInfo = async () => {
+  try {
+    const sessionDeets = await axios
+      .get(`http://localhost:8000/api/learner/sched`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("session details:", response.data);
+        todaySchedule.value = response.data.schedules_today;
+        upcommingSchedule.value = response.data.upcoming_schedules;
+      });
+  } catch (error) {
+    console.error("Error fetching session details:", error);
+    return null;
+  }
+};
+const mentorProfile = async () => {
+  try {
+    await axios
+      .get("http://localhost:8000/api/learner/users", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Mentor profiles fetched successfully: ", response.data);
+        if (response.status === 200) {
+          users.value = response.data.map((item) => ({
+            id: item.user.id,
+            userName: item.user.name,
+            yearLevel: item.mentor_infos.year,
+            course: item.mentor_infos.course,
+            image_id: item.mentor_infos.image,
+            proficiency: item.mentor_infos.proficiency,
+            subjects: JSON.parse(item.mentor_infos.subjects),
+            availability: JSON.parse(item.mentor_infos.availability),
+            rating_ave: item.mentor_infos.rating_ave || 0,
+            bio: item.mentor_infos.bio,
+            prefSessDur: item.mentor_infos.prefSessDur,
+            teach_sty: JSON.parse(item.mentor_infos.teach_sty || "[]"),
+            credentials: item.mentor_infos.credentials || [],
+          }));
+        }
+      });
+  } catch (error) {
+    console.error("Error fetching mentor profiles:", error);
+  }
+};
+
+const userData = ref({
+  user: {
+    id: null,
+    name: "",
+    email: "",
+    role: "",
+  },
+  learn: {
+    address: "",
+    year: "",
+    course: "",
+    availability: [],
+    prefSessDur: "",
+    bio: "",
+    subjects: [],
+    image: "",
+    phoneNum: "",
+    learn_sty: [],
+    goals: "",
+    rating_ave: 0,
+  },
+});
+
+const todaySchedule = ref([]);
+const upcommingSchedule = ref([]);
 
 const isEdit = ref(false);
 const users = ref([]);
@@ -56,24 +169,13 @@ const componentMap = {
   records: recordsView,
 };
 
-const courseCard = ref([
-  "Computer Programming",
-  "Ethics",
-  "Information Management",
-  "Networking",
-  "Database",
-  "Discrete Mathematics",
-  "Calculus",
-  "Algorithms",
-  "Data Structures",
-  "Operating Systems",
-  "Computer Architecture",
-  "Software Engineering"
-]);
+const courseCard = ref([]);
 
 const displayedCourses = computed(() => courseCard.value.slice(0, 5));
-const remainingCoursesCount = computed(() => Math.max(courseCard.value.length - 5, 0));
-const remainingCourses = computed(() => courseCard.value.slice(5)); 
+const remainingCoursesCount = computed(() =>
+  Math.max(courseCard.value.length - 5, 0)
+);
+const remainingCourses = computed(() => courseCard.value.slice(5));
 const showAllCourses = ref(false);
 
 const toggleShowAllCourses = () => {
@@ -93,7 +195,7 @@ const filteredUsers = computed(() => {
       searchQuery.value === "" ||
       user.userName.toLowerCase().includes(searchLower) ||
       user.yearLevel.toLowerCase().includes(searchLower) ||
-      (user.course && user.course.toLowerCase().includes(searchLower))
+      user.course.toLowerCase().includes(searchLower)
     );
   });
 });
@@ -108,7 +210,7 @@ const createUser = (id, userName, yearLevel, rating = 4) => {
     id,
     userName,
     yearLevel,
-    starFilled: ref(rating)
+    starFilled: ref(rating),
   };
 };
 
@@ -145,12 +247,16 @@ const fetchUserInformation = () => {
     createUser(29, "Amara Okonkwo", "4th Year"),
     createUser(30, "Liam O'Connor", "3rd Year"),
     createUser(31, "Priya Sharma", "2nd Year"),
-    createUser(32, "Ricardo Torres", "1st Year")
+    createUser(32, "Ricardo Torres", "1st Year"),
   ];
 };
 
-onMounted(() => {
+onMounted(async () => {
   users.value = fetchUserInformation();
+  await getLearnerDets();
+  await sessionInfo();
+  await mentorProfile();
+  console.log("User data:", userData.value);
 });
 </script>
 
@@ -160,38 +266,55 @@ onMounted(() => {
     <div class="upper-element">
       <div>
         <h1>Hi, Learner!</h1>
-        <img src="https://placehold.co/600x400" alt="profile-pic" />
+        <img
+          :src="
+            'http://localhost:8000/api/image/' + userData.learn.image ||
+            'https://placehold.co/600x400'
+          "
+          alt="profile-pic"
+        />
       </div>
       <div>
-        <h2>{{ userName }}</h2>
-        <i><p>{{ yearLevel }}</p></i>
-        <i><p>{{ program }}</p></i>
+        <h2>{{ userData.learn.name }}</h2>
+        <i
+          ><p>{{ userData.learn.year }}</p></i
+        >
+        <i
+          ><p>{{ userData.learn.course }}</p></i
+        >
       </div>
     </div>
-    <div class="wave-curve"></div>
+    <!--<div class="wave-curve"></div>-->
     <div class="footer-element">
       <div class="biogoals-container">
         <h1>BIO</h1>
         <div>
-          <p>{{ bio }}</p>
+          <p>{{ userData.learn.bio }}</p>
         </div>
         <h1>LEARNING GOALS</h1>
         <div>
-          <p>{{ goals }}</p>
-      </div>
+          <p>{{ userData.learn.goals }}</p>
+        </div>
       </div>
       <div class="availability">
         <h1>Availability</h1>
         <div class="lines">
           <h3>Days:</h3>
           <div>
-            <p>{{ days }}</p>
+            <ul>
+              <li
+                v-for="(day, index) in userData.learn.availability"
+                :key="index"
+              >
+                {{ day }}
+              </li>
+            </ul>
           </div>
         </div>
         <div class="lines">
           <h3>Duration:</h3>
           <div>
-            <p>{{ duration }}</p>
+            <p>{{ userData.learn.prefSessDur }}</p>
           </div>
         </div>
       </div>
@@ -209,8 +332,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <div 
-            v-if="remainingCoursesCount > 0" 
+          <div
+            v-if="remainingCoursesCount > 0"
             class="course-card remaining-courses"
             @click="toggleShowAllCourses"
           >
@@ -221,12 +344,12 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        
+
         <div v-if="showAllCourses" class="all-courses-popup">
           <div class="popup-content">
             <div class="popup-courses">
-              <div 
-                v-for="(course, index) in courseCard" 
+              <div
+                v-for="(course, index) in userData.learn.subjects"
                 :key="index"
                 class="popup-course"
               >
@@ -280,6 +403,9 @@ onMounted(() => {
     <component
       :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
+      :userData="userData"
+      :upcomingSchedule="upcommingSchedule"
+      :schedule="todaySchedule"
     />
   </div>
 
@@ -291,10 +417,7 @@ onMounted(() => {
 
   <Transition name="fade" mode="out-in">
     <div v-if="confirmLogout" class="logout-popup">
-      <logoutDialog
-        @close="confirmLogout = false"
-        @logout="handleLogout"
-      />
+      <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
   </Transition>
 
@@ -308,6 +431,4 @@ onMounted(() => {
 <style scoped>
 @import "@/assets/learnerpage/learner.css";
 @import "@/assets/learnerpage/color.css";
-
-
 </style>

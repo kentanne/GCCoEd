@@ -8,6 +8,8 @@ import LearnerInfo from "../views/LearnerInfo.vue";
 import AdminPage from "../views/admin/AdminPage.vue";
 import MentorPage from "../views/mentor/MentorPage.vue";
 import LearnerPage from "../views/learner/LearnerPage.vue";
+import passwordReset from "@/components/password-reset.vue";
+import forgotPassword from "../views/forgotPassword.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -18,7 +20,13 @@ const routes = [
   { path: "/learner-info", component: LearnerInfo },
   { path: "/admin", component: AdminPage },
   { path: "/mentor", component: MentorPage },
-  { path: "/learner", component: LearnerPage }
+  { path: "/learner", component: LearnerPage },
+  { path: "/reset-password", name: "password-reset", component: passwordReset },
+  {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: forgotPassword,
+  },
 ];
 
 const router = createRouter({
@@ -26,7 +34,7 @@ const router = createRouter({
   routes,
   scrollBehavior() {
     return { top: 0 };
-  }
+  },
 });
 
 export default router;

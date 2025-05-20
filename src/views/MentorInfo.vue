@@ -12,65 +12,210 @@
         <div class="personal-grid">
           <div class="personal-col">
             <div class="personal-field">
-              <label class="personal-label" for="full-name">FULL NAME</label>
-              <input type="text" id="full-name" v-model="fullName" placeholder="Enter your full name (FN MI LN)" class="personal-input" />
+              <!-- For Full Name -->
+              <label class="personal-label required" for="full-name"
+                >FULL NAME</label
+              >
+              <input
+                type="text"
+                id="full-name"
+                v-model="fullName"
+                @input="validateField('fullName', fullName)"
+                @blur="validateField('fullName', fullName)"
+                placeholder="Enter your full name (FN MI LN)"
+                class="personal-input"
+                :class="{ error: validationErrors.fullName }"
+              />
+              <span v-if="validationErrors.fullName" class="validation-message">
+                {{ validationErrors.fullName }}
+              </span>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="address">ADDRESS</label>
-              <input type="text" id="address" v-model="address" placeholder="Enter your address" class="personal-input" />
+              <!-- For Address -->
+              <label class="personal-label required" for="address"
+                >ADDRESS</label
+              >
+              <input
+                type="text"
+                id="address"
+                v-model="address"
+                @input="validateField('address', address)"
+                @blur="validateField('address', address)"
+                placeholder="Enter your address"
+                class="personal-input"
+                :class="{ error: validationErrors.address }"
+              />
+              <span v-if="validationErrors.address" class="validation-message">
+                {{ validationErrors.address }}
+              </span>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="gender">GENDER</label>
+              <!-- For Gender -->
+              <label class="personal-label required" for="gender">GENDER</label>
               <div class="gender-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('gender')">
-                  <input type="text" v-model="gender" placeholder="Select your gender" class="personal-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('gender')"
+                >
+                  <input
+                    type="text"
+                    v-model="gender"
+                    placeholder="Select your gender"
+                    class="personal-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.gender" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectGender('Female')">Female</div>
-                  <div class="dropdown-option" @click="selectGender('Male')">Male</div>
-                  <div class="dropdown-option" @click="selectGender('Non-binary')">Non-binary</div>
-                  <div class="dropdown-option" @click="selectGender('Other')">Other</div>
+                  <div class="dropdown-option" @click="selectGender('Female')">
+                    Female
+                  </div>
+                  <div class="dropdown-option" @click="selectGender('Male')">
+                    Male
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectGender('Non-binary')"
+                  >
+                    Non-binary
+                  </div>
+                  <div class="dropdown-option" @click="selectGender('Other')">
+                    Other
+                  </div>
                 </div>
               </div>
               <div v-if="gender === 'Other'" class="other-gender-input">
                 <label class="personal-label">Please specify: </label>
-                <input type="text" v-model="otherGender" class="gender-specify" placeholder="Specify your gender" />
+                <input
+                  type="text"
+                  v-model="otherGender"
+                  class="gender-specify"
+                  placeholder="Specify your gender"
+                />
               </div>
+              <span v-if="validationErrors.gender" class="validation-message">
+                {{ validationErrors.gender }}
+              </span>
             </div>
           </div>
           <div class="personal-col">
             <div class="personal-field">
               <label class="personal-label" for="year-level">YEAR LEVEL </label>
               <div class="year-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('yearLevel')">
-                  <input type="text" v-model="yearLevel" placeholder="Select your year level" class="personal-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('yearLevel')"
+                >
+                  <input
+                    type="text"
+                    v-model="yearLevel"
+                    placeholder="Select your year level"
+                    class="personal-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.yearLevel" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectYearLevel('1st Year')">1st Year</div>
-                  <div class="dropdown-option" @click="selectYearLevel('2nd Year')">2nd Year</div>
-                  <div class="dropdown-option" @click="selectYearLevel('3rd Year')">3rd Year</div>
-                  <div class="dropdown-option" @click="selectYearLevel('4th Year')">4th Year</div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectYearLevel('1st Year')"
+                  >
+                    1st Year
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectYearLevel('2nd Year')"
+                  >
+                    2nd Year
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectYearLevel('3rd Year')"
+                  >
+                    3rd Year
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectYearLevel('4th Year')"
+                  >
+                    4th Year
+                  </div>
                 </div>
               </div>
             </div>
             <div class="personal-field">
               <label class="personal-label" for="program">PROGRAM </label>
               <div class="program-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('program')">
-                  <input type="text" v-model="program" placeholder="Select your program" class="personal-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('program')"
+                >
+                  <input
+                    type="text"
+                    v-model="program"
+                    placeholder="Select your program"
+                    class="personal-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.program" class="dropdown-options">
-                  <div v-for="prog in programs" :key="prog" class="dropdown-option" @click="selectProgram(prog)">{{ prog }}</div>
+                  <div
+                    class="dropdown-option"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Information Technology (BSIT)'
+                      )
+                    "
+                  >
+                    Bachelor of Science in Information Technology (BSIT)
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Computer Science (BSCS)'
+                      )
+                    "
+                  >
+                    Bachelor of Science in Computer Science (BSCS)
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="
+                      selectProgram(
+                        'Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)'
+                      )
+                    "
+                  >
+                    Bachelor of Science in Entertainment and Multimedia
+                    Computing (BSEMC)
+                  </div>
                 </div>
               </div>
             </div>
             <div class="personal-field">
-              <label class="personal-label" for="contact-number">CONTACT NUMBER </label>
-              <input type="text" id="contact-number" v-model="contactNumber" @input="validateContactNumber" placeholder="Enter your contact number (11 digits)" class="personal-input" maxlength="11"/>
-              <small v-if="contactNumber.length > 0 && contactNumber.length < 11" class="validation-error">Contact number must be 11 digits</small>
+              <!-- For Contact Number -->
+              <label class="personal-label required" for="contact-number"
+                >CONTACT NUMBER</label
+              >
+              <input
+                type="text"
+                id="contact-number"
+                v-model="contactNumber"
+                @input="validateField('contactNumber', contactNumber)"
+                @blur="validateField('contactNumber', contactNumber)"
+                placeholder="Enter your contact number (11 digits)"
+                class="personal-input"
+                :class="{ error: validationErrors.contactNumber }"
+                maxlength="11"
+              />
+              <span
+                v-if="validationErrors.contactNumber"
+                class="validation-message"
+              >
+                {{ validationErrors.contactNumber }}
+              </span>
             </div>
           </div>
         </div>
@@ -82,74 +227,155 @@
         <div class="profile-grid">
           <div class="profile-col">
             <div class="profile-field">
-              <label class="profile-label" for="subjects">SUBJECTS OFFERED</label>
-              <div class="dropdown-wrapper">
-                <div class="dropdown-trigger" @click="toggleSubjectDropdown">
-                  <input type="text" 
-                        v-model="selectedSubjectCategory" 
-                        placeholder="Select subject category" 
-                        class="profile-input"
-                        readonly />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-show="showCategories" class="dropdown-menu categories">
-                  <div v-for="category in categories" 
-                      :key="category.type"
-                      @click="selectCategory(category)"
-                      @mouseenter="showSubjects(category.type)"
-                      class="dropdown-item">
-                    {{ category.name }}
-                    <span class="count-badge" v-if="selectedSubjectsCount[category.type] > 0">
-                      ({{ selectedSubjectsCount[category.type] }})
-                    </span>
+              <!-- For Subjects Offered -->
+              <label class="profile-label required">SUBJECTS OFFERED</label>
+              <div class="profile-field">
+                <label class="profile-label required"
+                  >SUBJECTS OF INTEREST</label
+                >
+                <div class="dropdown-wrapper">
+                  <div class="dropdown-trigger" @click="toggleSubjectDropdown">
+                    <input
+                      type="text"
+                      :placeholder="
+                        selectedSubjects.length
+                          ? `${selectedSubjects.length} subjects selected`
+                          : 'Select subjects'
+                      "
+                      readonly
+                      class="profile-input"
+                      :class="{ error: validationErrors.selectedSubjects }"
+                    />
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
                   </div>
-                </div>
-                
-                <div v-show="showSubjectsDropdown" 
-                    class="dropdown-menu subjects"
-                    @mouseleave="showSubjectsDropdown = false">
-                  <div v-if="currentSubjects.length > 0">
-                    <div v-for="subject in currentSubjects" 
-                        :key="subject" 
-                        class="dropdown-item subject-item">
-                      <input type="checkbox" 
-                            :id="'subject-'+subject" 
-                            :value="subject" 
-                            v-model="selectedSubjects"
-                            @click.stop />
-                      <label :for="'subject-'+subject">{{ subject }}</label>
+
+                  <div v-if="showCategories" class="dropdown-menu categories">
+                    <div
+                      v-for="category in categories"
+                      :key="category.type"
+                      class="dropdown-item"
+                      @click="selectCategory(category)"
+                    >
+                      {{ category.name }}
+                      <span
+                        v-if="selectedSubjectsCount[category.type]"
+                        class="count-badge"
+                      >
+                        {{ selectedSubjectsCount[category.type] }}
+                      </span>
                     </div>
                   </div>
-                  <div v-else class="dropdown-item no-subjects">
-                    No subjects available
+
+                  <div
+                    v-if="showSubjectsDropdown"
+                    class="dropdown-menu subjects"
+                  >
+                    <div
+                      v-for="subject in currentSubjects"
+                      :key="subject"
+                      class="dropdown-item subject-item"
+                    >
+                      <input
+                        type="checkbox"
+                        :id="subject"
+                        :value="subject"
+                        v-model="selectedSubjects"
+                        @change="updateSelectedCounts"
+                      />
+                      <label :for="subject">{{ subject }}</label>
+                    </div>
+                    <div
+                      v-if="currentSubjects.length === 0"
+                      class="dropdown-item no-subjects"
+                    >
+                      No subjects available
+                    </div>
                   </div>
                 </div>
+                <span
+                  v-if="validationErrors.selectedSubjects"
+                  class="validation-message"
+                >
+                  {{ validationErrors.selectedSubjects }}
+                </span>
               </div>
             </div>
             <div class="profile-field">
-              <label class="profile-label" for="modality">TEACHING MODALITY </label>
+              <!-- For Teaching Modality -->
+              <label class="profile-label required" for="modality"
+                >TEACHING MODALITY</label
+              >
               <div class="subjmodality-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('modality')">
-                  <input type="text" v-model="modality" placeholder="Select teaching modality" class="profile-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('modality')"
+                >
+                  <input
+                    type="text"
+                    v-model="modality"
+                    placeholder="Select teaching modality"
+                    class="profile-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.modality" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectModality('Online')">Online</div>
-                  <div class="dropdown-option" @click="selectModality('In-person')">In-person</div>
-                  <div class="dropdown-option" @click="selectModality('Hybrid')">Hybrid</div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectModality('Online')"
+                  >
+                    Online
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectModality('In-person')"
+                  >
+                    In-person
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectModality('Hybrid')"
+                  >
+                    Hybrid
+                  </div>
                 </div>
               </div>
             </div>
             <div class="profile-field">
-              <label class="profile-label" for="availability-days">DAYS OF AVAILABILITY </label>
+              <label class="profile-label" for="availability-days"
+                >DAYS OF AVAILABILITY</label
+              >
               <div class="availability-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('availability')">
-                  <input type="text" id="availability-days" v-model="availabilityDaysDisplay" placeholder="Select available days" class="profile-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('availability')"
+                >
+                  <input
+                    type="text"
+                    id="availability-days"
+                    v-model="availabilityDaysDisplay"
+                    placeholder="Select available days"
+                    class="profile-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div v-if="dropdownOpen.availability" class="dropdown-options availability-options">
-                  <div v-for="day in daysOfWeek" :key="day" class="dropdown-option availability-option">
-                    <input type="checkbox" :id="'day-' + day" :value="day" v-model="selectedDays" @click.stop />
+                <div
+                  v-if="dropdownOpen.availability"
+                  class="dropdown-options availability-options"
+                >
+                  <div
+                    v-for="day in daysOfWeek"
+                    :key="day"
+                    class="dropdown-option availability-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :id="'day-' + day"
+                      :value="day"
+                      v-model="selectedDays"
+                      @click.stop
+                    />
                     <label :for="'day-' + day">{{ day }}</label>
                   </div>
                 </div>
@@ -158,62 +384,172 @@
           </div>
           <div class="profile-col">
             <div class="profile-field">
-              <label class="profile-label" for="proficiency">PROFICIENCY LEVEL </label>
+              <label class="profile-label" for="proficiency"
+                >PROFICIENCY LEVEL
+              </label>
               <div class="proficiency-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('proficiency')">
-                  <input type="text" v-model="proficiency" placeholder="Select proficiency level" class="profile-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('proficiency')"
+                >
+                  <input
+                    type="text"
+                    v-model="proficiency"
+                    placeholder="Select proficiency level"
+                    class="profile-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
                 <div v-if="dropdownOpen.proficiency" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectProficiency('Beginner')">Beginner</div>
-                  <div class="dropdown-option" @click="selectProficiency('Intermediate')">Intermediate</div>
-                  <div class="dropdown-option" @click="selectProficiency('Advanced')">Advanced</div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Beginner')"
+                  >
+                    Beginner
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Intermediate')"
+                  >
+                    Intermediate
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Advanced')"
+                  >
+                    Advanced
+                  </div>
                 </div>
               </div>
             </div>
             <div class="profile-field">
-              <label class="profile-label" for="teaching-style">TEACHING STYLE </label>
+              <label class="profile-label" for="teaching-style"
+                >TEACHING STYLE
+              </label>
               <div class="teaching-style-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('learningStyle')">
-                  <input type="text" id="teaching-style" v-model="learningStyleDisplay" placeholder="Select teaching style(s)" class="profile-input" readonly />
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('learningStyle')"
+                >
+                  <input
+                    type="text"
+                    id="teaching-style"
+                    v-model="learningStyleDisplay"
+                    placeholder="Select teaching style(s)"
+                    class="profile-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div v-if="dropdownOpen.learningStyle" class="dropdown-options teaching-style-options">
-                  <div v-for="style in sessionStyles" :key="style" class="dropdown-option teaching-style-option">
-                    <input type="checkbox" :id="'style-' + style" :value="style" v-model="selectedsessionStyles" @click.stop />
+                <div
+                  v-if="dropdownOpen.learningStyle"
+                  class="dropdown-options teaching-style-options"
+                >
+                  <div
+                    v-for="style in sessionStyles"
+                    :key="style"
+                    class="dropdown-option teaching-style-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :id="'style-' + style"
+                      :value="style"
+                      v-model="selectedsessionStyles"
+                      @click.stop
+                    />
                     <label :for="'style-' + style">{{ style }}</label>
                   </div>
                 </div>
               </div>
             </div>
             <div class="profile-field">
-              <label class="profile-label" for="session-duration">PREFERRED SESSION DURATION </label>
+              <label class="profile-label" for="session-duration"
+                >PREFERRED SESSION DURATION
+              </label>
               <div class="session-duration-dropdown">
-                <div class="dropdown-container" @click="toggleDropdown('sessionDuration')">
-                  <input type="text" v-model="sessionDuration" placeholder="Select duration" class="profile-input" readonly/>
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('sessionDuration')"
+                >
+                  <input
+                    type="text"
+                    v-model="sessionDuration"
+                    placeholder="Select duration"
+                    class="profile-input"
+                    readonly
+                  />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div v-if="dropdownOpen.sessionDuration" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectSessionDuration('1 hour')">1 hour</div>
-                  <div class="dropdown-option" @click="selectSessionDuration('2 hours')">2 hours</div>
-                  <div class="dropdown-option" @click="selectSessionDuration('3 hours')">3 hours</div>
+                <div
+                  v-if="dropdownOpen.sessionDuration"
+                  class="dropdown-options"
+                >
+                  <div
+                    class="dropdown-option"
+                    @click="selectSessionDuration('1 hour')"
+                  >
+                    1 hour
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectSessionDuration('2 hours')"
+                  >
+                    2 hours
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectSessionDuration('3 hours')"
+                  >
+                    3 hours
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div> 
+        </div>
         <div class="profile-bottom">
           <div class="profile-bottom-grid">
             <div class="profile-bottom-col">
               <div class="profile-field">
-                <label class="profile-label" for="bio">SHORT BIO</label>
-                <textarea id="bio" v-model="bio" placeholder="Tell us about yourself" rows="2" class="profile-textarea"></textarea>
+                <!-- For Bio -->
+                <label class="profile-label required" for="bio"
+                  >SHORT BIO</label
+                >
+                <textarea
+                  id="bio"
+                  v-model="bio"
+                  @input="validateField('bio', bio)"
+                  @blur="validateField('bio', bio)"
+                  placeholder="Tell us about yourself (50-500 characters)"
+                  rows="4"
+                  class="profile-textarea"
+                  :class="{ error: validationErrors.bio }"
+                ></textarea>
+                <span v-if="validationErrors.bio" class="validation-message">
+                  {{ validationErrors.bio }}
+                </span>
               </div>
             </div>
             <div class="profile-bottom-col">
               <div class="profile-field">
-                <label class="profile-label" for="experience">TUTORING EXPERIENCE</label>
-                <textarea id="experience" v-model="experience" placeholder="Describe your tutoring experience" rows="2" class="profile-textarea"></textarea>
+                <!-- For Experience -->
+                <label class="profile-label required" for="experience"
+                  >TUTORING EXPERIENCE</label
+                >
+                <textarea
+                  id="goals"
+                  v-model="experience"
+                  @input="validateField('experience', experience)"
+                  @blur="validateField('experience', experience)"
+                  placeholder="Describe your tutoring experience (50-500 characters)"
+                  rows="4"
+                  class="profile-textarea"
+                  :class="{ error: validationErrors.goals }"
+                ></textarea>
+                <span v-if="validationErrors.goals" class="validation-message">
+                  {{ validationErrors.goals }}
+                </span>
               </div>
             </div>
           </div>
@@ -224,7 +560,12 @@
               <label class="profile-label">PROFILE PICTURE</label>
               <div class="upload-controls" @click="uploadProfilePicture">
                 <div class="profile-preview-container">
-                  <img v-if="profileImage" :src="profileImage" alt="Profile Preview" class="profile-preview" />
+                  <img
+                    v-if="profileImage"
+                    :src="profileImage"
+                    alt="Profile Preview"
+                    class="profile-preview"
+                  />
                   <i v-else class="fas fa-user-circle default-icon"></i>
                 </div>
                 <div class="upload-text">
@@ -232,8 +573,23 @@
                     <i class="fas fa-upload"></i>
                     <span>Choose File</span>
                   </div>
-                  <input type="file" ref="profileInput" accept="image/*" style="display: none" @change="handleProfileUpload" />
-                  <span class="file-name" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ profilePictureName || 'No file chosen' }}</span>
+                  <input
+                    type="file"
+                    ref="profileInput"
+                    accept="image/*"
+                    style="display: none"
+                    @change="handleProfileUpload"
+                  />
+                  <span
+                    class="file-name"
+                    style="
+                      max-width: 150px;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                    "
+                    >{{ profilePictureName || "No file chosen" }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -245,14 +601,22 @@
                   <i class="fas fa-file-upload"></i>
                   <span>Upload Credentials</span>
                 </div>
-                <input type="file" ref="credentialInput" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display: none" @change="handleCredentialUpload" />
-                <a href="#" @click.prevent="toggleFileList" class="file-link">View Uploaded Files ({{ credentials.length }})</a>
+                <input
+                  type="file"
+                  ref="credentialInput"
+                  multiple
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  style="display: none"
+                  @change="handleCredentialUpload"
+                />
+                <a href="#" @click.prevent="toggleFileList" class="file-link"
+                  >View Uploaded Files ({{ credentials.length }})</a
+                >
               </div>
             </div>
           </div>
         </div>
       </div>
-
 
       <!-- File List Modal -->
       <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
@@ -269,7 +633,7 @@
               </button>
             </li>
           </ul>
-          <div style="display: flex; justify-content: center; width: 100%;">
+          <div style="display: flex; justify-content: center; width: 100%">
             <button class="close-button" @click="closeFileList">Close</button>
           </div>
         </div>
@@ -279,35 +643,54 @@
       <div v-if="showStatusPopup" class="status-popup-overlay">
         <div class="status-popup-content">
           <h3>APPLICATION STATUS</h3>
-          <p class="status-text">Your mentor application is under review. You will receive an email once it's approved. Wait for 1-3 working days. Thank you!</p>
-          <button class="proceed-button" @click="proceedToHome">PROCEED TO HOME</button>
+          <p class="status-text">
+            Your mentor application is under review. You will receive an email
+            once it's approved. Wait for 1-3 working days. Thank you!
+          </p>
+          <button class="proceed-button" @click="proceedToHome">
+            PROCEED TO HOME
+          </button>
         </div>
       </div>
 
       <!-- Step Indicator -->
       <div class="step-indicator-container">
         <div class="step-indicator">
-          <div v-for="step in totalSteps" :key="step" :class="['step', { 'active': step === currentStep, 'completed': step < currentStep }]" @click="goToStep(step)"></div>
+          <div
+            v-for="step in totalSteps"
+            :key="step"
+            :class="[
+              'step',
+              { active: step === currentStep, completed: step < currentStep },
+            ]"
+            @click="goToStep(step)"
+          ></div>
         </div>
       </div>
     </div>
     <button class="next-button" @click="nextStep" :disabled="isSubmitted">
-      {{ isSubmitted ? 'SUBMITTED' : (currentStep === totalSteps ? 'SUBMIT' : 'NEXT') }}
+      {{
+        isSubmitted
+          ? "SUBMITTED"
+          : currentStep === totalSteps
+          ? "SUBMIT"
+          : "NEXT"
+      }}
     </button>
   </div>
 </template>
 
 <script>
-import { registrationStore } from '@/stores/registrationStore.js'; // Adjust the import path as necessary
-import axios, { Axios } from 'axios';
+import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
+import axios, { Axios } from "axios";
 
 axios.default.withCredentials = true; // Enable sending cookies with requests
 axios.default.withXSRFToken = true; // Enable CSRF token handling
 
-function getCookie(name){
+function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) return parts.pop().split(";").shift();
   return null;
 }
 
@@ -316,46 +699,61 @@ export default {
     return {
       currentStep: 1,
       totalSteps: 2,
-      fullName: '',
-      gender: '',
-      otherGender: '',
-      yearLevel: '',
-      program: '',
-      contactNumber: '',
-      address: '',
+      fullName: "",
+      gender: "",
+      otherGender: "",
+      yearLevel: "",
+      program: "",
+      contactNumber: "",
+      address: "",
       selectedSubjects: [],
       availableSubjects: {
         coreSubjects: [],
         gecSubjects: [],
-        peNstpSubjects: []
+        peNstpSubjects: [],
       },
-      modality: '',
+      modality: "",
       selectedDays: [],
-      daysOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      bio: '',
-      proficiency: '', 
+      daysOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      bio: "",
+      proficiency: "",
       selectedsessionStyles: [],
-      sessionStyles: ['Lecture-Based', 'Interactive Discussion (hands-on)', 'Q&A Session', 'Demonstration', 'Project-based', 'Step-by-step process'],
-      sessionDuration: '',
-      experience: '', 
+      sessionStyles: [
+        "Lecture-Based",
+        "Interactive Discussion (hands-on)",
+        "Q&A Session",
+        "Demonstration",
+        "Project-based",
+        "Step-by-step process",
+      ],
+      sessionDuration: "",
+      experience: "",
       profileImage: null,
-      profilePictureName: '',
-      credentials: [], 
-      showFileList: false, 
-      
+      profilePictureName: "",
+      credentials: [],
+      showFileList: false,
+
       categories: [
-        { type: 'core', name: 'Core Subjects' },
-        { type: 'gec', name: 'General Education Course' },
-        { type: 'peNstp', name: 'Physical Education & NSTP' }
+        { type: "core", name: "Core Subjects" },
+        { type: "gec", name: "General Education Course" },
+        { type: "peNstp", name: "Physical Education & NSTP" },
       ],
       showCategories: false,
       showSubjectsDropdown: false,
       currentSubjects: [],
-      selectedSubjectCategory: '',
+      selectedSubjectCategory: "",
       selectedSubjectsCount: {
         core: 0,
         gec: 0,
-        peNstp: 0
+        peNstp: 0,
       },
 
       dropdownOpen: {
@@ -363,80 +761,130 @@ export default {
         yearLevel: false,
         program: false,
         modality: false,
-        proficiency: false, 
+        proficiency: false,
         availability: false,
         learningStyle: false,
-        sessionDuration: false
+        sessionDuration: false,
       },
       programs: [
         "Bachelor of Science in Information Technology (BSIT)",
         "Bachelor of Science in Computer Science (BSCS)",
-        "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)"
+        "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)",
       ],
-      showStatusPopup: false, 
-      isSubmitted: false 
+      showStatusPopup: false,
+      isSubmitted: false,
+      validationErrors: {
+        fullName: "",
+        address: "",
+        gender: "",
+        yearLevel: "",
+        program: "",
+        contactNumber: "",
+        selectedSubjects: "",
+        modality: "",
+        selectedDays: "",
+        selectedsessionStyles: "",
+        sessionDuration: "",
+        bio: "",
+        goals: "",
+        profileImage: "",
+      },
+      validationRules: {
+        fullName: {
+          pattern: /^[a-zA-Z\s.]{5,50}$/,
+          message:
+            "Full name should contain only letters, spaces, and periods (5-50 characters)",
+        },
+        address: {
+          minLength: 10,
+          message: "Address should be at least 10 characters long",
+        },
+        contactNumber: {
+          pattern: /^09\d{9}$/,
+          message: "Contact number should start with 09 and have 11 digits",
+        },
+        bio: {
+          minLength: 50,
+          maxLength: 500,
+          message: "Bio should be between 50-500 characters",
+        },
+        goals: {
+          minLength: 50,
+          maxLength: 500,
+          message: "Goals should be between 50-500 characters",
+        },
+      },
     };
   },
 
   computed: {
     availabilityDaysDisplay() {
-      return this.selectedDays.join(', ') || 'Select available days';
+      return this.selectedDays.join(", ") || "Select available days";
     },
-    learningStyleDisplay() { 
-      return this.selectedsessionStyles.join(', ') || 'Select teaching style(s)';
+    learningStyleDisplay() {
+      return (
+        this.selectedsessionStyles.join(", ") || "Select teaching style(s)"
+      );
     },
     isFormComplete() {
       if (this.currentStep === 1) {
-        return this.fullName.trim() && 
-               this.gender && 
-               (this.gender !== 'Other' || this.otherGender.trim()) && 
-               this.yearLevel && 
-               this.program && 
-               this.contactNumber?.length === 11 && 
-               this.address.trim();
+        return (
+          this.fullName.trim() &&
+          this.gender &&
+          (this.gender !== "Other" || this.otherGender.trim()) &&
+          this.yearLevel &&
+          this.program &&
+          this.contactNumber?.length === 11 &&
+          this.address.trim()
+        );
       }
-      return this.selectedSubjects.length > 0 && 
-             this.modality && 
-             this.selectedDays.length > 0 && 
-             this.selectedsessionStyles.length > 0 && 
-             this.proficiency &&
-             this.sessionDuration && 
-             this.bio.trim() && 
-             this.experience.trim() && 
-             this.profileImage &&
-             this.credentials.length > 0; 
-    }
+      return (
+        this.selectedSubjects.length > 0 &&
+        this.modality &&
+        this.selectedDays.length > 0 &&
+        this.selectedsessionStyles.length > 0 &&
+        this.proficiency &&
+        this.sessionDuration &&
+        this.bio.trim() &&
+        this.experience.trim() &&
+        this.profileImage &&
+        this.credentials.length > 0
+      );
+    },
   },
 
   methods: {
-    async csrf(){
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie').then(response => {
-        console.log("CSRF cookie set");
-      }).catch(error => {
-        console.error("Error setting CSRF cookie:", error);
-      });
+    async csrf() {
+      await axios
+        .get("http://localhost:8000/sanctum/csrf-cookie")
+        .then((response) => {
+          console.log("CSRF cookie set");
+        })
+        .catch((error) => {
+          console.error("Error setting CSRF cookie:", error);
+        });
     },
     toggleSubjectDropdown() {
       this.showCategories = !this.showCategories;
       this.showSubjectsDropdown = false;
     },
-    
+
     selectCategory(category) {
       this.selectedSubjectCategory = category.name;
       this.showCategories = false;
       this.showSubjects(category.type);
       this.updateSelectedCounts();
     },
-    
+
     showSubjects(categoryType) {
-      switch(categoryType) {
-        case 'core':
+      switch (categoryType) {
+        case "core":
           this.currentSubjects = this.availableSubjects.coreSubjects;
           break;
-        case 'gec':
+        case "gec":
           this.currentSubjects = this.availableSubjects.gecSubjects;
           break;
-        case 'peNstp':
+        case "peNstp":
           this.currentSubjects = this.availableSubjects.peNstpSubjects;
           break;
       }
@@ -444,45 +892,53 @@ export default {
     },
 
     updateSelectedCounts() {
-      this.selectedSubjectsCount.core = this.selectedSubjects.filter(sub => 
+      this.selectedSubjectsCount.core = this.selectedSubjects.filter((sub) =>
         this.availableSubjects.coreSubjects.includes(sub)
       ).length;
-      
-      this.selectedSubjectsCount.gec = this.selectedSubjects.filter(sub => 
+
+      this.selectedSubjectsCount.gec = this.selectedSubjects.filter((sub) =>
         this.availableSubjects.gecSubjects.includes(sub)
       ).length;
-      
-      this.selectedSubjectsCount.peNstp = this.selectedSubjects.filter(sub => 
+
+      this.selectedSubjectsCount.peNstp = this.selectedSubjects.filter((sub) =>
         this.availableSubjects.peNstpSubjects.includes(sub)
       ).length;
     },
 
     validateForm() {
       const errors = [];
-      
+
       if (this.currentStep === 1) {
-        if (!this.fullName.trim()) errors.push('Full Name is required');
-        if (!this.gender) errors.push('Gender is required');
-        if (this.gender === 'Other' && !this.otherGender.trim()) errors.push('Please specify your gender');
-        if (!this.yearLevel) errors.push('Year Level is required');
-        if (!this.program) errors.push('Program is required');
-        if (!this.contactNumber || this.contactNumber.length !== 11) errors.push('Valid Contact Number is required (11 digits)');
-        if (!this.address.trim()) errors.push('Address is required');
+        if (!this.fullName.trim()) errors.push("Full Name is required");
+        if (!this.gender) errors.push("Gender is required");
+        if (this.gender === "Other" && !this.otherGender.trim())
+          errors.push("Please specify your gender");
+        if (!this.yearLevel) errors.push("Year Level is required");
+        if (!this.program) errors.push("Program is required");
+        if (!this.contactNumber || this.contactNumber.length !== 11)
+          errors.push("Valid Contact Number is required (11 digits)");
+        if (!this.address.trim()) errors.push("Address is required");
       }
-      
+
       if (this.currentStep === 2) {
-        if (this.selectedSubjects.length === 0) errors.push('At least one subject is required');
-        if (!this.modality) errors.push('Teaching Modality is required');
-        if (this.selectedDays.length === 0) errors.push('At least one day of availability is required');
-        if (this.selectedsessionStyles.length === 0) errors.push('At least one teaching style is required');
-        if (!this.proficiency) errors.push('Proficiency level is required'); 
-        if (!this.sessionDuration) errors.push('Preferred Session Duration is required');
-        if (!this.bio.trim()) errors.push('Short Bio is required');
-        if (!this.experience.trim()) errors.push('Tutoring experience is required');
-        if (!this.profileImage) errors.push('Profile Picture is required');
-        if (this.credentials.length === 0) errors.push('At least one credential is required'); 
+        if (this.selectedSubjects.length === 0)
+          errors.push("At least one subject is required");
+        if (!this.modality) errors.push("Teaching Modality is required");
+        if (this.selectedDays.length === 0)
+          errors.push("At least one day of availability is required");
+        if (this.selectedsessionStyles.length === 0)
+          errors.push("At least one teaching style is required");
+        if (!this.proficiency) errors.push("Proficiency level is required");
+        if (!this.sessionDuration)
+          errors.push("Preferred Session Duration is required");
+        if (!this.bio.trim()) errors.push("Short Bio is required");
+        if (!this.experience.trim())
+          errors.push("Tutoring experience is required");
+        if (!this.profileImage) errors.push("Profile Picture is required");
+        if (this.credentials.length === 0)
+          errors.push("At least one credential is required");
       }
-      
+
       return errors;
     },
 
@@ -491,76 +947,79 @@ export default {
         this.dropdownOpen[key] = key === type ? !this.dropdownOpen[key] : false;
       }
     },
-    
+
     selectGender(selectedGender) {
       this.gender = selectedGender;
       this.dropdownOpen.gender = false;
     },
-    
+
     selectYearLevel(selectedYear) {
       this.yearLevel = selectedYear;
       this.dropdownOpen.yearLevel = false;
     },
-    
+
     selectProgram(selectedProgram) {
       this.program = selectedProgram;
       this.dropdownOpen.program = false;
       this.updateAvailableSubjects();
     },
-    
+
     selectModality(selectedModality) {
       this.modality = selectedModality;
       this.dropdownOpen.modality = false;
     },
-    
-    selectProficiency(selectedProficiency) { 
+
+    selectProficiency(selectedProficiency) {
       this.proficiency = selectedProficiency;
       this.dropdownOpen.proficiency = false;
     },
-    
+
     selectSessionDuration(duration) {
       this.sessionDuration = duration;
       this.dropdownOpen.sessionDuration = false;
     },
-    
+
     nextStep() {
       const validationErrors = this.validateForm();
-      
+
       if (validationErrors.length > 0) {
-        alert('Please complete all required fields before proceeding:\n\n' + validationErrors.join('\n'));
+        alert(
+          "Please complete all required fields before proceeding:\n\n" +
+            validationErrors.join("\n")
+        );
         return;
       }
-      
+
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
       } else {
-        this.submitApplication(); 
+        this.submitApplication();
       }
     },
-    
+
     goToStep(step) {
       if (step <= this.currentStep) {
         this.currentStep = step;
       }
     },
-    
+
     uploadProfilePicture() {
       this.$refs.profileInput.click();
     },
-    
+
     handleProfileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        if (!file.type.match('image.*')) {
-          alert('Please select an image file');
+        if (!file.type.match("image.*")) {
+          alert("Please select an image file");
           return;
         }
-        
+
         if (file.size > 2000000) {
-          alert('File size should be less than 2MB');
+          alert("File size should be less than 2MB");
           return;
         }
-        
+
         this.profilePictureName = file.name;
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -569,105 +1028,204 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    
-    uploadCredentials() { 
+
+    uploadCredentials() {
       this.$refs.credentialInput.click();
     },
-    
-    handleCredentialUpload(event) { 
+
+    handleCredentialUpload(event) {
       const files = Array.from(event.target.files);
       this.credentials.push(...files);
     },
-    
-    deleteCredential(index) { 
+
+    deleteCredential(index) {
       this.credentials.splice(index, 1);
     },
-    
-    toggleFileList() { 
+
+    toggleFileList() {
       this.showFileList = !this.showFileList;
     },
-    
-    closeFileList() { 
+
+    closeFileList() {
       this.showFileList = false;
     },
-    
+
     updateAvailableSubjects() {
       switch (this.program) {
         case "Bachelor of Science in Information Technology (BSIT)":
           this.availableSubjects = {
-            coreSubjects: ["Application Development and Emerging Technologies", "Business Analytics", "Computer Programming 1", "Computer Programming 2", 
-              "Data Structures and Algorithms", "Digital Design with Multimedia Systems", "Discrete Structures 1", "Event Driven Programming", 
-              "Fundamentals of Database Systems", "Information Assurance and Security 1", "Information Assurance and Security 2", 
-              "Information Management 1", "Integrative Programming and Technologies", "Introduction to Computing", 
-              "Introduction to Human-Computer Interaction", "IT Elective 1", "IT Elective 2", "IT Elective 3", "IT Elective 4", 
-              "IT Elective 5", "IT Research Methods", "IT Seminars and Educational Trips", "Networking 1", "Networking 2", 
-              "Object-Oriented Programming", "PC Troubleshooting with Basic Electronics", "Platform Technologies", 
-              "Quantitative Methods (Inc. Modelling & Simulation)", "Social Issues and Professional Practice in Computing", 
-              "System Administration and Maintenance", "Systems Integration and Architecture 1"
+            coreSubjects: [
+              "Application Development and Emerging Technologies",
+              "Business Analytics",
+              "Computer Programming 1",
+              "Computer Programming 2",
+              "Data Structures and Algorithms",
+              "Digital Design with Multimedia Systems",
+              "Discrete Structures 1",
+              "Event Driven Programming",
+              "Fundamentals of Database Systems",
+              "Information Assurance and Security 1",
+              "Information Assurance and Security 2",
+              "Information Management 1",
+              "Integrative Programming and Technologies",
+              "Introduction to Computing",
+              "Introduction to Human-Computer Interaction",
+              "IT Elective 1",
+              "IT Elective 2",
+              "IT Elective 3",
+              "IT Elective 4",
+              "IT Elective 5",
+              "IT Research Methods",
+              "IT Seminars and Educational Trips",
+              "Networking 1",
+              "Networking 2",
+              "Object-Oriented Programming",
+              "PC Troubleshooting with Basic Electronics",
+              "Platform Technologies",
+              "Quantitative Methods (Inc. Modelling & Simulation)",
+              "Social Issues and Professional Practice in Computing",
+              "System Administration and Maintenance",
+              "Systems Integration and Architecture 1",
             ],
-            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
-              "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
-              "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
-              "The Life and Works of Rizal", "Understanding the Self"
+            gecSubjects: [
+              "Art Appreciation",
+              "Ethics",
+              "Mathematics in the Modern World",
+              "People and Earth's Ecosystem",
+              "Purposive Communication",
+              "Reading Visual Arts",
+              "Readings in Philippine History with Indigenous People Studies",
+              "Science, Technology and Society",
+              "The Contemporary World with Peace Studies",
+              "The Entrepreneurial Mind",
+              "The Life and Works of Rizal",
+              "Understanding the Self",
             ],
-            peNstpSubjects: ["National Service Training Program with Anti-Smoking and Environmental Education", 
-              "National Service Training Program with GAD and Peace Education", 
-              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency", 
-              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities", 
-              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)", 
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
+            peNstpSubjects: [
+              "National Service Training Program with Anti-Smoking and Environmental Education",
+              "National Service Training Program with GAD and Peace Education",
+              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
+              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
+              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+            ],
           };
           break;
 
         case "Bachelor of Science in Computer Science (BSCS)":
           this.availableSubjects = {
-            coreSubjects: ["Computer Programming 1", "Computer Programming 2",  "Introduction to Computing", 
-              "PC Troubleshooting with Basic Electronics","Data Structures and Algorithms",
-              "Algorithms and Complexity 1", "Software Engineering 1", "Software Engineering 2",
-              "Operating Systems", "Object-Oriented Programming", "Information Management 1",
-              "Discrete Structures 1", "Discrete Structures 2", "Principles of Statistics and Probability",
-              "Graphics and Visual Computing", "Automata Theory", "Intelligent Systems",
-              "Programming Languages", "Parallel and Distributed Computing",
-              "Architecture and Organization", "Information Assurance and Security",
-              "CS Thesis Writing 1", "CS Thesis Writing 2", 
-              "CS Elective 1", "CS Elective 2", "CS Elective 3", "CS Elective 4", "CS Elective 5",
-              "CS Seminars and Educational Trips"
-             ],
-            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
-              "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
-              "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
-              "The Life and Works of Rizal", "Understanding the Self"
-          ],
-            peNstpSubjects: ["National Service Training Program 1",
+            coreSubjects: [
+              "Computer Programming 1",
+              "Computer Programming 2",
+              "Introduction to Computing",
+              "PC Troubleshooting with Basic Electronics",
+              "Data Structures and Algorithms",
+              "Algorithms and Complexity 1",
+              "Software Engineering 1",
+              "Software Engineering 2",
+              "Operating Systems",
+              "Object-Oriented Programming",
+              "Information Management 1",
+              "Discrete Structures 1",
+              "Discrete Structures 2",
+              "Principles of Statistics and Probability",
+              "Graphics and Visual Computing",
+              "Automata Theory",
+              "Intelligent Systems",
+              "Programming Languages",
+              "Parallel and Distributed Computing",
+              "Architecture and Organization",
+              "Information Assurance and Security",
+              "CS Thesis Writing 1",
+              "CS Thesis Writing 2",
+              "CS Elective 1",
+              "CS Elective 2",
+              "CS Elective 3",
+              "CS Elective 4",
+              "CS Elective 5",
+              "CS Seminars and Educational Trips",
+            ],
+            gecSubjects: [
+              "Art Appreciation",
+              "Ethics",
+              "Mathematics in the Modern World",
+              "People and Earth's Ecosystem",
+              "Purposive Communication",
+              "Reading Visual Arts",
+              "Readings in Philippine History with Indigenous People Studies",
+              "Science, Technology and Society",
+              "The Contemporary World with Peace Studies",
+              "The Entrepreneurial Mind",
+              "The Life and Works of Rizal",
+              "Understanding the Self",
+            ],
+            peNstpSubjects: [
+              "National Service Training Program 1",
               "National Service Training Program 2",
               "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
               "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
               "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+            ],
           };
           break;
 
         case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
           this.availableSubjects = {
-            coreSubjects: ["Introduction to EM Computing", "Computer Programming 1", "PC Troubleshooting with Basic Electronics", "Computer Programming 2", 
-            "Usability, HCI, UI Design", "Free Hand and Digital Drawing", "Data Structures and Algorithms", "Information Management 1", "Introduction to Game Design and Development", 
-            "Computer Graphics Programming", "Image and Video Processing", "Script Writing and Storyboard Design", "Applications Development and Emerging Technologies",
-            "Principles of 2D Animation", "Audio Design and Sound Engineering Modelling and Rigging", "Texture and Mapping", "Social Issues and Professional Practice in Computing", 
-            "Lighting and Effects", "Principles of 3D Animation", "Design and Production Process", "Advanced Sound Production", "Advanced 2D Animation", "EMC Professional Elective 1",
-            "Research Methods", "Advanced 3D Animation and Scripting", "Compositing and Rendering", "EMC Professional Elective 2", "Animation Design and Production", "EMC Professional Elective 3",
-            "Computing Seminars and Educational Trips"
+            coreSubjects: [
+              "Introduction to EM Computing",
+              "Computer Programming 1",
+              "PC Troubleshooting with Basic Electronics",
+              "Computer Programming 2",
+              "Usability, HCI, UI Design",
+              "Free Hand and Digital Drawing",
+              "Data Structures and Algorithms",
+              "Information Management 1",
+              "Introduction to Game Design and Development",
+              "Computer Graphics Programming",
+              "Image and Video Processing",
+              "Script Writing and Storyboard Design",
+              "Applications Development and Emerging Technologies",
+              "Principles of 2D Animation",
+              "Audio Design and Sound Engineering Modelling and Rigging",
+              "Texture and Mapping",
+              "Social Issues and Professional Practice in Computing",
+              "Lighting and Effects",
+              "Principles of 3D Animation",
+              "Design and Production Process",
+              "Advanced Sound Production",
+              "Advanced 2D Animation",
+              "EMC Professional Elective 1",
+              "Research Methods",
+              "Advanced 3D Animation and Scripting",
+              "Compositing and Rendering",
+              "EMC Professional Elective 2",
+              "Animation Design and Production",
+              "EMC Professional Elective 3",
+              "Computing Seminars and Educational Trips",
             ],
-            gecSubjects: ["Art Appreciation", "Ethics", "Mathematics in the Modern World", "People and Earth's Ecosystem", 
-              "Purposive Communication", "Reading Visual Arts", "Readings in Philippine History with Indigenous People Studies", 
-              "Science, Technology and Society", "The Contemporary World with Peace Studies", "The Entrepreneurial Mind", 
-              "The Life and Works of Rizal", "Understanding the Self"
+            gecSubjects: [
+              "Art Appreciation",
+              "Ethics",
+              "Mathematics in the Modern World",
+              "People and Earth's Ecosystem",
+              "Purposive Communication",
+              "Reading Visual Arts",
+              "Readings in Philippine History with Indigenous People Studies",
+              "Science, Technology and Society",
+              "The Contemporary World with Peace Studies",
+              "The Entrepreneurial Mind",
+              "The Life and Works of Rizal",
+              "Understanding the Self",
             ],
-            peNstpSubjects: ["National Service Training Program with Anti-Smoking and Environmental Education", 
-              "National Service Training Program with GAD and Peace Education", 
-              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency", 
-              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities", 
-              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)", 
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)"]
+            peNstpSubjects: [
+              "National Service Training Program with Anti-Smoking and Environmental Education",
+              "National Service Training Program with GAD and Peace Education",
+              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
+              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
+              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+            ],
           };
           break;
 
@@ -675,129 +1233,207 @@ export default {
           this.availableSubjects = {
             coreSubjects: [],
             gecSubjects: [],
-            peNstpSubjects: []
+            peNstpSubjects: [],
           };
       }
       this.updateSelectedCounts();
     },
-    
+
     validateContactNumber() {
-      this.contactNumber = this.contactNumber.replace(/\D/g, '');
-      
+      this.contactNumber = this.contactNumber.replace(/\D/g, "");
+
       if (this.contactNumber.length > 11) {
         this.contactNumber = this.contactNumber.slice(0, 11);
       }
     },
-    
+
     async submitApplication() {
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
       // console.log("Store data:", store.registrationData);
 
       if (finalValidationErrors.length > 0) {
-        alert('Please complete all required fields before submitting:\n\n' + finalValidationErrors.join('\n'));
+        alert(
+          "Please complete all required fields before submitting:\n\n" +
+            finalValidationErrors.join("\n")
+        );
         return;
       }
 
-
       try {
         const formData = new FormData(); // Use FormData for file uploads
-        formData.append('email', store.registrationData.email); // Corrected property
-        formData.append('password', store.registrationData.password); // Corrected property
-        formData.append('password_confirmation', store.registrationData.password_confirmation); // Corrected property
-        formData.append('role', store.registrationData.role); // Corrected property
-        formData.append('name', this.fullName);
-        formData.append('gender', this.gender === 'Other' ? this.otherGender : this.gender);
-        formData.append('year', this.yearLevel);
-        formData.append('course', this.program);
-        formData.append('phoneNum', this.contactNumber);
-        formData.append('address', this.address);
-        formData.append('subjects', JSON.stringify(this.selectedSubjects)); // Convert array to JSON string
-        formData.append('learn_modality', this.modality);
-        formData.append('availability', JSON.stringify(this.selectedDays)); // Convert array to JSON string
-        formData.append('bio', this.bio);
-        formData.append('teach_sty', JSON.stringify(this.selectedsessionStyles)); // Convert array to JSON string
-        formData.append('prefSessDur', this.sessionDuration);
-        formData.append('exp', this.goals);
-        formData.append('proficiency', this.proficiency); // Added proficiency level
-        formData.append('credentials', JSON.stringify(this.credentials.map(file => file.name))); // Convert array to JSON string
+        formData.append("email", store.registrationData.email); // Corrected property
+        formData.append("password", store.registrationData.password); // Corrected property
+        formData.append(
+          "password_confirmation",
+          store.registrationData.password_confirmation
+        ); // Corrected property
+        formData.append("role", store.registrationData.role); // Corrected property
+        formData.append("name", this.fullName);
+        formData.append(
+          "gender",
+          this.gender === "Other" ? this.otherGender : this.gender
+        );
+        formData.append("year", this.yearLevel);
+        formData.append("course", this.program);
+        formData.append("phoneNum", this.contactNumber);
+        formData.append("address", this.address);
+        formData.append("subjects", JSON.stringify(this.selectedSubjects)); // Convert array to JSON string
+        formData.append("learn_modality", this.modality);
+        formData.append("availability", JSON.stringify(this.selectedDays)); // Convert array to JSON string
+        formData.append("bio", this.bio);
+        formData.append(
+          "teach_sty",
+          JSON.stringify(this.selectedsessionStyles)
+        ); // Convert array to JSON string
+        formData.append("prefSessDur", this.sessionDuration);
+        formData.append("exp", this.experience);
+        formData.append("proficiency", this.proficiency); // Added proficiency level
+        formData.append(
+          "credentials",
+          JSON.stringify(this.credentials.map((file) => file.name))
+        ); // Convert array to JSON string
 
         // Ensure profileImage is a file
         if (this.$refs.profileInput.files[0]) {
-          formData.append('image', this.$refs.profileInput.files[0]);
+          formData.append("image", this.$refs.profileInput.files[0]);
         } else {
-          throw new Error('Profile image is missing or invalid.');
+          throw new Error("Profile image is missing or invalid.");
         }
 
         this.credentials.forEach((file, index) => {
           formData.append(`credentials[${index}]`, file);
         });
 
-        await axios.post('http://localhost:8000/api/mentor/register', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'accept': 'application/json',
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
-          }})
-        .then(response => {
-          console.log('ge')
-        })
-        .catch(error => {
-          console.error(error);
-        });
+        await axios
+          .post("http://localhost:8000/api/mentor/register", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              accept: "application/json",
+              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+            },
+          })
+          .then((response) => {
+            console.log("ge");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
 
         // console.log('Mentor application submitted:', formData);
         this.sendEmailToAdmin(formData);
         this.showStatusPopup = true;
         this.isSubmitted = true;
-
       } catch (error) {
-        console.error('Application submission error:', error);
-        alert('An error occurred while submitting your application. Please try again.');
+        console.error("Application submission error:", error);
+        alert(
+          "An error occurred while submitting your application. Please try again."
+        );
       }
     },
-    
-    sendEmailToAdmin(formData) { 
-      console.log('Sending email to admin with application data:', formData);
+
+    sendEmailToAdmin(formData) {
+      console.log("Sending email to admin with application data:", formData);
     },
-    
-    closeStatusPopup() { 
+
+    closeStatusPopup() {
       this.showStatusPopup = false;
     },
-    
+
     proceedToHome() {
-      this.$router.push('/');
-    }
+      this.$router.push("/");
+    },
+
+    validateField(field, value) {
+      const rules = this.validationRules[field];
+      if (!rules) return;
+
+      if (rules.pattern && !rules.pattern.test(value)) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      if (rules.minLength && value.length < rules.minLength) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      if (rules.maxLength && value.length > rules.maxLength) {
+        this.validationErrors[field] = rules.message;
+        return false;
+      }
+
+      this.validationErrors[field] = "";
+      return true;
+    },
+
+    validateSelections() {
+      // Subjects validation
+      if (this.selectedSubjects.length === 0) {
+        this.validationErrors.selectedSubjects =
+          "Please select at least one subject";
+      } else {
+        this.validationErrors.selectedSubjects = "";
+      }
+
+      // Days validation
+      if (this.selectedDays.length === 0) {
+        this.validationErrors.selectedDays = "Please select at least one day";
+      } else {
+        this.validationErrors.selectedDays = "";
+      }
+
+      // Learning styles validation
+      if (this.selectedsessionStyles.length === 0) {
+        this.validationErrors.selectedsessionStyles =
+          "Please select at least one learning style";
+      } else {
+        this.validationErrors.selectedsessionStyles = "";
+      }
+    },
   },
 
-  mounted(){
+  mounted() {
     this.csrf();
   },
 
   watch: {
+    fullName(newVal) {
+      this.validateField("fullName", newVal);
+    },
+    address(newVal) {
+      this.validateField("address", newVal);
+    },
+    contactNumber(newVal) {
+      this.validateField("contactNumber", newVal);
+    },
+    bio(newVal) {
+      this.validateField("bio", newVal);
+    },
+    experience(newVal) {
+      this.validateField("experience", newVal);
+    },
     selectedSubjects: {
       handler() {
-        this.updateSelectedCounts();
+        this.validateSelections();
       },
-      deep: true
+      deep: true,
     },
-    
-    program(newVal) {
-      if (newVal) {
-        this.updateAvailableSubjects();
-      }
+    selectedDays: {
+      handler() {
+        this.validateSelections();
+      },
+      deep: true,
     },
-    
-    gender(newVal) {
-      if (newVal !== 'Other') {
-        this.otherGender = '';
-      }
-    }
-  }
-}
+    selectedsessionStyles: {
+      handler() {
+        this.validateSelections();
+      },
+      deep: true,
+    },
+  },
+};
 </script>
-
-
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -810,7 +1446,8 @@ export default {
   font-family: "Montserrat", sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -841,12 +1478,12 @@ html, body {
 .page-header h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: #02475E;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+  color: #02475e;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .page-header p {
-  color: #02475E;
+  color: #02475e;
   font-weight: 500;
   font-size: 0.9rem;
 }
@@ -868,7 +1505,7 @@ html, body {
 }
 
 .title {
-  color: #02475E;
+  color: #02475e;
   font-size: 1.6rem;
   margin-bottom: 2rem;
   margin-left: 2rem;
@@ -896,7 +1533,7 @@ html, body {
 }
 
 .personal-label {
-  color: #02475E;
+  color: #02475e;
   font-weight: 500;
   font-size: 0.85rem;
   margin-bottom: 0.6rem;
@@ -921,7 +1558,7 @@ html, body {
 .profile-input::placeholder,
 .gender-specify::placeholder {
   color: rgba(255, 250, 250, 0.683);
-  font-size: 0.80rem;
+  font-size: 0.8rem;
 }
 
 .personal-input:focus,
@@ -971,17 +1608,17 @@ html, body {
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.90rem;
+  font-size: 0.9rem;
 }
 
 .dropdown-option {
   padding: 7px 13px;
   cursor: pointer;
-  color: #02475E;
+  color: #02475e;
   transition: background-color 0.2s;
   display: flex;
-  align-items: center; 
-  gap: 13px; 
+  align-items: center;
+  gap: 13px;
 }
 
 .dropdown-option:hover {
@@ -1034,7 +1671,7 @@ html, body {
   position: absolute;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 100;
   max-height: 300px;
   overflow-y: auto;
@@ -1045,7 +1682,7 @@ html, body {
   top: 100%;
   left: 0;
   margin-top: 1px;
-  font-size: 13px
+  font-size: 13px;
 }
 
 .subjects {
@@ -1058,7 +1695,7 @@ html, body {
   padding: 10px 15px;
   cursor: pointer;
   transition: background 0.2s;
-  color: #02475E;
+  color: #02475e;
 }
 
 .dropdown-item:hover {
@@ -1094,7 +1731,7 @@ html, body {
 }
 
 .count-badge {
-  background-color: #02475E;
+  background-color: #02475e;
   color: white;
   border-radius: 10px;
   padding: 2px 6px;
@@ -1124,7 +1761,7 @@ html, body {
 }
 
 .profile-label {
-  color: #02475E;
+  color: #02475e;
   font-weight: 500;
   font-size: 0.85rem;
   margin-bottom: 0.3rem;
@@ -1165,7 +1802,7 @@ html, body {
   width: 100%;
 }
 
-.profile-textarea::placeholder{
+.profile-textarea::placeholder {
   color: rgba(255, 250, 250, 0.683);
   font-weight: 500;
 }
@@ -1248,7 +1885,7 @@ html, body {
   align-items: center;
   gap: 1.3rem;
   cursor: pointer;
-  color:#ffffff
+  color: #ffffff;
 }
 
 .file-name {
@@ -1264,7 +1901,7 @@ html, body {
   border-radius: 25px;
   transition: background-color 2s;
   color: #f9fbfb;
-  background: linear-gradient(to bottom, #02475E, #066678);
+  background: linear-gradient(to bottom, #02475e, #066678);
 }
 
 .choose-file-container:hover {
@@ -1347,7 +1984,7 @@ html, body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: #02475E;
+  color: #02475e;
 }
 
 .file-list button {
@@ -1405,14 +2042,14 @@ html, body {
 .status-popup-content h3 {
   text-align: center;
   color: white;
-  background-color: #02475E;
+  background-color: #02475e;
   padding: 10px;
-  border-radius:5px;
+  border-radius: 5px;
   margin-bottom: 23px;
 }
 
 .status-text {
-  color: #02475E;
+  color: #02475e;
   text-align: center;
   margin-bottom: 30px;
   padding: 0 20px;
@@ -1420,7 +2057,7 @@ html, body {
 }
 
 .proceed-button {
-  background-color: #02475E;
+  background-color: #02475e;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -1462,7 +2099,7 @@ html, body {
 }
 
 .step.active {
-  background-color: #02475E;
+  background-color: #02475e;
   transform: scale(1.2);
 }
 
@@ -1471,7 +2108,7 @@ html, body {
 }
 
 /* Next/Submit Button */
-.next-button { 
+.next-button {
   position: fixed;
   bottom: 15px;
   right: 30px;
@@ -1485,7 +2122,7 @@ html, body {
   font-weight: 600;
   font-size: 0.9rem;
   z-index: 10;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .next-button:hover {
@@ -1498,7 +2135,7 @@ html, body {
 }
 
 .fas {
-  font-family: 'Font Awesome 5 Free' !important;
+  font-family: "Font Awesome 5 Free" !important;
   font-weight: 900;
 }
 
@@ -1540,7 +2177,7 @@ html, body {
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  color: #02475E;
+  color: #02475e;
 }
 
 .availability-option input[type="checkbox"],
@@ -1551,7 +2188,36 @@ html, body {
 .availability-option label,
 .teaching-style-option label {
   cursor: pointer;
-  color: #02475E;
+  color: #02475e;
   font-size: 0.85rem;
+}
+
+.required::after {
+  content: "*";
+  color: #ff6b6b;
+  margin-left: 4px;
+}
+
+.validation-message {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
+.personal-input.error,
+.profile-input.error,
+.profile-textarea.error {
+  border-color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+/* Update the existing validation-error class */
+.validation-error {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
 }
 </style>

@@ -3,33 +3,187 @@ import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
 import help from "@/components/mentorpage/help.vue";
+import axios from "axios";
 
-const userName = ref("John Doe Mendoza");
-const proficiency = ref("Advanced");
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-const bio = ref(
-  "Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis"
-);
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
 
-const starFilled = ref(4);
-const yearLevel = ref(2);
-const program = ref("BSCS");
+const loggedUserDets = async () => {
+  try {
+    await axios
+      .get("http://localhost:8000/api/mentor/details", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("User details fetched successfully:", response.data);
+        if (response.status === 200) {
+          // Store data in unified userData ref
+          userData.value = {
+            user: response.data.user,
+            ment: {
+              ...response.data.ment,
+              availability: JSON.parse(response.data.ment.availability),
+              subjects: JSON.parse(response.data.ment.subjects),
+              teach_sty: JSON.parse(response.data.ment.teach_sty),
+              rating_ave: response.data.ment.rating_ave || 0, // Add this line
+            },
+          };
+        } else {
+          throw new Error("Failed to fetch user details");
+        }
+      });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return null;
+  }
+};
 
-const days = ref("MONDAY-TUESDAY");
-const duration = ref(2);
+const learnersProfile = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/users", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Learner profiles fetched successfully:", response.data);
+        if (response.status === 200) {
+          users.value = response.data;
+          // // users.value.userName = response.data.name;
+          // return response.data;
+        } else {
+          throw new Error("Failed to fetch learner profiles");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching learner profiles:", error);
+      });
+  } catch (error) {
+    console.error("Error fetching learner profiles:", error);
+    return null;
+  }
+};
 
-const isEdit = ref(false);
+const sessionInfo = async () => {
+  try {
+    const sessionDeets = await axios
+      .get(`http://localhost:8000/api/mentor/schedule`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("session details:", response.data);
+        todaySchedule.value = response.data.schedules_today;
+        upcommingSchedule.value = response.data.upcoming_schedules;
+      });
+  } catch (error) {
+    console.error("Error fetching session details:", error);
+    return null;
+  }
+};
+
+const getFeedbacks = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/getFeedback", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Feedbacks:", response.data);
+        feedbacks.value = response.data.feedbacks;
+      });
+    // return response.data
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error);
+    return null;
+  }
+};
+
+const getFiles = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/mentor/files", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Files:", response.data);
+        files.value = response.data.files;
+      });
+    // return response.data
+  } catch (error) {
+    console.error("Error fetching files:", error);
+    return null;
+  }
+};
+
+// Replace multiple refs with a single userData ref
+const userData = ref({
+  user: {
+    id: null,
+    name: "",
+    email: "",
+    role: "",
+  },
+  ment: {
+    address: "",
+    proficiency: "",
+    year: "",
+    course: "",
+    availability: [],
+    prefSessDur: "",
+    bio: "",
+    subjects: [],
+    image: "",
+    phoneNum: "",
+    teach_sty: [],
+    credentials: [],
+    exp: "",
+    rating_ave: 0, // Add this default value
+  },
+});
+
+// Keep other independent refs
+const department = ref("College of Computer Studies");
 const users = ref([]);
+const todaySchedule = ref([]);
+const upcommingSchedule = ref([]);
+const feedbacks = ref([]);
+const files = ref([]);
+const isEdit = ref(false);
 const confirmLogout = ref(false);
 const isHelp = ref(false);
-
-const openHelp = () => {
-  isHelp.value = !isHelp.value;
-};
-
-const openLogoutDialog = () => {
-  confirmLogout.value = !confirmLogout.value;
-};
+const showAllCourses = ref(false);
+const searchQuery = ref("");
 
 const activeComponent = ref("main");
 const switchComponent = (component) => {
@@ -54,32 +208,29 @@ const filesView = defineAsyncComponent(() =>
   import("../../components/mentorpage/files.vue")
 );
 
+const fileManageView = defineAsyncComponent(() =>
+  import("../../components/mentorpage/fileManage.vue")
+);
+
+const openLogoutDialog = () => {
+  confirmLogout.value = true;
+};
+
 const componentMap = {
   main: mainView,
   session: sessionView,
   records: recordsView,
   files: filesView,
+  fileManage: fileManageView,
 };
 
-const courseCard = ref([
-  "Computer Programming",
-  "Ethics",
-  "Information Management",
-  "Networking",
-  "Database",
-  "Discrete Mathematics",
-  "Calculus",
-  "Algorithms",
-  "Data Structures",
-  "Operating Systems",
-  "Computer Architecture",
-  "Software Engineering"
-]);
-
-const displayedCourses = computed(() => courseCard.value.slice(0, 5));
-const remainingCoursesCount = computed(() => Math.max(courseCard.value.length - 5, 0));
-const remainingCourses = computed(() => courseCard.value.slice(5)); 
-const showAllCourses = ref(false);
+const displayedCourses = computed(() =>
+  userData.value.ment.subjects.slice(0, 5)
+);
+const remainingCoursesCount = computed(() =>
+  Math.max(userData.value.ment.subjects.length - 5, 0)
+);
+const remainingCourses = computed(() => userData.value.ment.subjects.slice(5));
 
 const toggleShowAllCourses = () => {
   showAllCourses.value = !showAllCourses.value;
@@ -88,8 +239,6 @@ const toggleShowAllCourses = () => {
 const openEditInformation = () => {
   isEdit.value = !isEdit.value;
 };
-
-const searchQuery = ref("");
 
 const filteredUsers = computed(() => {
   return users.value.filter((user) => {
@@ -108,232 +257,51 @@ const handleLogout = () => {
   confirmLogout.value = false;
 };
 
-const fetchUserInformation = () => {
-  return [
-  {
-			id: 1,
-			userName: "Maria Santos",
-			yearLevel: "1st Year",
-			course: "BSCS | CSS",
-		},
-		{
-			id: 2,
-			userName: "James Wilson",
-			yearLevel: "3rd Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 3,
-			userName: "Sofia Rodriguez",
-			yearLevel: "2nd Year",
-			course: "BSA | CAFA",
-		},
-		{
-			id: 4,
-			userName: "David Chen",
-			yearLevel: "4th Year",
-			course: "BSME | COE",
-		},
-		{
-			id: 5,
-			userName: "Ana Reyes",
-			yearLevel: "1st Year",
-			course: "BSN | CON",
-		},
-		{
-			id: 6,
-			userName: "Marco Tan",
-			yearLevel: "3rd Year",
-			course: "BSBA | COB",
-		},
-		{
-			id: 7,
-			userName: "Ling Xu",
-			yearLevel: "5th Year",
-			course: "BSArch | CEA",
-		},
-		{
-			id: 8,
-			userName: "Paulo Cordova",
-			yearLevel: "2nd Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 9,
-			userName: "Aisha Patel",
-			yearLevel: "4th Year",
-			course: "BSCE | COE",
-		},
-		{
-			id: 10,
-			userName: "Rafael Gutierrez",
-			yearLevel: "3rd Year",
-			course: "BSCS | CSS",
-		},
-		{
-			id: 11,
-			userName: "Nina Thompson",
-			yearLevel: "1st Year",
-			course: "BSBio | COS",
-		},
-		{
-			id: 12,
-			userName: "Carlos Mendoza",
-			yearLevel: "2nd Year",
-			course: "BSECE | COE",
-		},
-		{
-			id: 13,
-			userName: "Jennifer Kim",
-			yearLevel: "4th Year",
-			course: "BSA | CAFA",
-		},
-		{
-			id: 14,
-			userName: "Hiroshi Tanaka",
-			yearLevel: "3rd Year",
-			course: "BSBA | COB",
-		},
-		{
-			id: 15,
-			userName: "Fatima Ahmed",
-			yearLevel: "2nd Year",
-			course: "BSMT | COS",
-		},
-		{
-			id: 16,
-			userName: "Victor Garcia",
-			yearLevel: "1st Year",
-			course: "BSEE | COE",
-		},
-		{
-			id: 17,
-			userName: "Emily Zhang",
-			yearLevel: "5th Year",
-			course: "BSArch | CEA",
-		},
-		{
-			id: 18,
-			userName: "Michael Okafor",
-			yearLevel: "3rd Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 19,
-			userName: "Isabella Martinez",
-			yearLevel: "2nd Year",
-			course: "BSPsych | CAS",
-		},
-		{
-			id: 20,
-			userName: "Raj Patel",
-			yearLevel: "4th Year",
-			course: "BSCS | CSS",
-		},
-		{
-			id: 21,
-			userName: "Gabriela Silva",
-			yearLevel: "1st Year",
-			course: "BSN | CON",
-		},
-		{
-			id: 22,
-			userName: "Daniel Lee",
-			yearLevel: "3rd Year",
-			course: "BSME | COE",
-		},
-		{
-			id: 23,
-			userName: "Fatma Ibrahim",
-			yearLevel: "2nd Year",
-			course: "BSBA | COB",
-		},
-		{
-			id: 24,
-			userName: "Alejandro Diaz",
-			yearLevel: "4th Year",
-			course: "BSCE | COE",
-		},
-		{
-			id: 25,
-			userName: "Mei Lin",
-			yearLevel: "3rd Year",
-			course: "BSChem | COS",
-		},
-		{
-			id: 26,
-			userName: "Mohammed Al-Farsi",
-			yearLevel: "1st Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 27,
-			userName: "Sarah Johnson",
-			yearLevel: "5th Year",
-			course: "BSArch | CEA",
-		},
-		{
-			id: 28,
-			userName: "Juan Dela Cruz",
-			yearLevel: "2nd Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 29,
-			userName: "Amara Okonkwo",
-			yearLevel: "4th Year",
-			course: "BSMath | COS",
-		},
-		{
-			id: 30,
-			userName: "Liam O'Connor",
-			yearLevel: "3rd Year",
-			course: "BSIT | CSS",
-		},
-		{
-			id: 31,
-			userName: "Priya Sharma",
-			yearLevel: "2nd Year",
-			course: "BSBA | COB",
-		},
-		{
-			id: 32,
-			userName: "Ricardo Torres",
-			yearLevel: "1st Year",
-			course: "BSCS | CSS",
-		},  ];
-};
-
-onMounted(() => {
-  users.value = fetchUserInformation();
+onMounted(async () => {
+  console.log("test kung namamount");
+  await loggedUserDets();
+  await learnersProfile();
+  await sessionInfo();
+  await getFeedbacks();
+  await getFiles();
+  // users.value = learnersProfile();
 });
 </script>
 
 <template>
-  <!-- sidebar -->
   <div class="sidebar">
     <div class="upper-element">
       <div>
         <h1>Hi, Mentor!</h1>
-        <img src="https://placehold.co/600x400" alt="profile-pic" />
+        <img
+          :src="
+            'http://localhost:8000/api/image/' + userData.ment.image ||
+            'http://placehold.co/600x400'
+          "
+          alt="profile-pic"
+        />
       </div>
       <div>
-        <h2>{{ userName }}</h2>
-        <i><p>{{ proficiency }}</p></i>
+        <h2>{{ userData.user.name }}</h2>
+        <i
+          ><p>{{ userData.ment.proficiency }}</p></i
+        >
         <div class="stars">
           <span class="filledStar" v-for="i in 5" :key="i">
-            <span v-if="i <= starFilled">★</span>
+            <span v-if="i <= Math.round(userData?.ment?.rating_ave || 0)"
+              >★</span
+            >
             <span v-else>☆</span>
           </span>
         </div>
       </div>
     </div>
-    <div class="wave-curve"></div>
+    <!-- <div class="wave-curve"></div> -->
     <div class="footer-element">
       <div class="bio-container">
         <h1>BIO</h1>
         <div>
-          <p>{{ bio }}</p>
+          <p>{{ userData.ment.bio }}</p>
         </div>
       </div>
       <div class="user-information">
@@ -341,19 +309,19 @@ onMounted(() => {
         <div class="lines">
           <h3>Year Level:</h3>
           <div>
-            <p>{{ yearLevel }}</p>
+            <p>{{ userData.ment.year }}</p>
           </div>
         </div>
         <div class="lines">
           <h3>Department:</h3>
           <div>
-            <p>College of Computer Studies</p>
+            <p>{{ department }}</p>
           </div>
         </div>
         <div class="lines">
           <h3>Program:</h3>
           <div>
-            <p>{{ program }}</p>
+            <p>{{ userData.ment.course }}</p>
           </div>
         </div>
       </div>
@@ -362,13 +330,20 @@ onMounted(() => {
         <div class="lines">
           <h3>Days:</h3>
           <div>
-            <p>{{ days }}</p>
+            <ul>
+              <li
+                v-for="(day, index) in userData.ment.availability"
+                :key="index"
+              >
+                {{ day }}
+              </li>
+            </ul>
           </div>
         </div>
         <div class="lines">
           <h3>Duration:</h3>
           <div>
-            <p>{{ duration }}</p>
+            <p>{{ userData.ment.prefSessDur }}</p>
           </div>
         </div>
       </div>
@@ -386,8 +361,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <div 
-            v-if="remainingCoursesCount > 0" 
+          <div
+            v-if="remainingCoursesCount > 0"
             class="course-card remaining-courses"
             @click="toggleShowAllCourses"
           >
@@ -398,12 +373,12 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        
+
         <div v-if="showAllCourses" class="all-courses-popup">
           <div class="popup-content">
             <div class="popup-courses">
-              <div 
-                v-for="(course, index) in courseCard" 
+              <div
+                v-for="(course, index) in userData.ment.subjects"
                 :key="index"
                 class="popup-course"
               >
@@ -425,7 +400,7 @@ onMounted(() => {
   <Transition name="fade">
     <div v-if="!isHelp" class="help-section">
       <div @click="openHelp" class="help">
-        <img src="/help.svg" alt="help" />				
+        <img src="/help.svg" alt="help" />
         <p>Help</p>
       </div>
     </div>
@@ -435,20 +410,24 @@ onMounted(() => {
   <div class="topbar">
     <div class="topbar-left">
       <div @click="switchComponent('main')" class="topbar-options">
-        <img src="/main.svg" alt="main" />
+        <img src="/main.svg" alt="Main" />
         <p>Main</p>
       </div>
       <div @click="switchComponent('session')" class="topbar-options">
-        <img src="/calendar.svg" alt="calendar" />
+        <img src="/calendar.svg" alt="Session" />
         <p>Sessions</p>
       </div>
       <div @click="switchComponent('records')" class="topbar-options">
-        <img src="/records.svg" alt="record" />
+        <img src="/records.svg" alt="Records" />
         <p>Records</p>
       </div>
       <div @click="switchComponent('files')" class="topbar-options">
-        <img src="/files.svg" alt="notes" />
+        <img src="/uploadCloud.svg" alt="Upload" />
         <p>Files</p>
+      </div>
+      <div @click="switchComponent('fileManage')" class="topbar-options">
+        <img src="/files.svg" alt="Files" />
+        <p>File Manager</p>
       </div>
       <div @click="openLogoutDialog" class="topbar-options">
         <img src="/logout.svg" alt="logout" />
@@ -471,21 +450,22 @@ onMounted(() => {
     <component
       :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
+      :schedule="todaySchedule"
+      :upcomingSchedule="upcommingSchedule"
+      :feedbacks="feedbacks"
+      :files="files"
     />
   </div>
 
   <Transition name="fade" mode="out-in">
     <div v-if="isEdit" class="edit-information-popup">
-      <Information @close="openEditInformation" />
+      <Information :userData="userData" @close="openEditInformation" />
     </div>
   </Transition>
 
   <Transition name="fade" mode="out-in">
     <div v-if="confirmLogout" class="logout-popup">
-      <logoutDialog
-        @close="confirmLogout = false"
-        @logout="handleLogout"
-      />
+      <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
   </Transition>
 
@@ -500,4 +480,3 @@ onMounted(() => {
 @import "@/assets/mentorpage/mentor.css";
 @import "@/assets/mentorpage/color.css";
 </style>
-

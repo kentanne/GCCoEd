@@ -1,5 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import App from "./App.vue";
+import router from "./router";
 
 // svg Icon
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -49,6 +51,7 @@ library.add(
 import App from "./App.vue";
 import router from "./router";
 
+
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -56,5 +59,4 @@ app.use(pinia);
 app.use(router);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
-
 app.mount("#app");

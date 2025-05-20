@@ -3,8 +3,11 @@ import { ref, computed } from "vue";
 import viewUser from "@/components/mentorpage/viewUser.vue";
 
 const isView = ref(false);
+const selectedUserId = ref();
 
-const openView = () => {
+const openView = (id) => {
+	console.log("Selected user ID:", id);
+	selectedUserId.value = id;
 	isView.value = true;
 };
 
@@ -17,7 +20,17 @@ const props = defineProps({
 		type: Array,
 		required: false,
 	},
+	schedule: {
+		type: Object,
+		required: false,
+	},
+	upcomingSchedule: {
+		type: Object,
+		required: false,
+	},
 });
+
+console.log("props:", props);
 </script>
 
 <template>
@@ -29,20 +42,20 @@ const props = defineProps({
 				class="user-card"
 			>
 				<div class="upper-element">
-					<img src="https://placehold.co/600x400" alt="profile-pic" />
+					<img :src="'http://localhost:8000/api/image/' + user.image_id || 'https://placehold.co/600x400'" alt="profile-pic" />
 					<h1>{{ user.userName }}</h1>
 				</div>
 				<div class="lower-element">
 					<p>{{ user.yearLevel }}</p>
 					<p>{{ user.course }}</p>
-					<button @click="openView">See More</button>
+					<button @click="openView(user.id)">See More</button>
 				</div>
 			</div>
 		</div>
 
 		<Transition name="fade" mode="out-in">
 			<div v-if="isView" class="view-popup">
-				<viewUser @close="closeView" />
+				<viewUser :userId="selectedUserId" @close="closeView" />
 			</div>
 		</Transition>
 	</div>
