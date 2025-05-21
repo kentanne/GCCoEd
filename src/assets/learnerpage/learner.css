@@ -1,4 +1,3 @@
-
 .sidebar {
   position: fixed;
   height: 100%;
@@ -76,14 +75,14 @@
   bottom: 61.3%;
   left: 0;
   right: 0;
-  height: 37px; 
+  height: 37px;
   background: #309cb0;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" preserveAspectRatio="none"><path fill="%230c434d" d="M0,80 C150,80 250,20 400,20 C550,20 650,80 800,80 C950,80 1050,20 1200,20 L1200,0 L0,0 Z"/></svg>');
   background-size: 100% 100%;
-  transform: translateY(25%); 
+  transform: translateY(25%);
   z-index: 1;
 }
-  
+
 /* help section */
 .help-section {
   position: fixed;
@@ -107,8 +106,8 @@
 
 .help p {
   font-weight: 700;
-  text-transform:uppercase;
-  color:#006981;
+  text-transform: uppercase;
+  color: #006981;
 }
 
 .help-section img {
@@ -119,15 +118,16 @@
 .footer-element {
   flex-direction: column;
   gap: 20px;
-  background-color: #309cb0; 
+  background-color: #309cb0;
   height: 100%;
   width: 103.5%;
-  margin-left: -25px; 
+  margin-left: -25px;
   padding: 20px;
   margin-top: 17px;
 }
 
-.biogoals-container {
+.bio-container,
+.goals-container {
   display: flex;
   gap: 4px;
   flex-direction: column;
@@ -135,14 +135,16 @@
   margin-top: 3px;
 }
 
-.biogoals-container input {
+.bio-container input,
+.goals-container input {
   color: #066678;
   border: none;
   height: 100%;
   width: 100%;
 }
 
-.biogoals-container div {
+.bio-container div,
+.goals-container div {
   max-height: 70px;
   overflow: auto;
 }
@@ -154,7 +156,8 @@ textarea {
   border: none;
 }
 
-.biogoals-container div::-webkit-scrollbar {
+.bio-container div::-webkit-scrollbar,
+.goals-container div::-webkit-scrollbar {
   display: none;
 }
 
@@ -164,7 +167,8 @@ input {
   text-align: center;
 }
 
-.biogoals-container h1,
+.bio-container h1,
+.goals-container h1,
 .user-information h1,
 .availability h1,
 .subject-interest h1 {
@@ -180,13 +184,15 @@ input {
   margin-top: 10px;
 }
 
-.biogoals-container div:first-of-type {
+.bio-container div:first-of-type,
+.goals-container div:first-of-type {
   background-color: white;
   padding: 10px 15px;
   border-radius: 15px;
 }
 
-.biogoals-container p {
+.bio-container p,
+.goals-container p {
   color: #066678;
 }
 
@@ -287,7 +293,6 @@ input {
   margin-top: 28%;
   max-height: 50%;
   max-height: 200px;
-
 }
 
 .popup-content {
@@ -440,17 +445,17 @@ input::placeholder {
 }
 
 .help-popup {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 3000; 
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: rgba(0, 0, 0, 0.7);
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
 
 .fade-enter-active,
 .fade-leave-active {

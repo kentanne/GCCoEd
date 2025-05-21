@@ -167,7 +167,7 @@ const handleStep2 = async () => {
           </div>
 
           <div class="form-group">
-            <select v-model="verificationData.secondaryRole">
+            <select v-model="verificationData.secondary_role">
               <option value="">Select Secondary Role (Optional)</option>
               <option v-for="role in roles" :key="role" :value="role">
                 {{ role.charAt(0).toUpperCase() + role.slice(1) }}
