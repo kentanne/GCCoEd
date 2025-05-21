@@ -343,7 +343,7 @@ onMounted(async () => {
         />
       </div>
       <div>
-        <h2>{{ userData.learn.name }}</h2>
+        <h2>{{ userData.user.name }}</h2>
         <i
           ><p>{{ userData.learn.year }}</p></i
         >
@@ -354,11 +354,15 @@ onMounted(async () => {
     </div>
     <!--<div class="wave-curve"></div>-->
     <div class="footer-element">
-      <div class="biogoals-container">
+      <div class="bio-container">
         <h1>BIO</h1>
         <div>
-          <p>{{ userData.learn.bio }}</p>
+          <p style="white-space: normal; word-break: break-all">
+            {{ userData.learn.bio }}
+          </p>
         </div>
+      </div>
+      <div class="goals-container">
         <h1>LEARNING GOALS</h1>
         <div>
           <p>{{ userData.learn.goals }}</p>
@@ -386,11 +390,11 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="s-interest">
+      <div class="subject-interest">
         <h1>Subject of Interest</h1>
         <div class="course-grid">
           <div
-            v-for="(card, index) in displayedCourses"
+            v-for="(card, index) in userData.learn.subjects"
             :key="index"
             class="course-card"
           >
@@ -484,7 +488,7 @@ onMounted(async () => {
 
   <Transition name="fade" mode="out-in">
     <div v-if="isEdit" class="edit-information-popup">
-      <Information @close="openEditInformation" />
+      <Information :userData="userData" @close="openEditInformation" />
     </div>
   </Transition>
 
