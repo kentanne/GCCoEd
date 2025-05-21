@@ -20,6 +20,7 @@
       
       <div class="divider tight-divider animated-divider"></div>
       
+      
       <!-- Features section -->
       <div class="content-wrapper">
         <div class="feature-row">

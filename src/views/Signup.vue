@@ -66,7 +66,6 @@
   </div>
 </template>
 
-
 <script>
 import { registrationStore } from "@/stores/registrationStore";
 

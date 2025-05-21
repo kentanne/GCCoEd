@@ -10,6 +10,7 @@
         </div>
       </div>
     </main>
+    
     <section id="learners" class="content-section learners-section">
       <div class="content-box learners-content-box">
         <h2 class="learners-heading">LEARNERS</h2>

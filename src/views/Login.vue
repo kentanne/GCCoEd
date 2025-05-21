@@ -162,7 +162,6 @@ body {
   color: white;
 }
 
-
 .login-container {
   background-image: url("@/assets/bg.png");
   position: fixed;

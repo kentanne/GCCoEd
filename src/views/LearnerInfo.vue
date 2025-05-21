@@ -229,7 +229,7 @@
     </div>
   </div>
 </div>
-           <div class="divider"></div>
+       <div class="divider"></div>
         <div class="profile-field">
           <label class="profile-label" for="availability-days"
             >DAYS OF AVAILABILITY</label
