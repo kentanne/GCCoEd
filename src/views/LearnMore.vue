@@ -20,6 +20,7 @@
       
       <div class="divider tight-divider animated-divider"></div>
       
+      
       <!-- Features section -->
       <div class="content-wrapper">
         <div class="feature-row">
@@ -524,6 +525,15 @@ html, body {
     flex-direction: column;
     align-items: center;
   }
+
+  .back-button {
+    top: 120px;
+    left: 20px;
+  }
+  
+  .back-icon {
+    font-size: 24px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -540,6 +550,15 @@ html, body {
   .icon-text {
     font-size: 0.8rem;
     padding: 6px 10px;
+  }
+
+    .back-button {
+    top: 100px;
+    left: 15px;
+  }
+  
+  .back-icon {
+    font-size: 20px;
   }
 }
 </style>

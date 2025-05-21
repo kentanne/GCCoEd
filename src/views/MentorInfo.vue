@@ -1,35 +1,23 @@
 <template>
   <div class="mentorinfo-container">
+
+        <button @click="scrollToGetStarted" class="back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+      </svg>
+      Back
+    </button>
+    
     <header class="page-header">
       <h1>MENTOR INFO</h1>
       <p>Complete your profile to start mentoring.</p>
     </header>
 
-    <div class="form-container">
+    <div class="form-container scrollable-content">
       <!-- Step 1 Content -->
       <div v-if="currentStep === 1">
         <h2 class="title">I. PERSONAL INFORMATION</h2>
-        <div class="personal-grid">
-          <div class="personal-col">
-            <div class="personal-field">
-              <!-- For Full Name -->
-              <label class="personal-label required" for="full-name"
-                >FULL NAME</label
-              >
-              <input
-                type="text"
-                id="full-name"
-                v-model="fullName"
-                @input="validateField('fullName', fullName)"
-                @blur="validateField('fullName', fullName)"
-                placeholder="Enter your full name (FN MI LN)"
-                class="personal-input"
-                :class="{ error: validationErrors.fullName }"
-              />
-              <span v-if="validationErrors.fullName" class="validation-message">
-                {{ validationErrors.fullName }}
-              </span>
-            </div>
+       
             <div class="personal-field">
               <!-- For Address -->
               <label class="personal-label required" for="address"
@@ -49,6 +37,31 @@
                 {{ validationErrors.address }}
               </span>
             </div>
+
+            <div class="personal-field">
+              <!-- For Contact Number -->
+              <label class="personal-label required" for="contact-number"
+                >CONTACT NUMBER</label
+              >
+              <input
+                type="text"
+                id="contact-number"
+                v-model="contactNumber"
+                @input="validateField('contactNumber', contactNumber)"
+                @blur="validateField('contactNumber', contactNumber)"
+                placeholder="Enter your contact number (11 digits)"
+                class="personal-input"
+                :class="{ error: validationErrors.contactNumber }"
+                maxlength="11"
+              />
+              <span
+                v-if="validationErrors.contactNumber"
+                class="validation-message"
+              >
+                {{ validationErrors.contactNumber }}
+              </span>
+            </div>
+
             <div class="personal-field">
               <!-- For Gender -->
               <label class="personal-label required" for="gender">GENDER</label>
@@ -97,8 +110,7 @@
                 {{ validationErrors.gender }}
               </span>
             </div>
-          </div>
-          <div class="personal-col">
+
             <div class="personal-field">
               <label class="personal-label" for="year-level">YEAR LEVEL </label>
               <div class="year-dropdown">
@@ -194,112 +206,225 @@
                 </div>
               </div>
             </div>
-            <div class="personal-field">
-              <!-- For Contact Number -->
-              <label class="personal-label required" for="contact-number"
-                >CONTACT NUMBER</label
-              >
-              <input
-                type="text"
-                id="contact-number"
-                v-model="contactNumber"
-                @input="validateField('contactNumber', contactNumber)"
-                @blur="validateField('contactNumber', contactNumber)"
-                placeholder="Enter your contact number (11 digits)"
-                class="personal-input"
-                :class="{ error: validationErrors.contactNumber }"
-                maxlength="11"
-              />
-              <span
-                v-if="validationErrors.contactNumber"
-                class="validation-message"
-              >
-                {{ validationErrors.contactNumber }}
-              </span>
-            </div>
           </div>
-        </div>
-      </div>
-
+          
       <!-- Step 2 Content -->
       <div v-if="currentStep === 2">
         <h2 class="title">II. PROFILE INFORMATION</h2>
-        <div class="profile-grid">
-          <div class="profile-col">
+
+                  <!-- Profile Picture and Credentials Upload -->
+          <div class="upload-container">
+            <div class="profile-picture-upload">
+              <label class="profile-label">PROFILE PICTURE</label>
+              <div class="upload-controls" @click="uploadProfilePicture">
+                <div class="profile-preview-container">
+                  <img
+                    v-if="profileImage"
+                    :src="profileImage"
+                    alt="Profile Preview"
+                    class="profile-preview"
+                  />
+                  <i v-else class="fas fa-user-circle default-icon"></i>
+                </div>
+                <div class="upload-text">
+                  <div class="choose-file-container">
+                    <i class="fas fa-upload"></i>
+                    <span>Choose File</span>
+                  </div>
+                  <input
+                    type="file"
+                    ref="profileInput"
+                    accept="image/*"
+                    style="display: none"
+                    @change="handleProfileUpload"
+                  />
+                  <span
+                    class="file-name"
+                    style="
+                      max-width: 150px;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                    "
+                    >{{ profilePictureName || "No file chosen" }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+<div class="credentials-upload">
+  <label class="profile-label">CREDENTIALS</label>
+  <div class="upload-controls">
+    <i class="fas fa-file-upload upload-icon"></i>
+    <div class="choose-file-container" @click="uploadCredentials">
+      <span>Upload Credentials</span>
+    </div>
+    <input
+      type="file"
+      ref="credentialInput"
+      multiple
+      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+      style="display: none"
+      @change="handleCredentialUpload"
+    />
+    <a href="#" @click.prevent="toggleFileList" class="file-link"
+      >View Uploaded Files ({{ credentials.length }})</a
+    >
+  </div>
+</div>
+ </div>
+
+                     <div class="divider"></div>
+
+                 <div class="profile-field">
+              <label class="profile-label" for="availability-days"
+                >DAYS OF AVAILABILITY</label
+              >
+              <div class="availability-dropdown">
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('availability')"
+                >
+                  <input
+                    type="text"
+                    id="availability-days"
+                    v-model="availabilityDaysDisplay"
+                    placeholder="Select available days"
+                    class="profile-input"
+                    readonly
+                  />
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div
+                  v-if="dropdownOpen.availability"
+                  class="dropdown-options availability-options"
+                >
+                  <div
+                    v-for="day in daysOfWeek"
+                    :key="day"
+                    class="dropdown-option availability-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :id="'day-' + day"
+                      :value="day"
+                      v-model="selectedDays"
+                      @click.stop
+                    />
+                    <label :for="'day-' + day">{{ day }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="profile-field">
               <!-- For Subjects Offered -->
               <label class="profile-label required">SUBJECTS OFFERED</label>
-              <div class="profile-field">
-                <label class="profile-label required"
-                  >SUBJECTS OF INTEREST</label
-                >
-                <div class="dropdown-wrapper">
-                  <div class="dropdown-trigger" @click="toggleSubjectDropdown">
-                    <input
-                      type="text"
-                      :placeholder="
-                        selectedSubjects.length
-                          ? `${selectedSubjects.length} subjects selected`
-                          : 'Select subjects'
-                      "
-                      readonly
-                      class="profile-input"
-                      :class="{ error: validationErrors.selectedSubjects }"
-                    />
-                    <i class="fas fa-chevron-down dropdown-icon"></i>
-                  </div>
+         <div class="dropdown-wrapper">
+            <div class="dropdown-trigger" @click="toggleSubjectDropdown">
+              <input
+                type="text"
+                :placeholder="
+                  selectedSubjects.length
+                    ? `${selectedSubjects.length} subjects selected`
+                    : 'Select subjects'
+                "
+                readonly
+                class="profile-input"
+                :class="{ error: validationErrors.selectedSubjects }"
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
 
-                  <div v-if="showCategories" class="dropdown-menu categories">
-                    <div
-                      v-for="category in categories"
-                      :key="category.type"
-                      class="dropdown-item"
-                      @click="selectCategory(category)"
-                    >
-                      {{ category.name }}
-                      <span
-                        v-if="selectedSubjectsCount[category.type]"
-                        class="count-badge"
-                      >
-                        {{ selectedSubjectsCount[category.type] }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    v-if="showSubjectsDropdown"
-                    class="dropdown-menu subjects"
-                  >
-                    <div
-                      v-for="subject in currentSubjects"
-                      :key="subject"
-                      class="dropdown-item subject-item"
-                    >
-                      <input
-                        type="checkbox"
-                        :id="subject"
-                        :value="subject"
-                        v-model="selectedSubjects"
-                        @change="updateSelectedCounts"
-                      />
-                      <label :for="subject">{{ subject }}</label>
-                    </div>
-                    <div
-                      v-if="currentSubjects.length === 0"
-                      class="dropdown-item no-subjects"
-                    >
-                      No subjects available
-                    </div>
-                  </div>
-                </div>
+            <div v-if="showCategories" class="dropdown-menu categories">
+              <div
+                v-for="category in categories"
+                :key="category.type"
+                class="dropdown-item"
+                @click="selectCategory(category)"
+              >
+                {{ category.name }}
                 <span
-                  v-if="validationErrors.selectedSubjects"
-                  class="validation-message"
+                  v-if="selectedSubjectsCount[category.type]"
+                  class="count-badge"
                 >
-                  {{ validationErrors.selectedSubjects }}
+                  {{ selectedSubjectsCount[category.type] }}
                 </span>
               </div>
             </div>
+
+            <div v-if="showSubjectsDropdown" class="dropdown-menu subjects">
+              <div
+                v-for="subject in currentSubjects"
+                :key="subject"
+                class="dropdown-item subject-item"
+              >
+                <input
+                  type="checkbox"
+                  :id="subject"
+                  :value="subject"
+                  v-model="selectedSubjects"
+                  @change="updateSelectedCounts"
+                />
+                <label :for="subject">{{ subject }}</label>
+              </div>
+              <div
+                v-if="currentSubjects.length === 0"
+                class="dropdown-item no-subjects"
+              >
+                No subjects available
+              </div>
+            </div>
+          </div>
+          <span
+            v-if="validationErrors.selectedSubjects"
+            class="validation-message"
+          >
+            {{ validationErrors.selectedSubjects }}
+          </span>
+        </div>
+
+                   <div class="profile-field">
+              <label class="profile-label" for="teaching-style"
+                >TEACHING STYLE
+              </label>
+              <div class="teaching-style-dropdown">
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('learningStyle')"
+                >
+                  <input
+                    type="text"
+                    id="teaching-style"
+                    v-model="learningStyleDisplay"
+                    placeholder="Select teaching style(s)"
+                    class="profile-input"
+                    readonly
+                  />
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div
+                  v-if="dropdownOpen.learningStyle"
+                  class="dropdown-options teaching-style-options"
+                >
+                  <div
+                    v-for="style in sessionStyles"
+                    :key="style"
+                    class="dropdown-option teaching-style-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :id="'style-' + style"
+                      :value="style"
+                      v-model="selectedsessionStyles"
+                      @click.stop
+                    />
+                    <label :for="'style-' + style">{{ style }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="profile-field">
               <!-- For Teaching Modality -->
               <label class="profile-label required" for="modality"
@@ -341,129 +466,8 @@
                 </div>
               </div>
             </div>
-            <div class="profile-field">
-              <label class="profile-label" for="availability-days"
-                >DAYS OF AVAILABILITY</label
-              >
-              <div class="availability-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('availability')"
-                >
-                  <input
-                    type="text"
-                    id="availability-days"
-                    v-model="availabilityDaysDisplay"
-                    placeholder="Select available days"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div
-                  v-if="dropdownOpen.availability"
-                  class="dropdown-options availability-options"
-                >
-                  <div
-                    v-for="day in daysOfWeek"
-                    :key="day"
-                    class="dropdown-option availability-option"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'day-' + day"
-                      :value="day"
-                      v-model="selectedDays"
-                      @click.stop
-                    />
-                    <label :for="'day-' + day">{{ day }}</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="profile-col">
-            <div class="profile-field">
-              <label class="profile-label" for="proficiency"
-                >PROFICIENCY LEVEL
-              </label>
-              <div class="proficiency-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('proficiency')"
-                >
-                  <input
-                    type="text"
-                    v-model="proficiency"
-                    placeholder="Select proficiency level"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.proficiency" class="dropdown-options">
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Beginner')"
-                  >
-                    Beginner
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Intermediate')"
-                  >
-                    Intermediate
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Advanced')"
-                  >
-                    Advanced
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="profile-field">
-              <label class="profile-label" for="teaching-style"
-                >TEACHING STYLE
-              </label>
-              <div class="teaching-style-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('learningStyle')"
-                >
-                  <input
-                    type="text"
-                    id="teaching-style"
-                    v-model="learningStyleDisplay"
-                    placeholder="Select teaching style(s)"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div
-                  v-if="dropdownOpen.learningStyle"
-                  class="dropdown-options teaching-style-options"
-                >
-                  <div
-                    v-for="style in sessionStyles"
-                    :key="style"
-                    class="dropdown-option teaching-style-option"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'style-' + style"
-                      :value="style"
-                      v-model="selectedsessionStyles"
-                      @click.stop
-                    />
-                    <label :for="'style-' + style">{{ style }}</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="profile-field">
+ 
+               <div class="profile-field">
               <label class="profile-label" for="session-duration"
                 >PREFERRED SESSION DURATION
               </label>
@@ -506,11 +510,50 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="profile-bottom">
-          <div class="profile-bottom-grid">
-            <div class="profile-bottom-col">
+
+
+                           <div class="profile-field">
+              <label class="profile-label" for="proficiency"
+                >PROFICIENCY LEVEL
+              </label>
+              <div class="proficiency-dropdown">
+                <div
+                  class="dropdown-container"
+                  @click="toggleDropdown('proficiency')"
+                >
+                  <input
+                    type="text"
+                    v-model="proficiency"
+                    placeholder="Select proficiency level"
+                    class="profile-input"
+                    readonly
+                  />
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div v-if="dropdownOpen.proficiency" class="dropdown-options">
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Beginner')"
+                  >
+                    Beginner
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Intermediate')"
+                  >
+                    Intermediate
+                  </div>
+                  <div
+                    class="dropdown-option"
+                    @click="selectProficiency('Advanced')"
+                  >
+                    Advanced
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
               <div class="profile-field">
                 <!-- For Bio -->
                 <label class="profile-label required" for="bio"
@@ -530,9 +573,8 @@
                   {{ validationErrors.bio }}
                 </span>
               </div>
-            </div>
-            <div class="profile-bottom-col">
-              <div class="profile-field">
+
+                  <div class="profile-field">
                 <!-- For Experience -->
                 <label class="profile-label required" for="experience"
                   >TUTORING EXPERIENCE</label
@@ -551,72 +593,36 @@
                   {{ validationErrors.goals }}
                 </span>
               </div>
-            </div>
           </div>
+         </div>
+       </div>
 
-          <!-- Profile Picture and Credentials Upload -->
-          <div class="upload-container">
-            <div class="profile-picture-upload">
-              <label class="profile-label">PROFILE PICTURE</label>
-              <div class="upload-controls" @click="uploadProfilePicture">
-                <div class="profile-preview-container">
-                  <img
-                    v-if="profileImage"
-                    :src="profileImage"
-                    alt="Profile Preview"
-                    class="profile-preview"
-                  />
-                  <i v-else class="fas fa-user-circle default-icon"></i>
-                </div>
-                <div class="upload-text">
-                  <div class="choose-file-container">
-                    <i class="fas fa-upload"></i>
-                    <span>Choose File</span>
-                  </div>
-                  <input
-                    type="file"
-                    ref="profileInput"
-                    accept="image/*"
-                    style="display: none"
-                    @change="handleProfileUpload"
-                  />
-                  <span
-                    class="file-name"
-                    style="
-                      max-width: 150px;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                    "
-                    >{{ profilePictureName || "No file chosen" }}</span
-                  >
-                </div>
-              </div>
-            </div>
-
-            <div class="credentials-upload">
-              <label class="profile-label">CREDENTIALS</label>
-              <div class="upload-controls">
-                <div class="choose-file-container" @click="uploadCredentials">
-                  <i class="fas fa-file-upload"></i>
-                  <span>Upload Credentials</span>
-                </div>
-                <input
-                  type="file"
-                  ref="credentialInput"
-                  multiple
-                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                  style="display: none"
-                  @change="handleCredentialUpload"
-                />
-                <a href="#" @click.prevent="toggleFileList" class="file-link"
-                  >View Uploaded Files ({{ credentials.length }})</a
-                >
-              </div>
-            </div>
-          </div>
+             <!-- Step Indicator -->
+      <div class="step-indicator-container">
+        <div class="step-indicator">
+          <div
+            v-for="step in totalSteps"
+            :key="step"
+            :class="[
+              'step',
+              { active: step === currentStep, completed: step < currentStep },
+            ]"
+            @click="goToStep(step)"
+          ></div>
         </div>
-      </div>
+
+    <button class="next-button" @click="nextStep" :disabled="isSubmitted">
+      {{
+        isSubmitted
+          ? "SUBMITTED"
+          : currentStep === totalSteps
+          ? "SUBMIT"
+          : "NEXT"
+      }}
+    </button>
+  </div>
+
+
 
       <!-- File List Modal -->
       <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
@@ -645,7 +651,7 @@
           <h3>APPLICATION STATUS</h3>
           <p class="status-text">
             Your mentor application is under review. You will receive an email
-            once it's approved. Wait for 1-3 working days. Thank you!
+            once it's approved. Thank you!
           </p>
           <button class="proceed-button" @click="proceedToHome">
             PROCEED TO HOME
@@ -653,31 +659,6 @@
         </div>
       </div>
 
-      <!-- Step Indicator -->
-      <div class="step-indicator-container">
-        <div class="step-indicator">
-          <div
-            v-for="step in totalSteps"
-            :key="step"
-            :class="[
-              'step',
-              { active: step === currentStep, completed: step < currentStep },
-            ]"
-            @click="goToStep(step)"
-          ></div>
-        </div>
-      </div>
-    </div>
-    <button class="next-button" @click="nextStep" :disabled="isSubmitted">
-      {{
-        isSubmitted
-          ? "SUBMITTED"
-          : currentStep === totalSteps
-          ? "SUBMIT"
-          : "NEXT"
-      }}
-    </button>
-  </div>
 </template>
 
 <script>
@@ -699,7 +680,7 @@ export default {
     return {
       currentStep: 1,
       totalSteps: 2,
-      fullName: "",
+      //fullName: "",
       gender: "",
       otherGender: "",
       yearLevel: "",
@@ -909,7 +890,7 @@ export default {
       const errors = [];
 
       if (this.currentStep === 1) {
-        if (!this.fullName.trim()) errors.push("Full Name is required");
+       // if (!this.fullName.trim()) errors.push("Full Name is required");
         if (!this.gender) errors.push("Gender is required");
         if (this.gender === "Other" && !this.otherGender.trim())
           errors.push("Please specify your gender");
@@ -1468,6 +1449,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding-top: 30px;
+  overflow: hidden;
 }
 
 .page-header {
@@ -1488,76 +1470,134 @@ body {
   font-size: 0.9rem;
 }
 
+.back-btn {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  color: #2c3e50;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.back-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.back-btn:hover {
+  background: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  transform: translateX(-2px);
+}
+
+.back-btn:hover svg {
+  transform: translateX(-4px);
+}
+
 .form-container {
   position: relative;
   width: 100%;
-  max-width: 1100px;
-  height: 70vh;
-  min-height: 550px;
-  max-height: 650px;
-  padding: 1.5rem;
-  background: rgba(0, 89, 105, 0.546);
+  max-width: 800px;
+  height: 100%;
+  min-height: 610px;
+  max-height: 800px;
+  background: rgba(255, 255, 255, 0.724);
   border-radius: 40px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 8px rgba(170, 10, 10, 0.1);
+  box-shadow: 2px 2px 4px 4px rgba(29, 61, 113, 0.3);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin; 
+  scrollbar-color: #02475e transparent;
+}
+
+.form-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.form-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, 
+              rgba(2, 71, 94, 0.6) 0%, 
+              rgba(6, 102, 120, 0.6) 100%);  border: 1px solid #02475e;
+  border-radius: 4px;
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #033a4b, #044c5c);
+}
+
+.form-content {
+  padding-bottom: 80px;
 }
 
 .title {
-  color: #02475e;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #02475e; 
+  padding: 1.5rem 4rem 1rem; 
+  color: #ffffff;
   font-size: 1.6rem;
-  margin-bottom: 2rem;
-  margin-left: 2rem;
+  margin: 0 -1.5rem 1.5rem; 
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
-.personal-grid {
-  display: flex;
-  gap: 4rem;
-  width: 95%;
-  margin-left: 2rem;
-  flex: 1;
-}
-
-.personal-col {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 3.2rem;
-  padding: 0 1rem;
-}
 
 .personal-field {
   display: flex;
   flex-direction: column;
+  margin-bottom: 2rem;
+  padding-left: 5.5rem;
+  padding-right: 5.5rem;
 }
 
 .personal-label {
   color: #02475e;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.85rem;
-  margin-bottom: 0.6rem;
-  margin-left: 0.3rem;
+  margin-left: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .personal-input,
 .profile-input,
 .gender-specify {
   padding: 0.7rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
+  border-radius: 15px;
+  border: 1px solid rgb(12, 4, 102);
+  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
+  background: #e8f0fe;
+  color: rgba(24, 37, 69, 0.842);
   width: 100%;
   transition: all 0.2s ease;
   text-align: left;
-  color: white;
   font-weight: 600;
 }
 
 .personal-input::placeholder,
 .profile-input::placeholder,
 .gender-specify::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(15, 31, 70, 0.683);
   font-size: 0.8rem;
 }
 
@@ -1590,25 +1630,25 @@ body {
 
 .dropdown-container input {
   padding: 0.7rem 30px 0.7rem 0.7rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
-  font-size: 0.85rem;
+  border-radius: 15px;
+  border: 1px solid rgb(12, 4, 102);
+  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
+  background: #e8f0fe;
+  color: rgba(26, 41, 80, 0.683);
   width: 100%;
   transition: all 0.2s ease;
-  color: white;
 }
 
 .dropdown-options {
   position: absolute;
-  background: rgba(255, 255, 255);
+  background: rgb(229, 235, 237);
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   z-index: 10;
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .dropdown-option {
@@ -1621,12 +1661,13 @@ body {
   gap: 13px;
 }
 
+
 .dropdown-option:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 253, 253, 0.243);
 }
 
 .dropdown-icon {
-  color: white;
+  color: rgb(36, 63, 131);
   font-size: 10px;
   position: absolute;
   right: 15px;
@@ -1634,7 +1675,6 @@ body {
   transform: translateY(-50%);
 }
 
-/* Double Dropdown Styles */
 .dropdown-wrapper {
   position: relative;
   width: 100%;
@@ -1656,27 +1696,27 @@ body {
   background: transparent;
   padding: 0.7rem;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
-  color: white;
+  border: 1px solid rgb(12, 4, 102);
+  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
+  background: #e8f0fe;
+  color: rgba(24, 37, 69, 0.842);
   font-size: 0.85rem;
   text-align: left;
 }
 
 .dropdown-trigger input::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(26, 41, 80, 0.683);
 }
 
 .dropdown-menu {
   position: absolute;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 100;
   max-height: 300px;
   overflow-y: auto;
 }
-
 .categories {
   width: 100%;
   top: 100%;
@@ -1686,7 +1726,7 @@ body {
 }
 
 .subjects {
-  width: 300px;
+  width: 350px;
   top: 0;
   left: calc(100% + 2px);
 }
@@ -1705,7 +1745,8 @@ body {
 .subject-item {
   display: flex;
   align-items: center;
-  font-size: 10px;
+  padding: 8px 15px;
+  font-size: 0.85rem;
 }
 
 .subject-item input[type="checkbox"] {
@@ -1714,16 +1755,16 @@ body {
 }
 
 .subject-item label {
+  color: #02475e;
   cursor: pointer;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .no-subjects {
   color: #999;
   font-style: italic;
+  text-align: center;
+  padding: 15px;
 }
 
 .dropdown-menu {
@@ -1731,33 +1772,20 @@ body {
 }
 
 .count-badge {
-  background-color: #02475e;
+  background: #02475e;
   color: white;
-  border-radius: 10px;
   padding: 2px 6px;
-  font-size: 0.7em;
+  border-radius: 10px;
+  font-size: 0.7rem;
   margin-left: 5px;
-}
-
-.profile-grid {
-  display: flex;
-  gap: 2rem;
-  width: 90%;
-  margin-left: 3rem;
-  flex: 1;
-}
-
-.profile-col {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 1.5rem;
-  padding: 0 1rem;
 }
 
 .profile-field {
   display: flex;
   flex-direction: column;
+  margin-bottom: 2rem;
+  padding-left: 4rem;
+  padding-right: 5rem;
 }
 
 .profile-label {
@@ -1773,7 +1801,7 @@ body {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   background: rgba(215, 217, 230, 0.293);
-  color: white;
+  color: rgba(26, 41, 80, 0.683);
   font-size: 0.85rem;
   width: 100%;
   transition: all 0.2s ease;
@@ -1781,7 +1809,7 @@ body {
 }
 
 .profile-input::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(26, 41, 80, 0.683);
 }
 
 .profile-input:focus {
@@ -1794,16 +1822,17 @@ body {
   min-height: 70px;
   resize: none;
   padding: 0.7rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(215, 217, 230, 0.293);
-  color: white;
+  border-radius: 15px;
+  border: 1px solid rgb(12, 4, 102);
+  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
+  background: #e8f0fe;
+  color: rgba(24, 37, 69, 0.842);
   font-size: 0.85rem;
   width: 100%;
 }
 
 .profile-textarea::placeholder {
-  color: rgba(255, 250, 250, 0.683);
+  color: rgba(26, 41, 80, 0.683);
   font-weight: 500;
 }
 
@@ -1813,123 +1842,156 @@ body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
-.profile-bottom {
-  width: 90%;
-  margin-left: 3rem;
-  margin-top: 1rem;
-  padding-bottom: 60px;
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-bottom-grid {
-  display: flex;
-  gap: 2.5rem;
-}
-
-.profile-bottom-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0 1rem;
-}
 
 /* Profile Picture and Credentials Upload */
 .upload-container {
-  display: flex;
+  display: flex; 
   justify-content: space-between;
-  margin-top: 1rem;
-  margin-left: 2.5rem;
-  gap: 2.5rem;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left; 
+  flex-wrap: wrap;
 }
 
 .profile-picture-upload {
-  flex: 1;
-}
-
-.profile-picture-upload .profile-label {
-  display: block;
-  margin-bottom: 0.8rem;
-}
-
-.upload-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
+  flex: 1;
+  min-width: 250px;
+  
+}
+
+.profile-label {
+  font-weight: 600;
+  color: #02475e;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
 }
 
 .profile-preview-container {
-  width: 65px;
-  height: 65px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 3px solid #02475e;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .profile-preview {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .default-icon {
-  font-size: 2.5rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 3rem;
+  color: rgba(2, 71, 94, 0.3);
+}
+
+.upload-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
 }
 
 .upload-text {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.3rem;
-  cursor: pointer;
-  color: #ffffff;
-}
-
-.file-name {
-  font-size: 15px;
+  gap: 0.5rem;
 }
 
 .choose-file-container {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 0.9rem;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 0.7rem 1.5rem;
   border-radius: 25px;
-  transition: background-color 2s;
-  color: #f9fbfb;
   background: linear-gradient(to bottom, #02475e, #066678);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .choose-file-container:hover {
-  background: rgba(12, 32, 87, 0.568);
+  background: linear-gradient(to bottom, #033a4b, #044c5c);
+  transform: translateY(-2px);
 }
 
-/* Credentials Upload */
+.file-name {
+  font-size: 0.8rem;
+  color: #02475e;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .credentials-upload {
   flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: -4%;
+  padding: 2rem;
+  border-radius: 12px;
 }
 
 .credentials-upload .profile-label {
   display: block;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1.8rem;
+  text-align: center;
 }
 
 .credentials-upload .upload-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.credentials-upload .profile-preview-container {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+}
+
+.credentials-upload .upload-icon {
+  font-size: 5rem;
+  color: #243c55;
 }
 
 .credentials-upload .upload-controls .file-link {
-  color: #e9ecee;
-  text-decoration: underline;
+  color: #19415b;
+  text-decoration: none;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
+  padding: 0.2rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin-top: -1.1rem;
+  text-decoration: underline;
 }
+
 
 /* File List Modal */
 .Credmodal-overlay {
@@ -1939,7 +2001,6 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1985,6 +2046,11 @@ body {
   gap: 0.5rem;
   font-size: 0.8rem;
   color: #02475e;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .file-list button {
@@ -1993,11 +2059,13 @@ body {
   color: rgba(255, 100, 100, 0.8);
   cursor: pointer;
   padding: 0.2rem;
+  flex-shrink: 0;
 }
 
 .file-list button:hover {
   color: #ff4d4d;
 }
+
 
 .close-button {
   background-color: #155577;
@@ -2015,6 +2083,19 @@ body {
   background-color: #032c58;
 }
 
+.divider {
+  height: 1px;
+  background: #929495;
+  margin-bottom: 35px;
+  margin-left: 10rem;
+  margin-top: -2rem;
+  width: 86%;
+  max-width: 1200px;
+  border: none;
+  border-radius: 2px;
+  transform: translateX(-100px);
+}
+
 /* Status Popup */
 .status-popup-overlay {
   position: fixed;
@@ -2026,7 +2107,6 @@ body {
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 40px;
   z-index: 1000;
 }
 
@@ -2051,7 +2131,7 @@ body {
 .status-text {
   color: #02475e;
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 45px;
   padding: 0 20px;
   line-height: 1.5;
 }
@@ -2073,45 +2153,10 @@ body {
   background-color: #033140;
 }
 
-/* Step Indicator */
-.step-indicator-container {
-  position: absolute;
-  bottom: 15px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 2;
-}
-
-.step-indicator {
-  display: flex;
-  gap: 15px;
-}
-
-.step {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.step.active {
-  background-color: #02475e;
-  transform: scale(1.2);
-}
-
-.step.completed {
-  background-color: rgba(2, 71, 94, 0.6);
-}
-
-/* Next/Submit Button */
 .next-button {
-  position: fixed;
-  bottom: 15px;
+  position: absolute;
   right: 30px;
+  bottom: 10px;
   background-color: #155577;
   color: white;
   padding: 10px 20px;
@@ -2123,7 +2168,10 @@ body {
   font-size: 0.9rem;
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  user-select: none;
 }
+
 
 .next-button:hover {
   background-color: #032c58;
@@ -2139,17 +2187,50 @@ body {
   font-weight: 900;
 }
 
+.dropdown-menu.subjects {
+  position: absolute;
+  left: 45%;
+  top: 2.5rem;
+  width: 350px;
+  max-width: 100vw; 
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  font-size: 0.85rem;
+}
+
+.subject-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.subject-item label {
+  color: #02475e;
+  cursor: pointer;
+  flex: 1;
+}
+
 .gender-specify {
-  padding: 0.7rem;
+  padding: 0.4rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(55, 61, 86, 0.242);
-  color: white;
-  font-size: 0.85rem;
-  width: 50%;
+  background: rgba(149, 154, 176, 0.242);
+  color: rgb(48, 66, 106);
+  font-size: 0.7rem;
+  width: 35%;
   height: 30%;
   transition: all 0.2s ease;
-  margin-top: 0.6rem;
+  margin-top: 0.8rem;
   margin-left: 0.8rem;
 }
 
@@ -2213,11 +2294,184 @@ body {
   background-color: rgba(255, 107, 107, 0.05);
 }
 
-/* Update the existing validation-error class */
 .validation-error {
   color: #ff6b6b;
   font-size: 0.75rem;
   margin-top: 0.25rem;
   margin-left: 0.5rem;
 }
+
+@media (max-width: 768px) {
+  .mentorinfo-container {
+    padding-top: 15px;
+    height: auto;
+    min-height: 100vh;
+    position: relative;
+  }
+
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-header p {
+    font-size: 0.8rem;
+  }
+
+  .form-container {
+    max-width: 85%;
+    min-height: auto;
+    max-height: none;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    padding: 1rem 1.5rem;
+    font-size: 1.3rem;
+    margin: 0 -1rem 1rem;
+  }
+
+  .personal-field,
+  .profile-field {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .personal-input,
+  .profile-input,
+  .profile-textarea {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .dropdown-menu.subjects {
+    position: absolute; 
+    width: 100%;
+    left: 0 !important;
+    top: 100% !important;
+    max-height: 50vh;
+    border-radius: 0 0 10px 10px;
+    border-top: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: none !important;
+  }
+
+  
+
+  .upload-container {
+    padding: 0.5rem;
+  }
+
+  .profile-preview-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .choose-file-container {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+
+
+  .next-button {
+    position: relative;
+    bottom: auto;
+    margin: 10px;
+    margin-left: 18rem;
+    width: 30%;
+    align-self: center;
+  }
+
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-container {
+    max-width: 90%;
+  }
+
+  .personal-field,
+  .profile-field {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  .dropdown-menu.subjects {
+    left: 30%;
+    width: 300px;
+  }
+
+  .next-button {
+    position: relative;
+    bottom: auto;
+    margin: 20px auto;
+    width: 50%;
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) { 
+  .form-container {
+    margin: 10px;
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+  }
+
+  .personal-field,
+  .profile-field {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .gender-specify {
+    width: 50%;
+  }
+
+    .title {
+    font-size: 15px;  }
+
+  .profile-preview-container {
+    width: 70px;
+    height: 70px;
+  }
+
+  .default-icon {
+    font-size: 2.5rem;
+  }
+    .dropdown-menu.subjects {
+    position: absolute; 
+    width: 100%;
+    left: 0 !important;
+    top: 100% !important;
+    max-height: 50vh;
+    border-radius: 0 0 10px 10px;
+    border-top: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: none !important;
+  }
+
+
+  .next-button {
+    position: relative;
+    bottom: auto;
+    margin: 10px;
+    margin-left: 6.5rem;
+    width: 50%;
+    align-self: center;
+  }
+
+  .divider {
+  height: 1px;
+  background: #929495;
+  margin-bottom: 35px;
+  margin-left: 7.5rem;
+  margin-top: -2rem;
+  width: 86%;
+  border: none;
+  border-radius: 2px;
+  transform: translateX(-100px);
+}
+}
+
 </style>
