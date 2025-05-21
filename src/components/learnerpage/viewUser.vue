@@ -1,7 +1,13 @@
 <script setup>
 import { ref } from "vue";
+import Schedule from "@/components/learnerpage/schedule.vue"; 
 
+const showSchedule = ref(false); 
 const emit = defineEmits(["close"]);
+
+const openSchedule = () => {
+  showSchedule.value = true;
+};
 </script>
 
 <template>
@@ -26,49 +32,33 @@ const emit = defineEmits(["close"]);
 				<div class="profile-information">
 					<div>
 						<h1>MARIA ROSE L. MENDOZA</h1>
-						<p>
-							2nd Year - Bachelor of Science in Information Technology 
-						</p>
-						<p>	College of Computer Studies
-						</p>
+						<p>2nd Year - Bachelor of Science in Information Technology</p>
+						<p>College of Computer Studies</p>
 					</div>
 					<div>
 						<p>Gender: <strong>Female</strong></p>
-						<p>
-							Contact Information:
-							<strong>09206033143/marirose.m@gmail.com</strong>
-						</p>
-						<p>
-							Address:
-							<strong>Calapacuan - Subic, Zambales</strong>
-						</p>
+						<p>Contact Information: <strong>09206033143/marirose.m@gmail.com</strong></p>
+						<p>Address: <strong>Calapacuan - Subic, Zambales</strong></p>
 					</div>
 				</div>
 			</div>
 
 			<div class="lower-lower">
-				<div class="bio">
-					<label>Bio</label>
-				</div>
-				<div class="offered">
-					<label>Course Offered</label>
-				</div>
-				<div class="mostyle">
-					<label>Teachng Modality</label>
-					<label>Teaching Style</label>
-				</div>
-				<div class="avadura">
-					<label>Days of Availability</label>
-					<label>Preferred Session Duration</label>
-				</div>
-				<div class="experience">
-					<label>Teaching Experience</label>
-				</div>
+				<div class="bio"><label>Bio</label></div>
+				<div class="offered"><label>Course Offered</label></div>
+				<div class="mostyle"><label>Teaching Modality</label><label>Teaching Style</label></div>
+				<div class="avadura"><label>Days of Availability</label><label>Preferred Session Duration</label></div>
+				<div class="experience"><label>Teaching Experience</label></div>
 				<div class="action-button">
-					<button>Schedule</button>
+                    <button @click="openSchedule">Schedule</button>
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<!-- Schedule Popup -->
+	<div v-if="showSchedule" class="popup-overlay">
+		<Schedule @close="showSchedule = false" />
 	</div>
 </template>
 
@@ -188,5 +178,19 @@ label {
 	border-radius: 5px;
 	cursor: pointer;
 	margin-top: 20px;
+}
+
+/* Styles for the popup overlay */
+.popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7); 
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
 }
 </style>
