@@ -108,7 +108,7 @@ const mentorProfile = async () => {
         console.log("Mentor profiles fetched successfully: ", response.data);
         if (response.status === 200) {
           users.value = response.data.map((item) => ({
-            id: item.user.id,
+            id: item.mentor_infos.mentor_no,
             userName: item.user.name,
             yearLevel: item.mentor_infos.year,
             course: item.mentor_infos.course,
@@ -118,6 +118,7 @@ const mentorProfile = async () => {
             availability: JSON.parse(item.mentor_infos.availability),
             rating_ave: item.mentor_infos.rating_ave || 0,
             bio: item.mentor_infos.bio,
+            exp: item.mentor_infos.exp,
             prefSessDur: item.mentor_infos.prefSessDur,
             teach_sty: JSON.parse(item.mentor_infos.teach_sty || "[]"),
             credentials: item.mentor_infos.credentials || [],
@@ -171,6 +172,48 @@ const switchRole = async () => {
   }
 };
 
+const mentFiles = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/learner/mentFiles", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Mentor files:", response.data);
+        return response.data;
+      });
+    return response;
+  } catch (error) {
+    console.error("Error fetching mentor files:", error);
+    return null;
+  }
+};
+
+const fetchMentFiles = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8000/api/learner/mentFiles",
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+    console.log("Mentor files fetched:", response.data);
+    mentorFiles.value = response.data;
+  } catch (error) {
+    console.error("Error fetching mentor files:", error);
+  }
+};
+
 const userData = ref({
   user: {
     id: null,
@@ -197,6 +240,7 @@ const userData = ref({
 const schedForReview = ref([]);
 const todaySchedule = ref([]);
 const upcommingSchedule = ref([]);
+const mentorFiles = ref([]);
 
 const isEdit = ref(false);
 const users = ref([]);
@@ -324,6 +368,7 @@ onMounted(async () => {
   await sessionInfo();
   await mentorProfile();
   await sessionForReview();
+  await fetchMentFiles(); // Changed from mentFiles() to fetchMentFiles()
   console.log("User data:", userData.value);
 });
 </script>
@@ -483,6 +528,7 @@ onMounted(async () => {
       :upcomingSchedule="upcommingSchedule"
       :schedule="todaySchedule"
       :schedForReview="schedForReview"
+      :mentFiles="mentorFiles"
     />
   </div>
 

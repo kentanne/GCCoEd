@@ -3,7 +3,7 @@
     <!-- Top bar -->
     <header class="header">
       <div class="header-content">
-        <img 
+        <img
           alt="Profile image"
           class="profile-image"
           src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
@@ -11,7 +11,9 @@
         <div class="profile-info">
           <p class="profile-name">Barry D. Allen</p>
           <p class="profile-position">Program Coordinator</p>
-          <p class="profile-degree">Bachelor of Science in Information Technology</p>
+          <p class="profile-degree">
+            Bachelor of Science in Information Technology
+          </p>
           <p class="profile-college">College of Computer Studies</p>
         </div>
       </div>
@@ -25,17 +27,17 @@
       <!-- Gradient backgrounds -->
       <div class="gradient-shape top-gradient"></div>
       <div class="gradient-shape bottom-gradient"></div>
-      
+
       <!-- All three buttons always visible -->
       <div class="buttons-container">
-        <button 
+        <button
           class="action-button"
           :class="{ 'active-tab': activeTab === 'dashboard' }"
           @click="activeTab = 'dashboard'"
         >
           DASHBOARD
         </button>
-        <button 
+        <button
           class="action-button"
           :class="{ 'active-tab': activeTab === 'application' }"
           @click="activeTab = 'application'"
@@ -52,10 +54,7 @@
       </div>
 
       <!-- Dashboard shown by default -->
-      <dashboard 
-        v-if="activeTab === 'dashboard'" 
-        :stats="stats" 
-      />
+      <dashboard v-if="activeTab === 'dashboard'" :stats="stats" />
 
       <!-- Applications table -->
       <application v-if="activeTab === 'application'" />
@@ -66,35 +65,87 @@
   </div>
 </template>
 
-<script>
-import { ref } from 'vue'
-import dashboard from '@/components/adminpage/dashboard.vue'
-import application from '@/components/adminpage/application.vue'
-import users from '@/components/adminpage/users.vue'
+<script setup>
+import { ref, onMounted } from "vue";
+import dashboard from "@/components/adminpage/dashboard.vue";
+import application from "@/components/adminpage/application.vue";
+import users from "@/components/adminpage/users.vue";
+import axios from "axios";
 
-export default {
-  components: { dashboard, application, users },
-  setup() {
-    const activeTab = ref('dashboard') // Dashboard shows by default
-    const stats = ref({
-      learners: 1245,
-      mentors: 86,
-      applicants: 324
-    })
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-    const handleLogout = () => {
-      console.log('Logout clicked')
-    }
-
-    return { activeTab, stats, handleLogout }
-  }
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
 }
+
+const fetchAll = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/admin", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("pre-fetched:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const fetchApplicants = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/admin/applicants", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("pre-fetched:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const activeTab = ref("dashboard"); // Dashboard shows by default
+const stats = ref({
+  learners: 1245,
+  mentors: 86,
+  applicants: 324,
+});
+
+const handleLogout = () => {
+  console.log("Logout clicked");
+};
+
+onMounted(async () => {
+  await fetchAll();
+  await fetchApplicants();
+});
 </script>
 
-
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 
 .content-area {
   width: 100%;
@@ -177,9 +228,9 @@ export default {
 }
 
 .logout-icon::before {
-  font-family: 'Font Awesome 5 Free';
+  font-family: "Font Awesome 5 Free";
   font-weight: 900;
-  content: '\f2f5';
+  content: "\f2f5";
   font-size: 1.875rem;
 }
 
@@ -200,7 +251,7 @@ export default {
   position: absolute;
   width: 24rem;
   height: 24rem;
-  background-color: #3B9AA9;
+  background-color: #3b9aa9;
   opacity: 0.2;
   border-radius: 9999px;
   filter: blur(120px);
@@ -236,7 +287,7 @@ export default {
   font-size: 1rem;
   border-radius: 9999px;
   padding: 0.75rem 2rem;
-  background-image: linear-gradient(to right, #6DD1E3, #0B3E8A);
+  background-image: linear-gradient(to right, #6dd1e3, #0b3e8a);
   transition: all 0.3s ease;
   width: 200px;
   text-align: center;
@@ -245,7 +296,7 @@ export default {
 }
 
 .action-button:hover {
-  background-image: linear-gradient(to right, #0B3E8A, #6DD1E3);
+  background-image: linear-gradient(to right, #0b3e8a, #6dd1e3);
 }
 
 .dashboard-cards {
@@ -292,7 +343,12 @@ export default {
 .card-divider {
   border: 0;
   height: 4px;
-  background: linear-gradient(to right, transparent, rgba(59, 154, 169, 0.5), transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(59, 154, 169, 0.5),
+    transparent
+  );
   margin: 0.5rem 0;
 }
 
@@ -322,7 +378,7 @@ export default {
 }
 
 .active-tab {
-  background-image: linear-gradient(to right, #0B3E8A, #3B9AA9) !important;
+  background-image: linear-gradient(to right, #0b3e8a, #3b9aa9) !important;
   box-shadow: 0 0 15px rgba(59, 154, 169, 0.5);
 }
 </style>
