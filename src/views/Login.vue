@@ -12,12 +12,15 @@
         <form @submit.prevent="login">
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
+              <div class="input-with-icon">
+              <i class="fas fa-user"></i>
             <input
               type="text"
               v-model="email"
               placeholder="Enter your email"
               required
             />
+          </div>
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
@@ -34,14 +37,14 @@
                 required
               />
             </div>
+        <p class="switch-link">
+          <router-link to="/forgot-password">Forgot Password?</router-link>
+        </p>
           </div>
           <button type="submit">Login</button>
         </form>
         <p class="switch-link">
           Don't have an account? <router-link to="/signup">Sign up</router-link>
-        </p>
-        <p class="switch-link">
-          <router-link to="/forgot-password">Forgot Password?</router-link>
         </p>
       </div>
     </main>
@@ -142,6 +145,7 @@ export default {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
 
 * {
   box-sizing: border-box;
@@ -155,7 +159,6 @@ body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  font-family: "Montserrat", sans-serif;
   color: white;
 }
 
@@ -180,8 +183,9 @@ main {
   justify-content: center;
   flex-grow: 1;
   width: 100%;
-  gap: 10rem;
-  margin-top: 5rem;
+  gap: 5rem;
+  padding: 1rem;
+  margin-top: 3rem;
 }
 
 .main-image {
@@ -191,8 +195,10 @@ main {
 }
 
 .main-image img {
-  width: 550px;
+  width: 400px;
   height: auto;
+  max-width: 100%;
+  transition: all 0.3s ease;
 }
 
 .main-content {
@@ -201,14 +207,14 @@ main {
   align-items: center;
   gap: 1rem;
   text-align: center;
-  max-width: 450px;
   width: 100%;
-  height: 450px;
-  background: rgba(6, 102, 120, 0.4);
+  max-width: 400px;
+  background: rgba(6, 102, 120, 0.5);
   padding: 2rem;
   border-radius: 30px;
   backdrop-filter: blur(12px);
-  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 10px rgba(46, 34, 34, 0.6);
+  transition: all 0.3s ease;
 }
 
 .main-content h1 {
@@ -221,8 +227,8 @@ main {
 form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  width: 95%;
+  gap: 1.5rem;
+  width: 100%;
   border-radius: 25px;
   margin-top: 1rem;
 }
@@ -246,17 +252,8 @@ form {
   position: relative;
 }
 
-.input-with-icon i {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(165, 161, 161, 0.9);
-  cursor: pointer;
-}
-
-input {
-  padding: 0.8rem;
+.input-with-icon input {
+  padding: 0.8rem 2.5rem 0.8rem 1rem; 
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
@@ -265,6 +262,29 @@ input {
   outline: none;
   transition: 0.3s;
   font-family: "Montserrat", sans-serif;
+}
+
+.input-with-icon i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(165, 161, 161, 0.9);
+}
+
+.input-with-icon .fa-user,
+.input-with-icon .fa-eye,
+.input-with-icon .fa-eye-slash {
+  right: 15px;
+  left: auto;
+}
+
+.input-with-icon .fa-eye,
+.input-with-icon .fa-eye-slash {
+  cursor: pointer;
+}
+
+.input-with-icon .fa-user {
+  cursor: default;
 }
 
 input::placeholder {
@@ -291,39 +311,106 @@ button {
   text-align: center;
   display: block;
   margin: 0.5rem auto 0;
-  transition: 0.3s;
-  margin-top: 1.5rem;
+  transition: all 0.3s ease;
   font-family: "Montserrat", sans-serif;
 }
 
 button:hover {
   background: #319cb0;
-  transform: scale(1);
+  color: white;
 }
 
 .switch-link {
-  color: white;
-  font-size: 1rem;
-  font-weight: 400;
+  text-align: right;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
 }
 
 .switch-link a {
-  color: #2b617e;
-  text-decoration: none;
-  font-weight: 500;
+  color: #144149;
+  text-decoration: underline;
+  transition: color 0.2s ease;
 }
 
 .switch-link a:hover {
-  text-decoration: underline;
+  color: #f8f8f8;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1199px) {
+  main {
+    gap: 3rem;
+  }
+
   .main-image img {
-    width: 600px;
+    width: 350px;
   }
 
   .main-content {
-    max-width: 420px;
+    max-width: 380px;
+    padding: 1.5rem;
   }
 }
+
+/* Mobile Screens */
+@media (max-width: 767px) {
+  main {
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 7rem;
+  }
+
+  .main-image img {
+    position: absolute;
+    top: 5.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 150px;
+  }
+
+  .main-content {
+    max-width: 350px;
+    padding: 1.5rem;
+  }
+
+  button {
+    width: 60%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-image img {
+    width: 170px;
+  }
+
+  .main-content {
+    padding: 1.2rem;
+  }
+
+  .main-content h1 {
+    font-size: 1.5rem;
+  }
+
+  button {
+    width: 70%;
+    padding: 0.7rem;
+  }
+}
+
+/* Large Desktop Screens */
+@media (min-width: 1200px) {
+  main {
+    gap: 8rem;
+  }
+
+  .main-image img {
+    width: 500px;
+  }
+
+  .main-content {
+    max-width: 450px;
+    padding: 2.5rem;
+  }
+}
+
 </style>

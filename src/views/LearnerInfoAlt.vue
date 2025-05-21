@@ -1,25 +1,35 @@
 <template>
-  <div class="mentorinfo-container">
-
-        <button @click="scrollToGetStarted" class="back-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
-      </svg>
-      Back
-    </button>
-    
+  <div class="learnerinfo-container">
     <header class="page-header">
-      <h1>MENTOR INFO</h1>
-      <p>Complete your profile to start mentoring.</p>
+      <h1>LEARNER INFO</h1>
+      <p>Complete your profile to start learning.</p>
     </header>
 
-    <div class="form-container scrollable-content">
+    <div class="form-container">
       <!-- Step 1 Content -->
       <div v-if="currentStep === 1">
         <h2 class="title">I. PERSONAL INFORMATION</h2>
-       
+        <div class="personal-grid">
+          <div class="personal-col">
+            <!-- <div class="personal-field">
+              <label class="personal-label required" for="full-name"
+                >FULL NAME</label
+              >
+              <input
+                type="text"
+                id="full-name"
+                v-model="fullName"
+                @input="validateField('fullName', fullName)"
+                @blur="validateField('fullName', fullName)"
+                placeholder="Enter your full name (FN MI LN)"
+                class="personal-input"
+                :class="{ error: validationErrors.fullName }"
+              />
+              <span v-if="validationErrors.fullName" class="validation-message">
+                {{ validationErrors.fullName }}
+              </span>
+            </div> -->
             <div class="personal-field">
-              <!-- For Address -->
               <label class="personal-label required" for="address"
                 >ADDRESS</label
               >
@@ -37,33 +47,7 @@
                 {{ validationErrors.address }}
               </span>
             </div>
-
             <div class="personal-field">
-              <!-- For Contact Number -->
-              <label class="personal-label required" for="contact-number"
-                >CONTACT NUMBER</label
-              >
-              <input
-                type="text"
-                id="contact-number"
-                v-model="contactNumber"
-                @input="validateField('contactNumber', contactNumber)"
-                @blur="validateField('contactNumber', contactNumber)"
-                placeholder="Enter your contact number (11 digits)"
-                class="personal-input"
-                :class="{ error: validationErrors.contactNumber }"
-                maxlength="11"
-              />
-              <span
-                v-if="validationErrors.contactNumber"
-                class="validation-message"
-              >
-                {{ validationErrors.contactNumber }}
-              </span>
-            </div>
-
-            <div class="personal-field">
-              <!-- For Gender -->
               <label class="personal-label required" for="gender">GENDER</label>
               <div class="gender-dropdown">
                 <div
@@ -110,7 +94,8 @@
                 {{ validationErrors.gender }}
               </span>
             </div>
-
+          </div>
+          <div class="personal-col">
             <div class="personal-field">
               <label class="personal-label" for="year-level">YEAR LEVEL </label>
               <div class="year-dropdown">
@@ -206,77 +191,39 @@
                 </div>
               </div>
             </div>
+            <div class="personal-field">
+              <label class="personal-label required" for="contact-number"
+                >CONTACT NUMBER
+              </label>
+              <input
+                type="text"
+                id="contact-number"
+                v-model="contactNumber"
+                @input="validateField('contactNumber', contactNumber)"
+                @blur="validateField('contactNumber', contactNumber)"
+                placeholder="Enter your contact number (11 digits)"
+                class="personal-input"
+                :class="{ error: validationErrors.contactNumber }"
+                maxlength="11"
+              />
+              <span
+                v-if="validationErrors.contactNumber"
+                class="validation-message"
+              >
+                {{ validationErrors.contactNumber }}
+              </span>
+            </div>
           </div>
-          
+        </div>
+      </div>
+
       <!-- Step 2 Content -->
       <div v-if="currentStep === 2">
         <h2 class="title">II. PROFILE INFORMATION</h2>
 
-                  <!-- Profile Picture and Credentials Upload -->
-          <div class="upload-container">
-            <div class="profile-picture-upload">
-              <label class="profile-label">PROFILE PICTURE</label>
-              <div class="upload-controls" @click="uploadProfilePicture">
-                <div class="profile-preview-container">
-                  <img
-                    v-if="profileImage"
-                    :src="profileImage"
-                    alt="Profile Preview"
-                    class="profile-preview"
-                  />
-                  <i v-else class="fas fa-user-circle default-icon"></i>
-                </div>
-                <div class="upload-text">
-                  <div class="choose-file-container">
-                    <i class="fas fa-upload"></i>
-                    <span>Choose File</span>
-                  </div>
-                  <input
-                    type="file"
-                    ref="profileInput"
-                    accept="image/*"
-                    style="display: none"
-                    @change="handleProfileUpload"
-                  />
-                  <span
-                    class="file-name"
-                    style="
-                      max-width: 150px;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                    "
-                    >{{ profilePictureName || "No file chosen" }}</span
-                  >
-                </div>
-              </div>
-            </div>
-
-<div class="credentials-upload">
-  <label class="profile-label">CREDENTIALS</label>
-  <div class="upload-controls">
-    <i class="fas fa-file-upload upload-icon"></i>
-    <div class="choose-file-container" @click="uploadCredentials">
-      <span>Upload Credentials</span>
-    </div>
-    <input
-      type="file"
-      ref="credentialInput"
-      multiple
-      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-      style="display: none"
-      @change="handleCredentialUpload"
-    />
-    <a href="#" @click.prevent="toggleFileList" class="file-link"
-      >View Uploaded Files ({{ credentials.length }})</a
-    >
-  </div>
-</div>
- </div>
-
-                     <div class="divider"></div>
-
-                 <div class="profile-field">
+        <div class="profile-grid">
+          <div class="profile-col">
+            <div class="profile-field">
               <label class="profile-label" for="availability-days"
                 >DAYS OF AVAILABILITY</label
               >
@@ -316,119 +263,75 @@
                 </div>
               </div>
             </div>
-
+            <!-- Add this in the Step 2 section, before the Learning Modality field -->
             <div class="profile-field">
-              <!-- For Subjects Offered -->
-              <label class="profile-label required">SUBJECTS OFFERED</label>
-         <div class="dropdown-wrapper">
-            <div class="dropdown-trigger" @click="toggleSubjectDropdown">
-              <input
-                type="text"
-                :placeholder="
-                  selectedSubjects.length
-                    ? `${selectedSubjects.length} subjects selected`
-                    : 'Select subjects'
-                "
-                readonly
-                class="profile-input"
-                :class="{ error: validationErrors.selectedSubjects }"
-              />
-              <i class="fas fa-chevron-down dropdown-icon"></i>
-            </div>
-
-            <div v-if="showCategories" class="dropdown-menu categories">
-              <div
-                v-for="category in categories"
-                :key="category.type"
-                class="dropdown-item"
-                @click="selectCategory(category)"
-              >
-                {{ category.name }}
-                <span
-                  v-if="selectedSubjectsCount[category.type]"
-                  class="count-badge"
-                >
-                  {{ selectedSubjectsCount[category.type] }}
-                </span>
-              </div>
-            </div>
-
-            <div v-if="showSubjectsDropdown" class="dropdown-menu subjects">
-              <div
-                v-for="subject in currentSubjects"
-                :key="subject"
-                class="dropdown-item subject-item"
-              >
-                <input
-                  type="checkbox"
-                  :id="subject"
-                  :value="subject"
-                  v-model="selectedSubjects"
-                  @change="updateSelectedCounts"
-                />
-                <label :for="subject">{{ subject }}</label>
-              </div>
-              <div
-                v-if="currentSubjects.length === 0"
-                class="dropdown-item no-subjects"
-              >
-                No subjects available
-              </div>
-            </div>
-          </div>
-          <span
-            v-if="validationErrors.selectedSubjects"
-            class="validation-message"
-          >
-            {{ validationErrors.selectedSubjects }}
-          </span>
-        </div>
-
-                   <div class="profile-field">
-              <label class="profile-label" for="teaching-style"
-                >TEACHING STYLE
-              </label>
-              <div class="teaching-style-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('learningStyle')"
-                >
+              <label class="profile-label required">SUBJECTS OF INTEREST</label>
+              <div class="dropdown-wrapper">
+                <div class="dropdown-trigger" @click="toggleSubjectDropdown">
                   <input
                     type="text"
-                    id="teaching-style"
-                    v-model="learningStyleDisplay"
-                    placeholder="Select teaching style(s)"
-                    class="profile-input"
+                    :placeholder="
+                      selectedSubjects.length
+                        ? `${selectedSubjects.length} subjects selected`
+                        : 'Select subjects'
+                    "
                     readonly
+                    class="profile-input"
+                    :class="{ error: validationErrors.selectedSubjects }"
                   />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div
-                  v-if="dropdownOpen.learningStyle"
-                  class="dropdown-options teaching-style-options"
-                >
+
+                <div v-if="showCategories" class="dropdown-menu categories">
                   <div
-                    v-for="style in sessionStyles"
-                    :key="style"
-                    class="dropdown-option teaching-style-option"
+                    v-for="category in categories"
+                    :key="category.type"
+                    class="dropdown-item"
+                    @click="selectCategory(category)"
+                  >
+                    {{ category.name }}
+                    <span
+                      v-if="selectedSubjectsCount[category.type]"
+                      class="count-badge"
+                    >
+                      {{ selectedSubjectsCount[category.type] }}
+                    </span>
+                  </div>
+                </div>
+
+                <div v-if="showSubjectsDropdown" class="dropdown-menu subjects">
+                  <div
+                    v-for="subject in currentSubjects"
+                    :key="subject"
+                    class="dropdown-item subject-item"
                   >
                     <input
                       type="checkbox"
-                      :id="'style-' + style"
-                      :value="style"
-                      v-model="selectedsessionStyles"
-                      @click.stop
+                      :id="subject"
+                      :value="subject"
+                      v-model="selectedSubjects"
+                      @change="updateSelectedCounts"
                     />
-                    <label :for="'style-' + style">{{ style }}</label>
+                    <label :for="subject">{{ subject }}</label>
+                  </div>
+                  <div
+                    v-if="currentSubjects.length === 0"
+                    class="dropdown-item no-subjects"
+                  >
+                    No subjects available
                   </div>
                 </div>
               </div>
+              <span
+                v-if="validationErrors.selectedSubjects"
+                class="validation-message"
+              >
+                {{ validationErrors.selectedSubjects }}
+              </span>
             </div>
-
             <div class="profile-field">
-              <!-- For Teaching Modality -->
-              <label class="profile-label required" for="modality"
-                >TEACHING MODALITY</label
+              <label class="profile-label" for="modality"
+                >LEARNING MODALITY</label
               >
               <div class="subjmodality-dropdown">
                 <div
@@ -438,7 +341,7 @@
                   <input
                     type="text"
                     v-model="modality"
-                    placeholder="Select teaching modality"
+                    placeholder="Select learning modality"
                     class="profile-input"
                     readonly
                   />
@@ -466,11 +369,10 @@
                 </div>
               </div>
             </div>
- 
-               <div class="profile-field">
+            <div class="profile-field">
               <label class="profile-label" for="session-duration"
-                >PREFERRED SESSION DURATION
-              </label>
+                >PREFERRED SESSION DURATION</label
+              >
               <div class="session-duration-dropdown">
                 <div
                   class="dropdown-container"
@@ -510,94 +412,127 @@
                 </div>
               </div>
             </div>
+          </div>
 
-
-                           <div class="profile-field">
-              <label class="profile-label" for="proficiency"
-                >PROFICIENCY LEVEL
-              </label>
-              <div class="proficiency-dropdown">
+          <div class="profile-col">
+            <div class="profile-field">
+              <label class="profile-label" for="learning-style"
+                >LEARNING STYLE</label
+              >
+              <div class="learning-style-dropdown">
                 <div
                   class="dropdown-container"
-                  @click="toggleDropdown('proficiency')"
+                  @click="toggleDropdown('learningStyle')"
                 >
                   <input
                     type="text"
-                    v-model="proficiency"
-                    placeholder="Select proficiency level"
+                    id="learning-style"
+                    v-model="learningStyleDisplay"
+                    placeholder="Select learning style(s)"
                     class="profile-input"
                     readonly
                   />
                   <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
-                <div v-if="dropdownOpen.proficiency" class="dropdown-options">
+                <div
+                  v-if="dropdownOpen.learningStyle"
+                  class="dropdown-options learning-style-options"
+                >
                   <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Beginner')"
+                    v-for="style in sessionStyles"
+                    :key="style"
+                    class="dropdown-option learning-style-option"
                   >
-                    Beginner
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Intermediate')"
-                  >
-                    Intermediate
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Advanced')"
-                  >
-                    Advanced
+                    <input
+                      type="checkbox"
+                      :id="'style-' + style"
+                      :value="style"
+                      v-model="selectedsessionStyles"
+                      @click.stop
+                    />
+                    <label :for="'style-' + style">{{ style }}</label>
                   </div>
                 </div>
               </div>
             </div>
-
-
-              <div class="profile-field">
-                <!-- For Bio -->
-                <label class="profile-label required" for="bio"
-                  >SHORT BIO</label
-                >
-                <textarea
-                  id="bio"
-                  v-model="bio"
-                  @input="validateField('bio', bio)"
-                  @blur="validateField('bio', bio)"
-                  placeholder="Tell us about yourself (50-500 characters)"
-                  rows="4"
-                  class="profile-textarea"
-                  :class="{ error: validationErrors.bio }"
-                ></textarea>
-                <span v-if="validationErrors.bio" class="validation-message">
-                  {{ validationErrors.bio }}
-                </span>
-              </div>
-
-                  <div class="profile-field">
-                <!-- For Experience -->
-                <label class="profile-label required" for="experience"
-                  >TUTORING EXPERIENCE</label
-                >
-                <textarea
-                  id="goals"
-                  v-model="experience"
-                  @input="validateField('experience', experience)"
-                  @blur="validateField('experience', experience)"
-                  placeholder="Describe your tutoring experience (50-500 characters)"
-                  rows="4"
-                  class="profile-textarea"
-                  :class="{ error: validationErrors.goals }"
-                ></textarea>
-                <span v-if="validationErrors.goals" class="validation-message">
-                  {{ validationErrors.goals }}
-                </span>
-              </div>
+            <div class="profile-field">
+              <label class="profile-label" for="bio">SHORT BIO</label>
+              <textarea
+                id="bio"
+                v-model="bio"
+                @input="validateField('bio', bio)"
+                @blur="validateField('bio', bio)"
+                placeholder="Tell us about yourself (50-500 characters)"
+                rows="4"
+                class="profile-textarea"
+                :class="{ error: validationErrors.bio }"
+              ></textarea>
+              <span v-if="validationErrors.bio" class="validation-message">
+                {{ validationErrors.bio }}
+              </span>
+            </div>
+            <div class="profile-field">
+              <label class="profile-label" for="goals">LEARNING GOALS</label>
+              <textarea
+                id="goals"
+                v-model="goals"
+                @input="validateField('goals', goals)"
+                @blur="validateField('goals', goals)"
+                placeholder="Describe your learning goals (50-500 characters)"
+                rows="4"
+                class="profile-textarea"
+                :class="{ error: validationErrors.goals }"
+              ></textarea>
+              <span v-if="validationErrors.goals" class="validation-message">
+                {{ validationErrors.goals }}
+              </span>
+            </div>
           </div>
-         </div>
-       </div>
+        </div>
 
-             <!-- Step Indicator -->
+        <!-- Profile Picture Upload -->
+        <div class="upload-container">
+          <div class="profile-picture-upload">
+            <label class="profile-label">PROFILE PICTURE</label>
+            <div class="upload-controls" @click="uploadProfilePicture">
+              <div class="profile-preview-container">
+                <img
+                  v-if="profileImage"
+                  :src="profileImage"
+                  alt="Profile Preview"
+                  class="profile-preview"
+                />
+                <i v-else class="fas fa-user-circle default-icon"></i>
+              </div>
+              <div class="upload-text">
+                <div class="choose-file-container">
+                  <i class="fas fa-upload"></i>
+                  <span>Choose File</span>
+                </div>
+                <input
+                  type="file"
+                  ref="profileInput"
+                  accept="image/*"
+                  style="display: none"
+                  @change="handleProfileUpload"
+                />
+                <span
+                  class="file-name"
+                  style="
+                    max-width: 150px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  "
+                  >{{ profilePictureName || "No file chosen" }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Indicator -->
       <div class="step-indicator-container">
         <div class="step-indicator">
           <div
@@ -610,63 +545,20 @@
             @click="goToStep(step)"
           ></div>
         </div>
-
-    <button class="next-button" @click="nextStep" :disabled="isSubmitted">
-      {{
-        isSubmitted
-          ? "SUBMITTED"
-          : currentStep === totalSteps
-          ? "SUBMIT"
-          : "NEXT"
-      }}
+      </div>
+    </div>
+    <button class="next-button" @click="nextStep">
+      {{ currentStep === totalSteps ? "SUBMIT" : "NEXT" }}
     </button>
   </div>
-
-
-
-      <!-- File List Modal -->
-      <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
-        <div class="Credmodal-content" @click.stop>
-          <h3>Uploaded Files</h3>
-          <ul class="file-list">
-            <li v-for="(file, index) in credentials" :key="index">
-              <span class="file-info">
-                <i class="fas fa-file-alt"></i>
-                {{ file.name }}
-              </span>
-              <button @click.stop="deleteCredential(index)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </li>
-          </ul>
-          <div style="display: flex; justify-content: center; width: 100%">
-            <button class="close-button" @click="closeFileList">Close</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Application Status Popup -->
-      <div v-if="showStatusPopup" class="status-popup-overlay">
-        <div class="status-popup-content">
-          <h3>APPLICATION STATUS</h3>
-          <p class="status-text">
-            Your mentor application is under review. You will receive an email
-            once it's approved. Thank you!
-          </p>
-          <button class="proceed-button" @click="proceedToHome">
-            PROCEED TO HOME
-          </button>
-        </div>
-      </div>
-
 </template>
 
 <script>
-import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
-import axios, { Axios } from "axios";
+import { registrationStore } from "@/stores/registrationStore";
+import axios from "axios";
 
-axios.default.withCredentials = true; // Enable sending cookies with requests
-axios.default.withXSRFToken = true; // Enable CSRF token handling
+axios.defaults.withCredentials = true; // Enable sending cookies with requests
+axios.defaults.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -680,7 +572,7 @@ export default {
     return {
       currentStep: 1,
       totalSteps: 2,
-      //fullName: "",
+      // fullName: "",
       gender: "",
       otherGender: "",
       yearLevel: "",
@@ -705,7 +597,6 @@ export default {
         "Sunday",
       ],
       bio: "",
-      proficiency: "",
       selectedsessionStyles: [],
       sessionStyles: [
         "Lecture-Based",
@@ -716,11 +607,9 @@ export default {
         "Step-by-step process",
       ],
       sessionDuration: "",
-      experience: "",
+      goals: "",
       profileImage: null,
       profilePictureName: "",
-      credentials: [],
-      showFileList: false,
 
       categories: [
         { type: "core", name: "Core Subjects" },
@@ -742,18 +631,10 @@ export default {
         yearLevel: false,
         program: false,
         modality: false,
-        proficiency: false,
         availability: false,
         learningStyle: false,
         sessionDuration: false,
       },
-      programs: [
-        "Bachelor of Science in Information Technology (BSIT)",
-        "Bachelor of Science in Computer Science (BSCS)",
-        "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)",
-      ],
-      showStatusPopup: false,
-      isSubmitted: false,
       validationErrors: {
         fullName: "",
         address: "",
@@ -804,7 +685,7 @@ export default {
     },
     learningStyleDisplay() {
       return (
-        this.selectedsessionStyles.join(", ") || "Select teaching style(s)"
+        this.selectedsessionStyles.join(", ") || "Select learning style(s)"
       );
     },
     isFormComplete() {
@@ -824,12 +705,10 @@ export default {
         this.modality &&
         this.selectedDays.length > 0 &&
         this.selectedsessionStyles.length > 0 &&
-        this.proficiency &&
         this.sessionDuration &&
         this.bio.trim() &&
-        this.experience.trim() &&
-        this.profileImage &&
-        this.credentials.length > 0
+        this.goals.trim() &&
+        this.profileImage
       );
     },
   },
@@ -890,7 +769,7 @@ export default {
       const errors = [];
 
       if (this.currentStep === 1) {
-       // if (!this.fullName.trim()) errors.push("Full Name is required");
+        // if (!this.fullName.trim()) errors.push("Full Name is required");
         if (!this.gender) errors.push("Gender is required");
         if (this.gender === "Other" && !this.otherGender.trim())
           errors.push("Please specify your gender");
@@ -904,20 +783,16 @@ export default {
       if (this.currentStep === 2) {
         if (this.selectedSubjects.length === 0)
           errors.push("At least one subject is required");
-        if (!this.modality) errors.push("Teaching Modality is required");
+        if (!this.modality) errors.push("Learning Modality is required");
         if (this.selectedDays.length === 0)
           errors.push("At least one day of availability is required");
         if (this.selectedsessionStyles.length === 0)
-          errors.push("At least one teaching style is required");
-        if (!this.proficiency) errors.push("Proficiency level is required");
+          errors.push("At least one learning style is required");
         if (!this.sessionDuration)
           errors.push("Preferred Session Duration is required");
         if (!this.bio.trim()) errors.push("Short Bio is required");
-        if (!this.experience.trim())
-          errors.push("Tutoring experience is required");
+        if (!this.goals.trim()) errors.push("Learning goals is required");
         if (!this.profileImage) errors.push("Profile Picture is required");
-        if (this.credentials.length === 0)
-          errors.push("At least one credential is required");
       }
 
       return errors;
@@ -950,11 +825,6 @@ export default {
       this.dropdownOpen.modality = false;
     },
 
-    selectProficiency(selectedProficiency) {
-      this.proficiency = selectedProficiency;
-      this.dropdownOpen.proficiency = false;
-    },
-
     selectSessionDuration(duration) {
       this.sessionDuration = duration;
       this.dropdownOpen.sessionDuration = false;
@@ -974,7 +844,7 @@ export default {
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
       } else {
-        this.submitApplication();
+        this.submitLearnerInfo();
       }
     },
 
@@ -1008,27 +878,6 @@ export default {
         };
         reader.readAsDataURL(file);
       }
-    },
-
-    uploadCredentials() {
-      this.$refs.credentialInput.click();
-    },
-
-    handleCredentialUpload(event) {
-      const files = Array.from(event.target.files);
-      this.credentials.push(...files);
-    },
-
-    deleteCredential(index) {
-      this.credentials.splice(index, 1);
-    },
-
-    toggleFileList() {
-      this.showFileList = !this.showFileList;
-    },
-
-    closeFileList() {
-      this.showFileList = false;
     },
 
     updateAvailableSubjects() {
@@ -1098,8 +947,6 @@ export default {
             coreSubjects: [
               "Computer Programming 1",
               "Computer Programming 2",
-              "Introduction to Computing",
-              "PC Troubleshooting with Basic Electronics",
               "Data Structures and Algorithms",
               "Algorithms and Complexity 1",
               "Software Engineering 1",
@@ -1127,18 +974,19 @@ export default {
               "CS Seminars and Educational Trips",
             ],
             gecSubjects: [
-              "Art Appreciation",
-              "Ethics",
-              "Mathematics in the Modern World",
-              "People and Earth's Ecosystem",
-              "Purposive Communication",
-              "Reading Visual Arts",
+              "Introduction to Computing",
+              "PC Troubleshooting with Basic Electronics",
+              "Understanding the SELF",
               "Readings in Philippine History with Indigenous People Studies",
+              "The Life and Works of Jose Rizal",
+              "People and Earth’s Ecosystem",
+              "Mathematics in the Modern World",
               "Science, Technology and Society",
-              "The Contemporary World with Peace Studies",
-              "The Entrepreneurial Mind",
-              "The Life and Works of Rizal",
-              "Understanding the Self",
+              "Reading Visual Arts",
+              "Art Appreciation",
+              "Purposive Communication",
+              "Ethics",
+              "The Contemporary World With Peace Studies",
             ],
             peNstpSubjects: [
               "National Service Training Program 1",
@@ -1154,58 +1002,14 @@ export default {
         case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
           this.availableSubjects = {
             coreSubjects: [
-              "Introduction to EM Computing",
-              "Computer Programming 1",
-              "PC Troubleshooting with Basic Electronics",
-              "Computer Programming 2",
-              "Usability, HCI, UI Design",
-              "Free Hand and Digital Drawing",
-              "Data Structures and Algorithms",
-              "Information Management 1",
-              "Introduction to Game Design and Development",
-              "Computer Graphics Programming",
-              "Image and Video Processing",
-              "Script Writing and Storyboard Design",
-              "Applications Development and Emerging Technologies",
-              "Principles of 2D Animation",
-              "Audio Design and Sound Engineering Modelling and Rigging",
-              "Texture and Mapping",
-              "Social Issues and Professional Practice in Computing",
-              "Lighting and Effects",
-              "Principles of 3D Animation",
-              "Design and Production Process",
-              "Advanced Sound Production",
-              "Advanced 2D Animation",
-              "EMC Professional Elective 1",
-              "Research Methods",
-              "Advanced 3D Animation and Scripting",
-              "Compositing and Rendering",
-              "EMC Professional Elective 2",
-              "Animation Design and Production",
-              "EMC Professional Elective 3",
-              "Computing Seminars and Educational Trips",
+              "Game Development",
+              "Animation",
+              "Multimedia Design",
             ],
-            gecSubjects: [
-              "Art Appreciation",
-              "Ethics",
-              "Mathematics in the Modern World",
-              "People and Earth's Ecosystem",
-              "Purposive Communication",
-              "Reading Visual Arts",
-              "Readings in Philippine History with Indigenous People Studies",
-              "Science, Technology and Society",
-              "The Contemporary World with Peace Studies",
-              "The Entrepreneurial Mind",
-              "The Life and Works of Rizal",
-              "Understanding the Self",
-            ],
+            gecSubjects: ["Art Appreciation", "Digital Media"],
             peNstpSubjects: [
-              "National Service Training Program with Anti-Smoking and Environmental Education",
-              "National Service Training Program with GAD and Peace Education",
-              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
-              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
-              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
-              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+              "National Service Training Program",
+              "Physical Education",
             ],
           };
           break;
@@ -1228,10 +1032,9 @@ export default {
       }
     },
 
-    async submitApplication() {
+    async submitLearnerInfo() {
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
-      // console.log("Store data:", store.registrationData);
 
       if (finalValidationErrors.length > 0) {
         alert(
@@ -1242,15 +1045,15 @@ export default {
       }
 
       try {
-        const formData = new FormData(); // Use FormData for file uploads
-        formData.append("email", store.registrationData.email); // Corrected property
-        formData.append("password", store.registrationData.password); // Corrected property
-        formData.append(
-          "password_confirmation",
-          store.registrationData.password_confirmation
-        ); // Corrected property
-        formData.append("role", store.registrationData.role); // Corrected property
-        formData.append("name", this.fullName);
+        const formData = new FormData();
+        // formData.append("email", store.registrationData.email);
+        // formData.append("password", store.registrationData.password);
+        // formData.append(
+        //   "password_confirmation",
+        //   store.registrationData.password_confirmation
+        // );
+        formData.append("role", store.registrationData.role);
+        // formData.append("name", this.fullName);
         formData.append(
           "gender",
           this.gender === "Other" ? this.otherGender : this.gender
@@ -1259,21 +1062,19 @@ export default {
         formData.append("course", this.program);
         formData.append("phoneNum", this.contactNumber);
         formData.append("address", this.address);
-        formData.append("subjects", JSON.stringify(this.selectedSubjects)); // Convert array to JSON string
-        formData.append("learn_modality", this.modality);
-        formData.append("availability", JSON.stringify(this.selectedDays)); // Convert array to JSON string
-        formData.append("bio", this.bio);
+
+        // Stringify array fields
+        formData.append("subjects", JSON.stringify(this.selectedSubjects));
+        formData.append("availability", JSON.stringify(this.selectedDays));
         formData.append(
-          "teach_sty",
+          "learn_sty",
           JSON.stringify(this.selectedsessionStyles)
-        ); // Convert array to JSON string
+        );
+
+        formData.append("learn_modality", this.modality);
+        formData.append("bio", this.bio);
         formData.append("prefSessDur", this.sessionDuration);
-        formData.append("exp", this.experience);
-        formData.append("proficiency", this.proficiency); // Added proficiency level
-        formData.append(
-          "credentials",
-          JSON.stringify(this.credentials.map((file) => file.name))
-        ); // Convert array to JSON string
+        formData.append("goals", this.goals);
 
         // Ensure profileImage is a file
         if (this.$refs.profileInput.files[0]) {
@@ -1282,12 +1083,8 @@ export default {
           throw new Error("Profile image is missing or invalid.");
         }
 
-        this.credentials.forEach((file, index) => {
-          formData.append(`credentials[${index}]`, file);
-        });
-
         await axios
-          .post("http://localhost:8000/api/mentor/register", formData, {
+          .post("http://localhost:8000/api/learner/register/2nd", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
               accept: "application/json",
@@ -1295,36 +1092,19 @@ export default {
             },
           })
           .then((response) => {
-            console.log("ge");
+            console.log("Registration successful:", response);
           })
           .catch((error) => {
-            console.error(error);
+            console.error("Registration error:", error);
+            throw error;
           });
-
-        // console.log('Mentor application submitted:', formData);
-        this.sendEmailToAdmin(formData);
-        this.showStatusPopup = true;
-        this.isSubmitted = true;
       } catch (error) {
-        console.error("Application submission error:", error);
+        console.error("Data collection error:", error);
         alert(
-          "An error occurred while submitting your application. Please try again."
+          "An error occurred while submitting your information. Please try again."
         );
       }
     },
-
-    sendEmailToAdmin(formData) {
-      console.log("Sending email to admin with application data:", formData);
-    },
-
-    closeStatusPopup() {
-      this.showStatusPopup = false;
-    },
-
-    proceedToHome() {
-      this.$router.push("/");
-    },
-
     validateField(field, value) {
       const rules = this.validationRules[field];
       if (!rules) return;
@@ -1391,8 +1171,8 @@ export default {
     bio(newVal) {
       this.validateField("bio", newVal);
     },
-    experience(newVal) {
-      this.validateField("experience", newVal);
+    goals(newVal) {
+      this.validateField("goals", newVal);
     },
     selectedSubjects: {
       handler() {
@@ -1435,7 +1215,7 @@ body {
   color: white;
 }
 
-.mentorinfo-container {
+.learnerinfo-container {
   background-image: url("@/assets/bg.png");
   position: fixed;
   top: 0;
@@ -1449,7 +1229,6 @@ body {
   flex-direction: column;
   align-items: center;
   padding-top: 30px;
-  overflow: hidden;
 }
 
 .page-header {
@@ -1470,134 +1249,76 @@ body {
   font-size: 0.9rem;
 }
 
-.back-btn {
-  position: fixed;
-  top: 1.5rem;
-  left: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem;
-  color: #2c3e50;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  z-index: 100;
-}
-
-.back-btn svg {
-  width: 1.2rem;
-  height: 1.2rem;
-  transition: transform 0.3s ease;
-}
-
-.back-btn:hover {
-  background: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-  transform: translateX(-2px);
-}
-
-.back-btn:hover svg {
-  transform: translateX(-4px);
-}
-
 .form-container {
   position: relative;
   width: 100%;
-  max-width: 800px;
-  height: 100%;
-  min-height: 610px;
-  max-height: 800px;
-  background: rgba(255, 255, 255, 0.724);
+  max-width: 1100px;
+  height: 70vh;
+  min-height: 550px;
+  max-height: 650px;
+  padding: 1.5rem;
+  background: rgba(0, 89, 105, 0.546);
   border-radius: 40px;
-  box-shadow: 2px 2px 4px 4px rgba(29, 61, 113, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 8px rgba(170, 10, 10, 0.1);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin; 
-  scrollbar-color: #02475e transparent;
-}
-
-.form-container::-webkit-scrollbar {
-  width: 10px;
-}
-
-.form-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  margin: 10px;
-}
-
-.form-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, 
-              rgba(2, 71, 94, 0.6) 0%, 
-              rgba(6, 102, 120, 0.6) 100%);  border: 1px solid #02475e;
-  border-radius: 4px;
-}
-
-.form-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #033a4b, #044c5c);
-}
-
-.form-content {
-  padding-bottom: 80px;
 }
 
 .title {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: #02475e; 
-  padding: 1.5rem 4rem 1rem; 
-  color: #ffffff;
+  color: #02475e;
   font-size: 1.6rem;
-  margin: 0 -1.5rem 1.5rem; 
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2.5rem;
+  margin-left: 2rem;
 }
 
+.personal-grid {
+  display: flex;
+  gap: 4rem;
+  width: 95%;
+  margin-left: 2rem;
+  flex: 1;
+}
+
+.personal-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3.2rem;
+  padding: 0 1rem;
+}
 
 .personal-field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
-  padding-left: 5.5rem;
-  padding-right: 5.5rem;
 }
 
 .personal-label {
   color: #02475e;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.85rem;
-  margin-left: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  margin-left: 0.3rem;
 }
 
 .personal-input,
 .profile-input,
 .gender-specify {
   padding: 0.7rem;
-  border-radius: 15px;
-  border: 1px solid rgb(12, 4, 102);
-  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
-  background: #e8f0fe;
-  color: rgba(24, 37, 69, 0.842);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 217, 230, 0.293);
   width: 100%;
   transition: all 0.2s ease;
   text-align: left;
+  color: white;
   font-weight: 600;
 }
 
 .personal-input::placeholder,
 .profile-input::placeholder,
 .gender-specify::placeholder {
-  color: rgba(15, 31, 70, 0.683);
+  color: rgba(255, 250, 250, 0.683);
   font-size: 0.8rem;
 }
 
@@ -1613,9 +1334,8 @@ body {
 .year-dropdown,
 .program-dropdown,
 .subjmodality-dropdown,
-.proficiency-dropdown,
 .availability-dropdown,
-.teaching-style-dropdown,
+.learning-style-dropdown,
 .session-duration-dropdown {
   position: relative;
   width: 100%;
@@ -1630,25 +1350,24 @@ body {
 
 .dropdown-container input {
   padding: 0.7rem 30px 0.7rem 0.7rem;
-  border-radius: 15px;
-  border: 1px solid rgb(12, 4, 102);
-  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
-  background: #e8f0fe;
-  color: rgba(26, 41, 80, 0.683);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 217, 230, 0.293);
+  font-size: 0.85rem;
   width: 100%;
   transition: all 0.2s ease;
 }
 
 .dropdown-options {
   position: absolute;
-  background: rgb(229, 235, 237);
+  background: rgba(255, 255, 255);
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .dropdown-option {
@@ -1661,13 +1380,12 @@ body {
   gap: 13px;
 }
 
-
 .dropdown-option:hover {
-  background-color: rgba(255, 253, 253, 0.243);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-icon {
-  color: rgb(36, 63, 131);
+  color: white;
   font-size: 10px;
   position: absolute;
   right: 15px;
@@ -1675,6 +1393,7 @@ body {
   transform: translateY(-50%);
 }
 
+/* Double Dropdown Styles */
 .dropdown-wrapper {
   position: relative;
   width: 100%;
@@ -1696,27 +1415,27 @@ body {
   background: transparent;
   padding: 0.7rem;
   border-radius: 20px;
-  border: 1px solid rgb(12, 4, 102);
-  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
-  background: #e8f0fe;
-  color: rgba(24, 37, 69, 0.842);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 217, 230, 0.293);
+  color: white;
   font-size: 0.85rem;
   text-align: left;
 }
 
 .dropdown-trigger input::placeholder {
-  color: rgba(26, 41, 80, 0.683);
+  color: rgba(255, 250, 250, 0.683);
 }
 
 .dropdown-menu {
   position: absolute;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 100;
   max-height: 300px;
   overflow-y: auto;
 }
+
 .categories {
   width: 100%;
   top: 100%;
@@ -1751,13 +1470,21 @@ body {
 
 .subject-item input[type="checkbox"] {
   margin-right: 10px;
-  cursor: pointer;
 }
 
 .subject-item label {
   color: #02475e;
   cursor: pointer;
   flex: 1;
+}
+
+.count-badge {
+  background: #02475e;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  margin-left: 5px;
 }
 
 .no-subjects {
@@ -1771,21 +1498,25 @@ body {
   z-index: 1000;
 }
 
-.count-badge {
-  background: #02475e;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.7rem;
-  margin-left: 5px;
+.profile-grid {
+  display: flex;
+  gap: 2rem;
+  width: 90%;
+  margin-left: 3rem;
+  flex: 1;
+}
+
+.profile-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1.5rem;
+  padding: 0 1rem;
 }
 
 .profile-field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
-  padding-left: 4rem;
-  padding-right: 5rem;
 }
 
 .profile-label {
@@ -1801,7 +1532,7 @@ body {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   background: rgba(215, 217, 230, 0.293);
-  color: rgba(26, 41, 80, 0.683);
+  color: white;
   font-size: 0.85rem;
   width: 100%;
   transition: all 0.2s ease;
@@ -1809,7 +1540,7 @@ body {
 }
 
 .profile-input::placeholder {
-  color: rgba(26, 41, 80, 0.683);
+  color: rgba(255, 250, 250, 0.683);
 }
 
 .profile-input:focus {
@@ -1822,17 +1553,16 @@ body {
   min-height: 70px;
   resize: none;
   padding: 0.7rem;
-  border-radius: 15px;
-  border: 1px solid rgb(12, 4, 102);
-  box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
-  background: #e8f0fe;
-  color: rgba(24, 37, 69, 0.842);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 217, 230, 0.293);
+  color: white;
   font-size: 0.85rem;
   width: 100%;
 }
 
 .profile-textarea::placeholder {
-  color: rgba(26, 41, 80, 0.683);
+  color: rgba(255, 250, 250, 0.683);
   font-weight: 500;
 }
 
@@ -1842,321 +1572,115 @@ body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
-
-/* Profile Picture and Credentials Upload */
 .upload-container {
-  display: flex; 
+  display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 2rem;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  text-align: left; 
-  flex-wrap: wrap;
+  margin-top: 1rem;
+  margin-left: 4rem;
+  gap: 2.5rem;
 }
 
 .profile-picture-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
   flex: 1;
-  min-width: 250px;
-  
 }
 
-.profile-label {
-  font-weight: 600;
-  color: #02475e;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+.profile-picture-upload .profile-label {
+  display: block;
+  margin-bottom: 0.8rem;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 }
 
 .profile-preview-container {
-  width: 100px;
-  height: 100px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid #02475e;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .profile-preview {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
 }
 
 .default-icon {
-  font-size: 3rem;
-  color: rgba(2, 71, 94, 0.3);
-}
-
-.upload-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .upload-text {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1.3rem;
+  cursor: pointer;
+  color: #ffffff;
+}
+.file-name {
+  font-size: 15px;
 }
 
 .choose-file-container {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 0.7rem 1.5rem;
+  padding: 0.9rem;
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 25px;
+  transition: background-color 2s;
+  color: #f9fbfb;
   background: linear-gradient(to bottom, #02475e, #066678);
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
 }
 
 .choose-file-container:hover {
-  background: linear-gradient(to bottom, #033a4b, #044c5c);
-  transform: translateY(-2px);
+  background: rgba(12, 32, 87, 0.568);
 }
 
-.file-name {
-  font-size: 0.8rem;
-  color: #02475e;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.credentials-upload {
-  flex: 1;
-  min-width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: -4%;
-  padding: 2rem;
-  border-radius: 12px;
-}
-
-.credentials-upload .profile-label {
-  display: block;
-  margin-bottom: 1.8rem;
-  text-align: center;
-}
-
-.credentials-upload .upload-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  width: 100%;
-}
-
-.credentials-upload .profile-preview-container {
-  width: 60px;
-  height: 60px;
+.step-indicator-container {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  background-color: #f0f0f0;
+  z-index: 2;
+}
+
+.step-indicator {
+  display: flex;
+  gap: 15px;
+}
+
+.step {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-}
-
-.credentials-upload .upload-icon {
-  font-size: 5rem;
-  color: #243c55;
-}
-
-.credentials-upload .upload-controls .file-link {
-  color: #19415b;
-  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
   cursor: pointer;
-  font-size: 12px;
-  padding: 0.2rem 1rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  margin-top: -1.1rem;
-  text-decoration: underline;
 }
 
-
-/* File List Modal */
-.Credmodal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.Credmodal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 350px;
-  max-height: 80%;
-  overflow-y: auto;
-  color: black;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.Credmodal-content h3 {
-  text-align: center;
-  color: rgb(9, 9, 80);
-  margin-bottom: 10px;
-}
-
-.file-list {
-  margin-top: 0.5rem;
-  list-style: none;
-  padding: 0;
-}
-
-.file-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: #02475e;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.file-list button {
-  background: transparent;
-  border: none;
-  color: rgba(255, 100, 100, 0.8);
-  cursor: pointer;
-  padding: 0.2rem;
-  flex-shrink: 0;
-}
-
-.file-list button:hover {
-  color: #ff4d4d;
-}
-
-
-.close-button {
-  background-color: #155577;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 120px;
-  align-self: center;
-  margin-top: 20px;
-}
-
-.close-button:hover {
-  background-color: #032c58;
-}
-
-.divider {
-  height: 1px;
-  background: #929495;
-  margin-bottom: 35px;
-  margin-left: 10rem;
-  margin-top: -2rem;
-  width: 86%;
-  max-width: 1200px;
-  border: none;
-  border-radius: 2px;
-  transform: translateX(-100px);
-}
-
-/* Status Popup */
-.status-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-}
-
-.status-popup-content {
-  background: white;
-  border-radius: 8px;
-  width: 500px;
-  height: 220px;
-  max-width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.status-popup-content h3 {
-  text-align: center;
-  color: white;
+.step.active {
   background-color: #02475e;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 23px;
+  transform: scale(1.2);
 }
 
-.status-text {
-  color: #02475e;
-  text-align: center;
-  margin-bottom: 45px;
-  padding: 0 20px;
-  line-height: 1.5;
-}
-
-.proceed-button {
-  background-color: #02475e;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.proceed-button:hover {
-  background-color: #033140;
+.step.completed {
+  background-color: rgba(2, 71, 94, 0.6);
 }
 
 .next-button {
-  position: absolute;
+  position: fixed;
+  bottom: 15px;
   right: 30px;
-  bottom: 10px;
   background-color: #155577;
   color: white;
   padding: 10px 20px;
@@ -2168,10 +1692,7 @@ body {
   font-size: 0.9rem;
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  user-select: none;
 }
-
 
 .next-button:hover {
   background-color: #032c58;
@@ -2187,50 +1708,17 @@ body {
   font-weight: 900;
 }
 
-.dropdown-menu.subjects {
-  position: absolute;
-  left: 45%;
-  top: 2.5rem;
-  width: 350px;
-  max-width: 100vw; 
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 999;
-  box-sizing: border-box;
-}
-
-.subject-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 15px;
-  font-size: 0.85rem;
-}
-
-.subject-item input[type="checkbox"] {
-  margin-right: 10px;
-}
-
-.subject-item label {
-  color: #02475e;
-  cursor: pointer;
-  flex: 1;
-}
-
 .gender-specify {
-  padding: 0.4rem;
+  padding: 0.7rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(149, 154, 176, 0.242);
-  color: rgb(48, 66, 106);
-  font-size: 0.7rem;
-  width: 35%;
+  background: rgba(55, 61, 86, 0.242);
+  color: white;
+  font-size: 0.85rem;
+  width: 50%;
   height: 30%;
   transition: all 0.2s ease;
-  margin-top: 0.8rem;
+  margin-top: 0.6rem;
   margin-left: 0.8rem;
 }
 
@@ -2238,39 +1726,6 @@ body {
   outline: none;
   border-color: rgba(2, 71, 94, 0.8);
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
-}
-
-.validation-error {
-  color: #ff6b6b;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  margin-left: 0.5rem;
-}
-
-.availability-options,
-.teaching-style-options {
-  padding: 0.5rem;
-  width: 100%;
-}
-
-.availability-option,
-.teaching-style-option {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  color: #02475e;
-}
-
-.availability-option input[type="checkbox"],
-.teaching-style-option input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
-
-.availability-option label,
-.teaching-style-option label {
-  cursor: pointer;
-  color: #02475e;
-  font-size: 0.85rem;
 }
 
 .required::after {
@@ -2294,184 +1749,48 @@ body {
   background-color: rgba(255, 107, 107, 0.05);
 }
 
-.validation-error {
-  color: #ff6b6b;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  margin-left: 0.5rem;
+.dropdown-menu.subjects {
+  position: absolute;
+  left: 105%;
+  top: 0;
+  width: 350px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-@media (max-width: 768px) {
-  .mentorinfo-container {
-    padding-top: 15px;
-    height: auto;
-    min-height: 100vh;
-    position: relative;
-  }
-
-
-  .page-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .page-header p {
-    font-size: 0.8rem;
-  }
-
-  .form-container {
-    max-width: 85%;
-    min-height: auto;
-    max-height: none;
-    border-radius: 20px;
-    margin-bottom: 20px;
-  }
-
-  .title {
-    padding: 1rem 1.5rem;
-    font-size: 1.3rem;
-    margin: 0 -1rem 1rem;
-  }
-
-  .personal-field,
-  .profile-field {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .personal-input,
-  .profile-input,
-  .profile-textarea {
-    padding: 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .dropdown-menu.subjects {
-    position: absolute; 
-    width: 100%;
-    left: 0 !important;
-    top: 100% !important;
-    max-height: 50vh;
-    border-radius: 0 0 10px 10px;
-    border-top: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: none !important;
-  }
-
-  
-
-  .upload-container {
-    padding: 0.5rem;
-  }
-
-  .profile-preview-container {
-    width: 80px;
-    height: 80px;
-  }
-
-  .choose-file-container {
-    padding: 0.6rem 1rem;
-    font-size: 0.8rem;
-  }
-
-
-  .next-button {
-    position: relative;
-    bottom: auto;
-    margin: 10px;
-    margin-left: 18rem;
-    width: 30%;
-    align-self: center;
-  }
-
+.subject-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  font-size: 0.85rem;
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .form-container {
-    max-width: 90%;
-  }
-
-  .personal-field,
-  .profile-field {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
-
-  .dropdown-menu.subjects {
-    left: 30%;
-    width: 300px;
-  }
-
-  .next-button {
-    position: relative;
-    bottom: auto;
-    margin: 20px auto;
-    width: 50%;
-    align-self: center;
-  }
+.subject-item input[type="checkbox"] {
+  margin-right: 10px;
 }
 
-@media (max-width: 480px) { 
-  .form-container {
-    margin: 10px;
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-  }
-
-  .personal-field,
-  .profile-field {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .gender-specify {
-    width: 50%;
-  }
-
-    .title {
-    font-size: 15px;  }
-
-  .profile-preview-container {
-    width: 70px;
-    height: 70px;
-  }
-
-  .default-icon {
-    font-size: 2.5rem;
-  }
-    .dropdown-menu.subjects {
-    position: absolute; 
-    width: 100%;
-    left: 0 !important;
-    top: 100% !important;
-    max-height: 50vh;
-    border-radius: 0 0 10px 10px;
-    border-top: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: none !important;
-  }
-
-
-  .next-button {
-    position: relative;
-    bottom: auto;
-    margin: 10px;
-    margin-left: 6.5rem;
-    width: 50%;
-    align-self: center;
-  }
-
-  .divider {
-  height: 1px;
-  background: #929495;
-  margin-bottom: 35px;
-  margin-left: 7.5rem;
-  margin-top: -2rem;
-  width: 86%;
-  border: none;
-  border-radius: 2px;
-  transform: translateX(-100px);
-}
+.subject-item label {
+  color: #02475e;
+  cursor: pointer;
+  flex: 1;
 }
 
+.count-badge {
+  background: #02475e;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  margin-left: 5px;
+}
+
+.no-subjects {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 15px;
+}
 </style>

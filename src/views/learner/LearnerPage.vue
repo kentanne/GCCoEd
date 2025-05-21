@@ -2,7 +2,10 @@
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
 import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
+
+const router = useRouter();
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -69,6 +72,27 @@ const sessionInfo = async () => {
     return null;
   }
 };
+
+const sessionForReview = async () => {
+  try {
+    const pastSessionDeets = await axios
+      .get(`http://localhost:8000/api/learner/doneSched`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("done session details:", response.data);
+        schedForReview.value = response.data.schedules_done;
+      });
+  } catch (error) {
+    console.error("Error fetching session details:", error);
+    return null;
+  }
+};
 const mentorProfile = async () => {
   try {
     await axios
@@ -105,6 +129,48 @@ const mentorProfile = async () => {
   }
 };
 
+const registerMentorRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/set/2nd_role", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Mentor registration:", response.data);
+        router.push("/mentor-info/alt");
+      });
+  } catch (error) {
+    console.error("Error registering as learner:", error);
+    return null;
+  }
+};
+
+const switchRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/switch", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Role switched:", response.data);
+        router.push("/login");
+      });
+  } catch (error) {
+    console.error("Error switching role:", error);
+    return null;
+  }
+};
+
 const userData = ref({
   user: {
     id: null,
@@ -128,6 +194,7 @@ const userData = ref({
   },
 });
 
+const schedForReview = ref([]);
 const todaySchedule = ref([]);
 const upcommingSchedule = ref([]);
 
@@ -256,6 +323,7 @@ onMounted(async () => {
   await getLearnerDets();
   await sessionInfo();
   await mentorProfile();
+  await sessionForReview();
   console.log("User data:", userData.value);
 });
 </script>
@@ -368,6 +436,10 @@ onMounted(async () => {
           {{ isEdit ? "Save" : "Edit" }}
         </button>
       </div>
+      <div>
+        <button @click="registerMentorRole">Register as Mentor</button>
+        <button @click="switchRole">switch Account Role</button>
+      </div>
     </div>
   </div>
 
@@ -410,6 +482,7 @@ onMounted(async () => {
       :userData="userData"
       :upcomingSchedule="upcommingSchedule"
       :schedule="todaySchedule"
+      :schedForReview="schedForReview"
     />
   </div>
 
