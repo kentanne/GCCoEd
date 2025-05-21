@@ -2153,6 +2153,7 @@ body {
   background-color: #033140;
 }
 
+
 .next-button {
   position: absolute;
   right: 30px;
