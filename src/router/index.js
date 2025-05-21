@@ -10,6 +10,8 @@ import MentorPage from "../views/mentor/MentorPage.vue";
 import LearnerPage from "../views/learner/LearnerPage.vue";
 import passwordReset from "@/components/password-reset.vue";
 import forgotPassword from "../views/forgotPassword.vue";
+import MentorInfoAlt from "../views/MentorInfoAlt.vue";
+import LearnerInfoAlt from "../views/LearnerInfoAlt.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -26,6 +28,16 @@ const routes = [
     path: "/forgot-password",
     name: "forgot-password",
     component: forgotPassword,
+  },
+  {
+    path: "/mentor-info/alt",
+    name: "mentor-info-alt",
+    component: MentorInfoAlt,
+  },
+  {
+    path: "/learner-info/alt",
+    name: "learner-info-alt",
+    component: LearnerInfoAlt,
   },
 ];
 

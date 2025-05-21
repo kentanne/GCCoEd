@@ -174,7 +174,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel Session</p>
+                      <p class="option-text" @click="cancelSession(item.id)">
+                        Cancel Session
+                      </p>
                     </div>
                   </div>
                 </transition>
@@ -277,7 +279,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel</p>
+                      <p class="option-text" @click="cancelSession(item.id)">
+                        Cancel Session
+                      </p>
                     </div>
                   </div>
                 </transition>
