@@ -85,6 +85,7 @@ export default {
   gap: 2rem;
   width: 100%;
   max-width: 1400px;
+
 }
 
 .dashboard-card {
@@ -249,4 +250,5 @@ export default {
     font-size: 2.5rem;
   }
 }
+
 </style>

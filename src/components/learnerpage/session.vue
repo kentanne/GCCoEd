@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
@@ -16,7 +16,21 @@ const props = defineProps({
     type: Array,
     required: false,
   },
+  mentFiles: {
+    type: Array,
+    default: () => ({
+      message: "",
+      files: [],
+    }),
+  },
 });
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
 
 const cancelSession = async (item) => {
   try {
@@ -54,10 +68,38 @@ const activePopup = ref({
 const todaySchedule = ref([]);
 const upcommingSchedule = ref([]);
 const selectedSessionID = ref(null);
+const selectedMentorId = ref(null);
 
-const openFileModal = (files, event) => {
+const filteredFiles = computed(() => {
+  if (!selectedMentorId.value || !props.mentFiles?.files) {
+    console.log("No mentor selected or no files available");
+    return [];
+  }
+
+  console.log("Selected Mentor ID:", selectedMentorId.value);
+  console.log("Available files:", props.mentFiles.files);
+
+  const filtered = props.mentFiles.files.filter((file) => {
+    const isMatch = String(file.owner_id) === String(selectedMentorId.value);
+    console.log(
+      `Comparing file owner ${file.owner_id} with mentor ${selectedMentorId.value}: ${isMatch}`
+    );
+    return isMatch;
+  });
+
+  console.log("Filtered files:", filtered);
+  return filtered.map((file) => ({
+    id: file.id,
+    name: file.file_name,
+    fileId: file.file_id,
+  }));
+});
+
+const openFileModal = (files, event, mentorId) => {
   event.stopPropagation();
-  currentFiles.value = files;
+  console.log("Opening modal for mentor:", mentorId);
+  selectedMentorId.value = mentorId;
+  console.log("filteredFiles:", filteredFiles.value);
   isFileModalOpen.value = true;
 };
 
@@ -107,12 +149,61 @@ onMounted(() => {
   document.addEventListener("click", closePopups);
   todaySchedule.value = props.schedule;
   upcommingSchedule.value = props.upcomingSchedule;
-  console.log("props: ", props);
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", closePopups);
 });
+
+const previewFile = (fileId) => {
+  const response = axios
+    .get("http://localhost:8000/api/preview/file/" + fileId, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    })
+    .then((response) => {
+      console.log("File URL:", response.data.url);
+      window.open(response.data.webViewLink, "_blank");
+    })
+    .catch((error) => {
+      console.error("Error fetching file URL:", error);
+    });
+};
+
+const downloadFile = async (fileId, fileName) => {
+  axios
+    .get("http://localhost:8000/api/download/file/" + fileId, {
+      responseType: "blob",
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    })
+    .then((response) => {
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName; // Use the fileName parameter instead of file.file_name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
+      console.log("File downloaded successfully.");
+    })
+    .catch((error) => {
+      console.error("Error downloading file:", error);
+    });
+};
 </script>
 
 <template>
@@ -174,7 +265,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel Session</p>
+                      <p class="option-text" @click="cancelSession(item.id)">
+                        Cancel Session
+                      </p>
                     </div>
                   </div>
                 </transition>
@@ -211,7 +304,9 @@ onUnmounted(() => {
                   size="2x"
                   color="#f72197"
                   class="file-icon"
-                  @click="openFileModal(item.files, $event)"
+                  @click="
+                    openFileModal(item.files, $event, item.mentor.ment_inf_id)
+                  "
                 />
                 <font-awesome-icon
                   icon="fa-envelope"
@@ -277,7 +372,9 @@ onUnmounted(() => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">Cancel</p>
+                      <p class="option-text" @click="cancelSession(item.id)">
+                        Cancel Session
+                      </p>
                     </div>
                   </div>
                 </transition>
@@ -314,7 +411,9 @@ onUnmounted(() => {
                   size="2x"
                   color="#f72197"
                   class="file-icon"
-                  @click="openFileModal(item.files, $event)"
+                  @click="
+                    openFileModal(item.files, $event, item.mentor.ment_inf_id)
+                  "
                 />
                 <font-awesome-icon
                   icon="fa-envelope"
@@ -341,23 +440,34 @@ onUnmounted(() => {
       <div v-if="isFileModalOpen" class="file-modal">
         <div class="file-modal-content">
           <div class="file-modal-header">
-            <h2>Available Files</h2>
+            <h2>Mentor's Files</h2>
             <button @click="closeFileModal" class="close-button">
               <font-awesome-icon icon="fa-times" />
             </button>
           </div>
           <div class="file-list">
-            <div
-              v-for="(file, index) in currentFiles"
-              :key="index"
-              class="file-item"
-            >
-              <font-awesome-icon icon="fa-file" class="file-icon" />
+            <div v-if="filteredFiles.length === 0" class="no-files">
+              <p>No files available from this mentor</p>
+            </div>
+            <div v-for="file in filteredFiles" :key="file.id" class="file-item">
+              <font-awesome-icon icon="file" class="file-icon" />
               <span class="file-name">{{ file.name }}</span>
-              <a :href="file.url" download class="download-button">
-                <font-awesome-icon icon="fa-download" />
-                Download
-              </a>
+              <div class="file-actions">
+                <button
+                  class="action-button preview"
+                  @click="previewFile(file.fileId)"
+                  title="Preview"
+                >
+                  <font-awesome-icon icon="eye" />
+                </button>
+                <button
+                  class="action-button download"
+                  @click="downloadFile(file.fileId, file.name)"
+                  title="Download"
+                >
+                  <font-awesome-icon icon="download" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -643,12 +753,13 @@ onUnmounted(() => {
 .file-item {
   display: flex;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
 }
 
-.file-item:last-child {
-  border-bottom: none;
+.file-item:hover {
+  background-color: #f8f8f8;
 }
 
 .file-icon {
@@ -659,8 +770,8 @@ onUnmounted(() => {
 }
 
 .file-name {
+  margin: 0 12px;
   flex-grow: 1;
-  color: #333;
 }
 
 .download-button {
@@ -679,5 +790,11 @@ onUnmounted(() => {
 
 .download-button:hover {
   background-color: #0c434d;
+}
+
+.no-files {
+  text-align: center;
+  padding: 20px;
+  color: #666;
 }
 </style>

@@ -2,7 +2,10 @@
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
 import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
+
+const router = useRouter();
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -69,6 +72,27 @@ const sessionInfo = async () => {
     return null;
   }
 };
+
+const sessionForReview = async () => {
+  try {
+    const pastSessionDeets = await axios
+      .get(`http://localhost:8000/api/learner/doneSched`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("done session details:", response.data);
+        schedForReview.value = response.data.schedules_done;
+      });
+  } catch (error) {
+    console.error("Error fetching session details:", error);
+    return null;
+  }
+};
 const mentorProfile = async () => {
   try {
     await axios
@@ -84,7 +108,7 @@ const mentorProfile = async () => {
         console.log("Mentor profiles fetched successfully: ", response.data);
         if (response.status === 200) {
           users.value = response.data.map((item) => ({
-            id: item.user.id,
+            id: item.mentor_infos.mentor_no,
             userName: item.user.name,
             yearLevel: item.mentor_infos.year,
             course: item.mentor_infos.course,
@@ -94,6 +118,7 @@ const mentorProfile = async () => {
             availability: JSON.parse(item.mentor_infos.availability),
             rating_ave: item.mentor_infos.rating_ave || 0,
             bio: item.mentor_infos.bio,
+            exp: item.mentor_infos.exp,
             prefSessDur: item.mentor_infos.prefSessDur,
             teach_sty: JSON.parse(item.mentor_infos.teach_sty || "[]"),
             credentials: item.mentor_infos.credentials || [],
@@ -102,6 +127,90 @@ const mentorProfile = async () => {
       });
   } catch (error) {
     console.error("Error fetching mentor profiles:", error);
+  }
+};
+
+const registerMentorRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/set/2nd_role", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Mentor registration:", response.data);
+        router.push("/mentor-info/alt");
+      });
+  } catch (error) {
+    console.error("Error registering as learner:", error);
+    return null;
+  }
+};
+
+const switchRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/switch", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Role switched:", response.data);
+        router.push("/login");
+      });
+  } catch (error) {
+    console.error("Error switching role:", error);
+    return null;
+  }
+};
+
+const mentFiles = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/learner/mentFiles", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Mentor files:", response.data);
+        return response.data;
+      });
+    return response;
+  } catch (error) {
+    console.error("Error fetching mentor files:", error);
+    return null;
+  }
+};
+
+const fetchMentFiles = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8000/api/learner/mentFiles",
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+    console.log("Mentor files fetched:", response.data);
+    mentorFiles.value = response.data;
+  } catch (error) {
+    console.error("Error fetching mentor files:", error);
   }
 };
 
@@ -128,8 +237,10 @@ const userData = ref({
   },
 });
 
+const schedForReview = ref([]);
 const todaySchedule = ref([]);
 const upcommingSchedule = ref([]);
+const mentorFiles = ref([]);
 
 const isEdit = ref(false);
 const users = ref([]);
@@ -256,6 +367,8 @@ onMounted(async () => {
   await getLearnerDets();
   await sessionInfo();
   await mentorProfile();
+  await sessionForReview();
+  await fetchMentFiles(); // Changed from mentFiles() to fetchMentFiles()
   console.log("User data:", userData.value);
 });
 </script>
@@ -275,7 +388,7 @@ onMounted(async () => {
         />
       </div>
       <div>
-        <h2>{{ userData.learn.name }}</h2>
+        <h2>{{ userData.user.name }}</h2>
         <i
           ><p>{{ userData.learn.year }}</p></i
         >
@@ -286,11 +399,15 @@ onMounted(async () => {
     </div>
     <!--<div class="wave-curve"></div>-->
     <div class="footer-element">
-      <div class="biogoals-container">
+      <div class="bio-container">
         <h1>BIO</h1>
         <div>
-          <p>{{ userData.learn.bio }}</p>
+          <p style="white-space: normal; word-break: break-all">
+            {{ userData.learn.bio }}
+          </p>
         </div>
+      </div>
+      <div class="goals-container">
         <h1>LEARNING GOALS</h1>
         <div>
           <p>{{ userData.learn.goals }}</p>
@@ -318,11 +435,11 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="s-interest">
+      <div class="subject-interest">
         <h1>Subject of Interest</h1>
         <div class="course-grid">
           <div
-            v-for="(card, index) in displayedCourses"
+            v-for="(card, index) in userData.learn.subjects"
             :key="index"
             class="course-card"
           >
@@ -363,6 +480,10 @@ onMounted(async () => {
         <button @click="openEditInformation">
           {{ isEdit ? "Save" : "Edit" }}
         </button>
+      </div>
+      <div>
+        <button @click="registerMentorRole">Register as Mentor</button>
+        <button @click="switchRole">switch Account Role</button>
       </div>
     </div>
   </div>
@@ -406,12 +527,14 @@ onMounted(async () => {
       :userData="userData"
       :upcomingSchedule="upcommingSchedule"
       :schedule="todaySchedule"
+      :schedForReview="schedForReview"
+      :mentFiles="mentorFiles"
     />
   </div>
 
   <Transition name="fade" mode="out-in">
     <div v-if="isEdit" class="edit-information-popup">
-      <Information @close="openEditInformation" />
+      <Information :userData="userData" @close="openEditInformation" />
     </div>
   </Transition>
 
