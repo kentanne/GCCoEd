@@ -466,6 +466,7 @@ export default {
   max-height: 465px; 
   height: 460px; 
  overflow-y: auto;
+   margin-top: 2rem;
 
 }
 

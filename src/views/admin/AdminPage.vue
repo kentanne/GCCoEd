@@ -1,106 +1,122 @@
 <template>
   <div class="profile-page">
-    <!-- Top bar -->
-    <header class="header">
-      <div class="header-content">
-        <img
-          alt="Profile image"
-          class="profile-image"
-          src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
-        />
-        <div class="profile-info">
-          <p class="profile-name">Barry D. Allen</p>
-          <p class="profile-position">Program Coordinator</p>
-          <p class="profile-degree">
-            Bachelor of Science in Information Technology
-          </p>
-          <p class="profile-college">College of Computer Studies</p>
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="profile-section">
+        <div class="avatar-container">
+          <img 
+            alt="Profile image"
+            class="avatar"
+            src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
+          />
+        </div>
+        <div class="profile-meta">
+          <h1 class="profile-name">Barry D. Allen</h1>
+          <p class="profile-title">Program Coordinator</p>
+          <p class="profile-details">BS Information Technology • College of Computer Studies</p>
         </div>
       </div>
-      <div class="logout-button" @click="handleLogout">
-        <i class="logout-icon"></i>
-        <span class="logout-text">LOGOUT</span>
+      <div class="current-date">
+        {{ currentDate }}
       </div>
     </header>
 
-    <main class="main-content">
-      <!-- Gradient backgrounds -->
-      <div class="gradient-shape top-gradient"></div>
-      <div class="gradient-shape bottom-gradient"></div>
+    <!-- Main Content -->
+    <div class="main-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <nav class="app-navigation">
+          <button 
+            class="nav-btn"
+            :class="{ 'active': activeTab === 'dashboard' }"
+            @click="activeTab = 'dashboard'"
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z" />
+            </svg>
+            Dashboard
+          </button>
+          <button 
+            class="nav-btn"
+            :class="{ 'active': activeTab === 'application' }"
+            @click="activeTab = 'application'"
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>
+            Applications
+          </button>
+          <button
+            class="nav-btn"
+            :class="{ 'active': activeTab === 'users' }"
+            @click="activeTab = 'users'"
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+            </svg>
+            Users
+          </button>
+          
+          <!-- Logout button moved to bottom of sidebar -->
+          <div class="nav-bottom">
+            <button class="nav-btn logout-btn" @click="handleLogout">
+              <svg class="nav-icon" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
 
-      <!-- All three buttons always visible -->
-      <div class="buttons-container">
-        <button
-          class="action-button"
-          :class="{ 'active-tab': activeTab === 'dashboard' }"
-          @click="activeTab = 'dashboard'"
-        >
-          DASHBOARD
-        </button>
-        <button
-          class="action-button"
-          :class="{ 'active-tab': activeTab === 'application' }"
-          @click="activeTab = 'application'"
-        >
-          APPLICATIONS
-        </button>
-        <button
-          class="action-button"
-          :class="{ 'active-tab': activeTab === 'users' }"
-          @click="activeTab = 'users'"
-        >
-          USERS
-        </button>
-      </div>
+      <!-- Content Area -->
+      <main class="content-area">
+        <!-- Dashboard shown by default -->
+        <dashboard 
+          v-if="activeTab === 'dashboard'" 
+          :stats="stats" 
+        />
 
-      <!-- Dashboard shown by default -->
-      <dashboard v-if="activeTab === 'dashboard'" :stats="stats" />
+        <!-- Applications table -->
+        <application v-if="activeTab === 'application'" />
 
-      <!-- Applications table -->
-      <application v-if="activeTab === 'application'" />
-
-      <!-- Users table -->
-      <users v-if="activeTab === 'users'" />
-    </main>
+        <!-- Users table -->
+        <users v-if="activeTab === 'users'" />
+      </main>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
-import dashboard from "@/components/adminpage/dashboard.vue";
-import application from "@/components/adminpage/application.vue";
-import users from "@/components/adminpage/users.vue";
-import axios from "axios";
+<script>
+import { ref } from 'vue'
+import dashboard from '@/components/adminpage/dashboard.vue'
+import application from '@/components/adminpage/application.vue'
+import users from '@/components/adminpage/users.vue'
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+export default {
+  components: { dashboard, application, users },
+  setup() {
+    const activeTab = ref('dashboard')
+    const stats = ref({
+      learners: 1245,
+      mentors: 86,
+      applicants: 324
+    })
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
+    const handleLogout = () => {
+      console.log('Logout clicked')
+    }
 
-const fetchAll = async () => {
-  try {
-    const response = await axios
-      .get("http://localhost:8000/api/admin", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      })
-      .then((response) => {
-        console.log("pre-fetched:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  } catch (error) {
-    console.error(error);
+    // Get current date in readable format
+    const currentDate = ref(new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }))
+
+    return { activeTab, stats, handleLogout, currentDate }
+
   }
 };
 
@@ -144,241 +160,189 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
+:root {
+  --primary: #4361ee;       /* Vibrant blue */
+  --primary-light: #4895ef; /* Lighter blue */
+  --primary-dark: #3f37c9;  /* Darker blue */
+  --secondary: #f8f9fa;     /* Light gray background */
+  --sidebar-bg: #1c3858;    /* Dark navy for sidebar */
+  --sidebar-bottom: #0f2438; /* Even darker for bottom section */
+  --accent: #7209b7;        /* Purple accent */
+  --text: #2b2d42;         /* Dark text */
+  --text-light: #8d99ae;    /* Light text */
+  --white: #ffffff;
+  --border: #e9ecef;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
 
-.content-area {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .profile-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #0c434d;
-  padding: 1.5rem 2rem;
-  height: 90px;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  width: 85%;
-}
-
-.profile-image {
-  width: 6rem;
-  height: 6rem;
-  border-radius: 9999px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.profile-info {
-  color: white;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  height: 100vh; 
+  background-color: var(--secondary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden; 
+}
+
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0; 
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.avatar-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-name {
-  font-weight: 800;
-  font-style: italic;
-  font-size: 1.5rem;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.profile-position,
-.profile-degree,
-.profile-college {
-  font-style: italic;
-  font-size: 14px;
-  font-weight: 400;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.logout-button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 300;
-  letter-spacing: 0.025em;
-  user-select: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-left: 1rem;
-}
-
-.logout-icon::before {
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  content: "\f2f5";
-  font-size: 1.875rem;
-}
-
-.logout-text {
-  margin-top: 0.25rem;
-}
-
-.main-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem 2rem 5rem;
-  min-height: calc(100vh - 88px);
-}
-
-.gradient-shape {
-  position: absolute;
-  width: 24rem;
-  height: 24rem;
-  background-color: #3b9aa9;
-  opacity: 0.2;
-  border-radius: 9999px;
-  filter: blur(120px);
-  pointer-events: none;
-}
-
-.top-gradient {
-  top: 0;
-  left: 0;
-  transform: translate(-5rem, -5rem);
-}
-
-.bottom-gradient {
-  bottom: 0;
-  right: 0;
-  transform: translate(5rem, 5rem);
-}
-
-.buttons-container {
-  display: flex;
-  gap: 3rem;
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 600px;
-  justify-content: center;
-  margin-bottom: 2.5rem;
-}
-
-.action-button {
-  font-weight: 800;
-  color: white;
-  font-size: 1rem;
-  border-radius: 9999px;
-  padding: 0.75rem 2rem;
-  background-image: linear-gradient(to right, #6dd1e3, #0b3e8a);
-  transition: all 0.3s ease;
-  width: 200px;
-  text-align: center;
-  border: none;
-  cursor: pointer;
-}
-
-.action-button:hover {
-  background-image: linear-gradient(to right, #0b3e8a, #6dd1e3);
-}
-
-.dashboard-cards {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-  width: 100%;
-  max-width: 1200px;
-  z-index: 10;
-  position: relative;
-}
-
-.dashboard-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-  padding: 2rem;
-  width: 280px;
-  height: 280px;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15);
-}
-
-.card-text {
-  margin-bottom: 1.5rem;
-}
-
-.card-title {
   font-size: 1.25rem;
-  color: #384869;
-  margin: 0 0 1rem 0;
+  font-weight: 600;
+  color: rgb(43, 64, 93);
+  margin-bottom: 0.25rem;
+}
+
+.profile-title {
+  font-size: 0.875rem;
+  color: rgba(60, 80, 114, 0.9);
   font-weight: 500;
-  text-align: center;
+  margin-bottom: 0.25rem;
 }
 
-.card-divider {
-  border: 0;
-  height: 4px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(59, 154, 169, 0.5),
-    transparent
-  );
-  margin: 0.5rem 0;
+.profile-details {
+  font-size: 0.75rem;
+  color: rgba(44, 59, 106, 0.7);
 }
 
-.card-number-container {
-  position: relative;
-  flex-grow: 1;
+.current-date {
+  font-size: 0.875rem;
+  color: rgba(42, 67, 98, 0.9);
+  font-weight: 500;
+  background-color: #d4d7dd;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+/* Main Container */
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden; 
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 220px;
+  background-color: rgb(40, 70, 86);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  margin-right: 2.5rem;
+  flex-shrink: 0; 
+}
+
+/* Sidebar Navigation */
+.app-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  flex: 1;
+  margin-top: 1.5rem;
+}
+
+.nav-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: rgba(253, 253, 253, 0.8);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
 }
 
-.card-icon {
-  position: absolute;
-  font-size: 8rem;
-  color: rgba(59, 154, 169, 0.2);
-  z-index: 0;
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.712);
+  color: var(--white);
 }
 
-.card-value {
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: #0b2548;
-  margin: 0;
-  line-height: 1;
-  position: relative;
-  z-index: 1;
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.712);
+  color: black;
+  box-shadow: 0 4px 12px rgba(114, 9, 183, 0.3);
 }
 
-.active-tab {
-  background-image: linear-gradient(to right, #0b3e8a, #3b9aa9) !important;
-  box-shadow: 0 0 15px rgba(59, 154, 169, 0.5);
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+}
+
+/* Nav bottom section */
+.nav-bottom {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.693);
+}
+
+/* Content Area */
+.content-area {
+  flex: 1;
+  background-color: var(--white);
+  border-radius: 12px 0 0 0;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  overflow-y: auto; 
+  margin: 1.5rem 1.5rem 1.5rem 0;
 }
 </style>
+

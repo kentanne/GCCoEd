@@ -40,6 +40,10 @@
             class="search-input"
           >
         </div>
+        <button class="export-btn" @click="exportUsersToCSV">
+          <i class="fas fa-download"></i> Export
+        </button>
+
       </div>
     </div>
     
@@ -214,7 +218,8 @@
                         <button class="action-btn preview">
                           <i class="fas fa-eye"></i> Preview
                         </button>
-                        <button class="action-btn download">
+                        <button class="action-btn download" @click="downloadFile(file)">
+
                           <i class="fas fa-download"></i> Download
                         </button>
                       </div>
@@ -281,6 +286,10 @@
             <button class="footer-btn back" @click="hideUserDetails">
               <i class="fas fa-arrow-left"></i> Back to Users
             </button>
+            <button class="footer-btn export" @click="exportUserToPDF(currentUser)">
+              <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+
           </div>
         </div>
       </div>
@@ -288,8 +297,13 @@
   </div>
 </template>
 
+
 <script>
 import { ref, computed } from 'vue';
+import * as XLSX from 'xlsx';
+import html2pdf from 'html2pdf.js';
+import logoGccoed from '@/assets/logo_gccoed.png';
+
 
 export default {
   setup() {
@@ -374,6 +388,291 @@ export default {
       showUserModal.value = false;
     };
 
+    const exportUsersToCSV = () => {
+      const data = displayedUsers.value.map(user => ({
+        ID: user.id,
+        Name: user.name,
+        Email: user.email,
+        Year: user.year || 'N/A',
+        Program: user.program || 'N/A',
+        Role: user.role,
+        Phone: user.phone || 'N/A',
+        Department: user.department || 'N/A',
+        Gender: user.gender || 'N/A',
+        Address: user.address || 'N/A'
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      
+      const colWidths = [
+        { wch: 8 }, { wch: 25 }, { wch: 30 }, 
+        { wch: 10 }, { wch: 20 }, { wch: 12 },
+        { wch: 20 }, { wch: 25 }, { wch: 10 }, 
+        { wch: 30 }
+      ];
+      worksheet['!cols'] = colWidths;
+      
+      const headerRange = XLSX.utils.decode_range(worksheet['!ref']);
+      for(let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({r: headerRange.s.r, c: C});
+        if(!worksheet[cellAddress]) continue;
+        worksheet[cellAddress].s = { 
+          font: { bold: true },
+          alignment: { horizontal: 'center' },
+          fill: { fgColor: { rgb: "D3D3D3" } }
+        };
+      }
+      
+      for(let R = headerRange.s.r + 1; R <= headerRange.e.r; ++R) {
+        worksheet['!rows'] = worksheet['!rows'] || [];
+        worksheet['!rows'][R] = { hpx: 20 };
+      }
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+      
+      let reportType = 'users';
+      if (activeFilter.value === 'mentors') reportType = 'mentors';
+      if (activeFilter.value === 'learners') reportType = 'learners';
+      const formattedDate = new Date().toISOString().slice(0, 10);
+      
+      XLSX.writeFile(workbook, `${reportType}_report_${formattedDate}.xlsx`);
+    };
+
+    const exportUserToPDF = async (user) => {
+      const element = document.createElement('div');
+      
+      // Convert logo to base64
+      const getBase64Logo = () => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+          };
+          img.src = logoGccoed;
+        });
+      };
+
+      const logoBase64 = await getBase64Logo();
+
+      element.innerHTML = `
+        <style>
+          .pdf-header {
+            text-align: center; 
+            margin-bottom: 20px;
+          }
+          .logo-container {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 10px;
+          }
+          .logo {
+            height: 80px;
+            margin-right: 20px;
+          }
+          .institution-name {
+            margin: 0; 
+            color: #0B3E8A; 
+            font-size: 24px;
+          }
+          .institution-sub {
+            margin: 0; 
+            color: #3B9AA9; 
+            font-size: 20px;
+          }
+          .report-title {
+            color: #0B3E8A; 
+            border-top: 2px solid #0B3E8A; 
+            border-bottom: 2px solid #0B3E8A; 
+            padding: 5px 0; 
+            margin: 0 auto; 
+            width: 80%;
+          }
+          .user-title {
+            color: #3B9AA9; 
+            border-bottom: 2px solid #3B9AA9; 
+            padding-bottom: 5px; 
+            margin-top: 20px;
+          }
+          .section-title {
+            color: #0B3E8A; 
+            margin-top: 20px;
+          }
+          .info-table {
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px;
+          }
+          .info-table td {
+            padding: 8px; 
+            border: 1px solid #ddd;
+          }
+          .info-label {
+            width: 30%; 
+            font-weight: bold; 
+            background-color: #f5f5f5;
+          }
+          .pdf-footer {
+            margin-top: 40px; 
+            text-align: center; 
+            color: #666; 
+            font-size: 12px; 
+            border-top: 1px solid #eee; 
+            padding-top: 10px;
+          }
+        </style>
+
+        <div class="pdf-header">
+          <div class="logo-container">
+            <img src="${logoBase64}" alt="GCCOED Logo" class="logo">
+            <div>
+              <h1 class="institution-name">GCCoEd</h1>
+              <h2 class="institution-sub">College of Computer Studies</h2>
+            </div>
+          </div>
+          <h3 class="report-title">User Report</h3>
+        </div>
+        
+        <h2 class="user-title">
+          ${user.name} <span style="font-size: 16px; color: #666;">(${user.role})</span>
+        </h2>
+        
+        <h3 class="section-title">Basic Information</h3>
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Email</td>
+            <td>${user.email}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Contact Number</td>
+            <td>${user.phone || 'Not provided'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Year Level</td>
+            <td>${user.year || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Program</td>
+            <td>${user.program || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Department</td>
+            <td>${user.department || 'College of Computer Studies'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Gender</td>
+            <td>${user.gender || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Address</td>
+            <td>${user.address || 'Not provided'}</td>
+          </tr>
+        </table>
+        
+        ${user.role === 'Mentor' ? `
+        <h3 class="section-title">Teaching Information</h3>
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Teaching Modality</td>
+            <td>${user.teachingModality || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Days of Availability</td>
+            <td>${user.availability || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Proficiency Level</td>
+            <td>${user.proficiency || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Teaching Style</td>
+            <td>${user.teachingStyle || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Preferred Session Duration</td>
+            <td>${user.sessionDuration || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Course Offered</td>
+            <td>${user.coursesOffered || 'Not specified'}</td>
+          </tr>
+        </table>
+        
+        <h3 class="section-title">Bio & Experience</h3>
+        <p style="margin-bottom: 10px;"><strong>Short Bio:</strong></p>
+        <p style="margin-bottom: 20px;">${user.bio || 'No bio provided'}</p>
+        <p style="margin-bottom: 10px;"><strong>Tutoring Experience:</strong></p>
+        <p>${user.experience || 'No experience provided'}</p>
+        ` : ''}
+        
+        ${user.role === 'Learner' ? `
+        <h3 class="section-title">Learning Preferences</h3>
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Learning Modality</td>
+            <td>${user.learningModality || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Days of Availability</td>
+            <td>${user.availability || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Learning Style</td>
+            <td>${user.learningStyle || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Preferred Session Duration</td>
+            <td>${user.sessionDuration || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Subjects of Interest</td>
+            <td>${user.subjectsInterest || 'Not specified'}</td>
+          </tr>
+        </table>
+        
+        <h3 class="section-title">Bio & Goals</h3>
+        <p style="margin-bottom: 10px;"><strong>Short Bio:</strong></p>
+        <p style="margin-bottom: 20px;">${user.bio || 'No bio provided'}</p>
+        <p style="margin-bottom: 10px;"><strong>Learning Goals:</strong></p>
+        <p>${user.learningGoals || 'No goals provided'}</p>
+        ` : ''}
+        
+        <div class="pdf-footer">
+          <p>GCCoEd</p>
+          <p>Generated on ${new Date().toLocaleDateString()}</p>
+        </div>
+      `;
+
+      const opt = {
+        margin: 10,
+        filename: `user_${user.id}_${user.name.replace(' ', '_')}_report.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          logging: true,
+          useCORS: true
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait' 
+        }
+      };
+
+      html2pdf().from(element).set(opt).save();
+    };
+
+    const downloadFile = (file) => {
+      alert(`Downloading file: ${file.name}`);
+    };
+
+
     return {
       searchQuery,
       activeFilter,
@@ -381,11 +680,15 @@ export default {
       showUserDetails,
       hideUserDetails,
       showUserModal,
-      currentUser
+      currentUser,
+      exportUsersToCSV,
+      exportUserToPDF,
+      downloadFile
     };
   }
 };
 </script>
+
 
 <style scoped>
 :root {
@@ -414,6 +717,10 @@ export default {
   max-height: 465px; 
   height: 460px; 
   overflow-y: auto;
+     margin-top: 2rem;
+
+
+
 }
 
 .table-header {
@@ -998,6 +1305,40 @@ export default {
 .footer-btn.suspend:hover {
   background-color: rgba(244, 67, 54, 0.2);
 }
+
+.export-btn {
+  padding: 0.5rem 1rem;
+  background-color: #203d4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+  background-color: #366177;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.footer-btn.export {
+  background-color: #e53935;
+  color: white;
+  border: none;
+}
+
+.footer-btn.export:hover {
+  background-color: #c62828;
+}
+
 
 /* Action Modal */
 .action-modal {
