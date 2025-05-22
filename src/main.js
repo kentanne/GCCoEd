@@ -15,6 +15,7 @@ import {
   faCommentDots,
   faEllipsisH,
   faEnvelope,
+  faEye,
   faFileArrowUp,
   faFileLines,
   faLifeRing,
@@ -24,6 +25,8 @@ import {
   faTimes,
   faUser,
   faX,
+  faFile,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle, faLine } from "@fortawesome/free-brands-svg-icons";
 
@@ -45,7 +48,10 @@ library.add(
   faFileLines,
   faFileArrowUp,
   faRightFromBracket,
-  faLink
+  faLink,
+  faEye,
+  faFile,
+  faDownload
 );
 
 // import App from "./App.vue";
