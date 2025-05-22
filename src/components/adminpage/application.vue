@@ -12,6 +12,7 @@
           :class="{ active: activeFilter === 'all' }"
           @click="activeFilter = 'all'"
         >
+        
           All
         </button>
         <button 

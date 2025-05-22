@@ -16,7 +16,6 @@
           </div>
         </div>
       </div>
-      
       <div class="dashboard-card mentors">
         <div class="card-bg-pattern"></div>
         <div class="card-content">

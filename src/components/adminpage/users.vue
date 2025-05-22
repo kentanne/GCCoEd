@@ -5,7 +5,6 @@
         <i class="fas fa-users header-icon"></i>
         Users
       </h2>
-      
       <div class="filter-buttons">
         <button 
           class="filter-btn" 
