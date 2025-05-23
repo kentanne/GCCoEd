@@ -5,6 +5,7 @@
       <div class="profile-section">
         <div class="avatar-container">
           <img
+            <img
             alt="Profile image"
             class="avatar"
             src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
@@ -23,7 +24,6 @@
       </div>
     </header>
 
-    
     <!-- Main Content -->
     <div class="main-container">
       <!-- Sidebar Navigation -->
