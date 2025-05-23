@@ -39,6 +39,7 @@ const userInfo = async (id) => {
       })
       .then((response) => {
         console.log("user details:", response.data);
+        mentor_no.value = response.data.user_info.mentor_no;
         name.value = response.data.user.name;
         year.value = response.data.user_info.year;
         course.value = response.data.user_info.course;
@@ -54,6 +55,19 @@ const userInfo = async (id) => {
         sessionDur.value = response.data.user_info.prefSessDur;
         goal.value = response.data.user_info.exp;
         profilePic.value = response.data.user_info.image;
+        userDeetsForSched.value = [
+          mentor_no.value, // mentorNo
+          name.value, // mentorName
+          year.value, // mentorYear
+          course.value, // mentorCourse
+          sessionDur.value, // mentorSessionDur
+          modality.value, // mentorModality
+          learnStyle.value, // mentorTeachStyle
+          availability.value, // mentorAvailability
+          modality.value, // mentorLearnModality
+          profilePic.value, // mentorProfilePic
+          subjects.value, // mentorSubjects
+        ];
       });
   } catch (error) {
     console.error("Error fetching user details:", error);
@@ -61,6 +75,8 @@ const userInfo = async (id) => {
   }
 };
 
+const userDeetsForSched = ref();
+const mentor_no = ref();
 const name = ref();
 const year = ref();
 const course = ref();
@@ -164,7 +180,7 @@ onMounted(() => {
 
   <!-- Schedule Popup -->
   <div v-if="showSchedule" class="popup-overlay">
-    <Schedule @close="showSchedule = false" />
+    <Schedule @close="showSchedule = false" :info="userDeetsForSched" />
   </div>
 </template>
 
@@ -174,7 +190,6 @@ onMounted(() => {
   flex-direction: column;
   width: 775px;
   height: 600px;
-  padding: 20px;
   overflow: hidden;
 }
 

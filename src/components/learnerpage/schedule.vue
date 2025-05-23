@@ -1,53 +1,123 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
 
-const emit = defineEmits(['close', 'confirm']);
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-const selectedDate = ref('');
+const props = defineProps({
+  info: {
+    type: Array,
+    required: true,
+  },
+});
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
+
+const emit = defineEmits(["close", "confirm"]);
+
+const selectedDate = ref("");
 const availableTimes = ref([
-  '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', 
-  '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM',
-  '4:00 PM', '5:00 PM'
+  "8:00 AM",
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
 ]);
-const selectedTime = ref('');
-const sessionType = ref('in-person');
-const notes = ref('');
-const meetingLocation = ref('');
+const selectedTime = ref("");
+const sessionType = ref("in-person");
+const notes = ref("");
+const meetingLocation = ref("");
+const selectedSubject = ref(""); // Add this with other refs
 
 // Calendar variables
 const currentDate = ref(new Date());
 const days = ref([]);
 const showYearSelection = ref(false);
 
-const confirmSchedule = () => {
-  if (!selectedDate.value || !selectedTime.value) {
-    alert('Please select both date and time');
+const confirmSchedule = async () => {
+  if (!selectedDate.value || !selectedTime.value || !selectedSubject.value) {
+    alert("Please select date, time and subject");
     return;
   }
-  
+
+  // Format date to match required format MM/DD/YYYY
+  const formattedDate = new Date(selectedDate.value).toLocaleDateString(
+    "en-US",
+    {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    }
+  );
+
+  // Extract hour and format time HH:MM
+  const timeMatch = selectedTime.value.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  let hours = parseInt(timeMatch[1]);
+  const minutes = timeMatch[2];
+  const period = timeMatch[3].toUpperCase();
+
+  if (period === "PM" && hours < 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+
+  const formattedTime = `${String(hours).padStart(2, "0")}:${minutes}`;
+
+  // Create the JSON structure with subject included
   const scheduleData = {
-    date: selectedDate.value,
-    time: selectedTime.value,
-    type: sessionType.value,
-    location: meetingLocation.value,
-    notes: notes.value
+    participant_id: mentorNo,
+    date: formattedDate,
+    time: formattedTime,
+    location:
+      sessionType.value === "in-person" ? meetingLocation.value : "online",
+    subject: selectedSubject.value, // Add subject to the payload
   };
-  
-  emit('confirm', scheduleData);
-  emit('close');
+
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/learner/scheduleCreate",
+      scheduleData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+
+    // Debug logs
+    console.log("Selected Subject:", selectedSubject.value);
+    console.log("Schedule Data:", scheduleData);
+
+    emit("confirm", scheduleData);
+    emit("close");
+  } catch (error) {
+    console.error("Error in schedule confirmation:", error);
+  }
 };
 
 // Generate years for selection (±5 years from current)
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
-  return Array.from({length: 11}, (_, i) => currentYear - 5 + i);
+  return Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 });
 
 // Format date as YYYY-MM-DD for the input
 const formatDateForInput = (date) => {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -55,52 +125,56 @@ const formatDateForInput = (date) => {
 const generateDays = () => {
   const year = currentDate.value.getFullYear();
   const month = currentDate.value.getMonth();
-  
+
   // First day of the month
   const firstDay = new Date(year, month, 1);
   // Last day of the month
   const lastDay = new Date(year, month + 1, 0);
-  
+
   // Days from previous month to show
   const prevMonthDays = firstDay.getDay();
-  
+
   // Days from next month to show
   const nextMonthDays = 6 - lastDay.getDay();
-  
+
   days.value = [];
-  
+
   // Add previous month's days
   const prevMonthLastDay = new Date(year, month, 0).getDate();
-  for (let i = prevMonthLastDay - prevMonthDays + 1; i <= prevMonthLastDay; i++) {
+  for (
+    let i = prevMonthLastDay - prevMonthDays + 1;
+    i <= prevMonthLastDay;
+    i++
+  ) {
     const date = new Date(year, month - 1, i);
-    days.value.push({ 
+    days.value.push({
       date,
       isCurrentMonth: false,
       isSelected: false,
-      isToday: isToday(date)
+      isToday: isToday(date),
     });
   }
-  
+
   // Add current month's days
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const date = new Date(year, month, i);
     const dateString = formatDateForInput(date);
-    days.value.push({ 
+    days.value.push({
       date,
       isCurrentMonth: true,
       isSelected: selectedDate.value === dateString,
-      isToday: isToday(date)
+      isToday: isToday(date),
     });
   }
-  
+
   // Add next month's days
   for (let i = 1; i <= nextMonthDays; i++) {
     const date = new Date(year, month + 1, i);
-    days.value.push({ 
+    days.value.push({
       date,
       isCurrentMonth: false,
       isSelected: false,
-      isToday: isToday(date)
+      isToday: isToday(date),
     });
   }
 };
@@ -113,7 +187,7 @@ const selectDate = (day) => {
     currentDate.value = new Date(newDate.getFullYear(), newDate.getMonth(), 1);
     generateDays();
   }
-  
+
   selectedDate.value = formatDateForInput(day.date);
   generateDays();
 };
@@ -144,21 +218,51 @@ const selectYear = (year) => {
 };
 
 const currentMonthYear = computed(() => {
-  return currentDate.value.toLocaleString('default', { month: 'long', year: 'numeric' });
+  return currentDate.value.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
 });
 
 // Function to check if a date is today
 const isToday = (date) => {
   const today = new Date();
-  return date.getDate() === today.getDate() &&
-         date.getMonth() === today.getMonth() &&
-         date.getFullYear() === today.getFullYear();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
 };
 
 // Initialize the calendar
 onMounted(() => {
   selectedDate.value = formatDateForInput(new Date());
   generateDays();
+});
+
+// First, update the destructuring to match the order from viewUser.vue
+const [
+  mentorNo,
+  mentorName,
+  mentorYear,
+  mentorCourse,
+  mentorSessionDur,
+  mentorModality,
+  mentorTeachStyle,
+  mentorAvailability,
+  mentorLearnModality,
+  mentorProfilePic,
+  mentorSubjects,
+] = props.info || [];
+
+// Parse subjects from mentorTeachStyle string
+const subjectOptions = computed(() => {
+  try {
+    return JSON.parse(mentorSubjects || "[]");
+  } catch (e) {
+    console.error("Error parsing subjects:", e);
+    return [];
+  }
 });
 </script>
 
@@ -171,29 +275,35 @@ onMounted(() => {
       </div>
       <button @click="emit('close')" aria-label="Close" type="button">×</button>
     </div>
-    
+
     <!-- Profile info -->
     <div class="profile">
       <img
         alt="Profile image"
-        src="https://storage.googleapis.com/a1aa/image/63566d83-05ec-418d-7234-c22ea7a13985.jpg"
+        :src="
+          mentorProfilePic
+            ? 'http://localhost:8000/api/image/' + mentorProfilePic
+            : 'https://placehold.co/400x400'
+        "
         width="64"
         height="64"
       />
       <div>
-        <p><strong>Barry D. Allen</strong></p>
-        <p>3rd Year - Bachelor of Science in Computer Science</p>
+        <p>
+          <strong>{{ mentorName }}</strong>
+        </p>
+        <p>{{ mentorYear }} - {{ mentorCourse }}</p>
         <p>College of Computer Studies</p>
       </div>
     </div>
-    
+
     <!-- Main content -->
     <div class="content">
       <!-- Left side -->
       <div class="left">
         <div class="time-header">
           <h2>Select Time Slots</h2>
-          <p>(2 hours duration)</p>
+          <p>({{ mentorSessionDur }} duration)</p>
         </div>
         <div class="time-slots">
           <button
@@ -206,22 +316,24 @@ onMounted(() => {
             {{ time }}
           </button>
         </div>
-        
+
         <h3 class="mode-header">Select Mode of Session</h3>
         <div class="mode-buttons">
-          <button 
-            type="button" 
+          <button
+            type="button"
             @click="sessionType = 'in-person'"
             :class="{ 'mode-active': sessionType === 'in-person' }"
+            :disabled="!mentorModality?.toLowerCase().includes('in-person')"
             class="mode-btn"
           >
             <span aria-label="In Person"><i class="fas fa-user"></i></span>
             <span>In Person</span>
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             @click="sessionType = 'online'"
             :class="{ 'mode-active': sessionType === 'online' }"
+            :disabled="!mentorModality?.toLowerCase().includes('online')"
             class="mode-btn"
           >
             <span aria-label="Online"><i class="fas fa-laptop"></i></span>
@@ -230,33 +342,36 @@ onMounted(() => {
         </div>
 
         <div v-if="sessionType === 'in-person'" class="location-input">
-          <input 
-            type="text" 
-            v-model="meetingLocation" 
+          <input
+            type="text"
+            v-model="meetingLocation"
             placeholder="Enter meeting location"
             class="location-field"
           />
         </div>
       </div>
-      
+
       <!-- Right side - Calendar -->
-      <div class="right" style="margin-left: -20px;">
+      <div class="right" style="margin-left: -20px">
         <div class="calendar">
           <div class="calendar-header">
             <button class="arrow" @click="prevMonth">&lt;</button>
             <div class="month-container">
-              <button class="month" @click="showYearSelection = !showYearSelection">
+              <button
+                class="month"
+                @click="showYearSelection = !showYearSelection"
+              >
                 {{ currentMonthYear }}
               </button>
               <button class="today-btn" @click="goToToday">Today</button>
             </div>
             <button class="arrow" @click="nextMonth">&gt;</button>
           </div>
-          
+
           <!-- Year selection dropdown -->
           <div v-if="showYearSelection" class="year-select">
-            <div 
-              v-for="year in years" 
+            <div
+              v-for="year in years"
               :key="year"
               @click="selectYear(year)"
               :class="{ 'year-active': currentDate.getFullYear() === year }"
@@ -265,36 +380,60 @@ onMounted(() => {
               {{ year }}
             </div>
           </div>
-          
+
           <div class="weekdays">
-            <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day">{{ day }}</div>
+            <div
+              v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+              :key="day"
+            >
+              {{ day }}
+            </div>
           </div>
           <div class="days">
-            <div 
-              v-for="(day, index) in days" 
-              :key="index" 
+            <div
+              v-for="(day, index) in days"
+              :key="index"
               @click="selectDate(day)"
               :class="[
-                'day', 
-                { 
-                  'today': day.isToday,
-                  'selected': day.isSelected,
-                  'current': day.isCurrentMonth,
-                  'other': !day.isCurrentMonth
-                }
+                'day',
+                {
+                  today: day.isToday,
+                  selected: day.isSelected,
+                  current: day.isCurrentMonth,
+                  other: !day.isCurrentMonth,
+                },
               ]"
             >
               {{ day.date.getDate() }}
             </div>
           </div>
         </div>
+
+        <!-- Add this after the calendar div in the right side section -->
+        <div class="subject-select">
+          <h3 class="subject-header">Select Subject</h3>
+          <select v-model="selectedSubject" class="subject-dropdown" required>
+            <option value="" disabled selected>Choose a subject</option>
+            <option
+              v-for="subject in subjectOptions"
+              :key="subject"
+              :value="subject"
+            >
+              {{ subject }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
-    
+
     <!-- Footer buttons -->
     <div class="footer">
-      <button @click="emit('close')" type="button" class="btn-cancel">CANCEL</button>
-      <button @click="confirmSchedule" type="button" class="btn-proceed">PROCEED</button>
+      <button @click="emit('close')" type="button" class="btn-cancel">
+        CANCEL
+      </button>
+      <button @click="confirmSchedule" type="button" class="btn-proceed">
+        PROCEED
+      </button>
     </div>
   </div>
 </template>
@@ -427,6 +566,15 @@ onMounted(() => {
   border: 1px solid #d1d5db;
   background-color: white;
   transition: all 0.2s;
+}
+.mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.mode-btn:disabled:hover {
+  background-color: #f3f4f6;
 }
 .mode-btn:hover {
   background-color: #f3f4f6;
@@ -614,5 +762,31 @@ onMounted(() => {
 }
 .btn-proceed:hover {
   background-color: #1f6d7e;
+}
+.subject-select {
+  margin-top: 1.5rem;
+}
+.subject-header {
+  font-weight: 600;
+  color: #0b3b44;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  user-select: none;
+}
+.subject-dropdown {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #4b5563;
+  cursor: pointer;
+}
+.subject-dropdown:focus {
+  outline: none;
+  border-color: #0b3b44;
+  /* ring: 2px;
+  ring-color: #0b3b44; */
 }
 </style>
