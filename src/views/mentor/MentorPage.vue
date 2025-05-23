@@ -192,6 +192,26 @@ const switchRole = async () => {
   }
 };
 
+const logout = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/logout/web",
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+    console.log("Logout response:", response.data);
+  } catch (error) {
+    console.error("Error during logout:", error);
+  }
+};
+
 // Replace multiple refs with a single userData ref
 const userData = ref({
   user: {
@@ -300,6 +320,8 @@ const filteredUsers = computed(() => {
 const handleLogout = () => {
   alert("User logged out");
   confirmLogout.value = false;
+  logout();
+  router.push("/login");
 };
 
 onMounted(async () => {

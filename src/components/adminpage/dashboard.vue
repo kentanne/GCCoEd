@@ -11,11 +11,12 @@
             <h3 class="card-title">Total Learners</h3>
           </div>
           <p class="card-value">{{ stats.learners.toLocaleString() }}</p>
-          <div class="card-footer"> 
+          <div class="card-footer">
             <button class="card-action">View Details</button>
           </div>
         </div>
       </div>
+
       <div class="dashboard-card mentors">
         <div class="card-bg-pattern"></div>
         <div class="card-content">
@@ -31,7 +32,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="dashboard-card applicants">
         <div class="card-bg-pattern"></div>
         <div class="card-content">
@@ -60,18 +61,18 @@ export default {
       default: () => ({
         learners: 0,
         mentors: 0,
-        applicants: 0
-      })
-    }
-  }
-}
+        applicants: 0,
+      }),
+    },
+  },
+};
 </script>
 
 <style scoped>
 .dashboard-cards-container {
   padding: 2rem;
   width: 100%;
-  height: calc(100vh - 80px); 
+  height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,7 +85,6 @@ export default {
   gap: 2rem;
   width: 100%;
   max-width: 1400px;
-
 }
 
 .dashboard-card {
@@ -106,18 +106,34 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(67, 97, 238, 0.03) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(67, 97, 238, 0.03) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   opacity: 0.5;
 }
 
 .learners .card-bg-pattern {
-  background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(67, 97, 238, 0.05) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 .mentors .card-bg-pattern {
-  background: linear-gradient(135deg, rgba(114, 9, 183, 0.05) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(114, 9, 183, 0.05) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 .applicants .card-bg-pattern {
-  background: linear-gradient(135deg, rgba(58, 12, 163, 0.05) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(58, 12, 163, 0.05) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .dashboard-card:hover {
@@ -185,7 +201,7 @@ export default {
   font-size: 3.5rem;
   font-weight: 700;
   color: var(--text);
-  margin: 1.5rem 0;
+  margin: 0 auto !important;
   line-height: 1;
   flex-grow: 1;
   display: flex;
@@ -198,9 +214,8 @@ export default {
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: center;
-    align-items: center;
+  align-items: center;
 }
-
 
 .card-action {
   background: rgba(0, 0, 0, 0.03);
@@ -212,7 +227,6 @@ export default {
   color: var(--text-light);
   cursor: pointer;
   transition: all 0.2s ease;
-
 }
 
 .card-action:hover {
@@ -226,11 +240,11 @@ export default {
     grid-template-columns: 1fr;
     max-width: 600px;
   }
-  
+
   .dashboard-card {
     height: 240px;
   }
-  
+
   .card-value {
     font-size: 3rem;
   }
@@ -240,14 +254,13 @@ export default {
   .dashboard-cards-container {
     padding: 1.5rem;
   }
-  
+
   .card-content {
     padding: 1.5rem;
   }
-  
+
   .card-value {
     font-size: 2.5rem;
   }
 }
-
 </style>
