@@ -131,24 +131,7 @@ const mentorProfile = async () => {
 };
 
 const registerMentorRole = async () => {
-  try {
-    const response = await axios
-      .post("http://localhost:8000/api/set/2nd_role", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      })
-      .then((response) => {
-        console.log("Mentor registration:", response.data);
-        router.push("/mentor-info/alt");
-      });
-  } catch (error) {
-    console.error("Error registering as learner:", error);
-    return null;
-  }
+  router.push("/mentor-info/alt");
 };
 
 const switchRole = async () => {
@@ -211,6 +194,26 @@ const fetchMentFiles = async () => {
     mentorFiles.value = response.data;
   } catch (error) {
     console.error("Error fetching mentor files:", error);
+  }
+};
+
+const logout = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/logout/web",
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+    console.log("Logout response:", response.data);
+  } catch (error) {
+    console.error("Error during logout:", error);
   }
 };
 
@@ -314,6 +317,8 @@ const filteredUsers = computed(() => {
 const handleLogout = () => {
   alert("User logged out");
   confirmLogout.value = false;
+  logout();
+  router.push("/login");
 };
 
 const createUser = (id, userName, yearLevel, rating = 4) => {

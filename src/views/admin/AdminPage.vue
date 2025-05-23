@@ -5,6 +5,7 @@
       <div class="profile-section">
         <div class="avatar-container">
           <img
+            <img
             alt="Profile image"
             class="avatar"
             src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
@@ -89,82 +90,165 @@
         <dashboard v-if="activeTab === 'dashboard'" :stats="stats" />
 
         <!-- Applications table -->
-        <application v-if="activeTab === 'application'" />
+        <application
+          v-if="activeTab === 'application'"
+          :applicantsList="applicantsList"
+        />
 
         <!-- Users table -->
-        <users v-if="activeTab === 'users'" />
+        <users v-if="activeTab === 'users'" :users="usersFetch" />
+
+        <!-- Add this where you want to display the data -->
+        <div v-if="activeTab === 'users'" class="users-container">
+          <div v-for="user in users" :key="user.id" class="user-item">
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.email }}</p>
+            <!-- Add more user properties as needed -->
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'application'" class="applicants-container">
+          <div
+            v-for="applicant in applicantsList.value"
+            :key="applicant.id"
+            class="applicant-item"
+          >
+            <h3>{{ applicant.name }}</h3>
+            <p>{{ applicant.email }}</p>
+            <!-- Add more applicant properties as needed -->
+          </div>
+        </div>
       </main>
     </div>
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup>
+import { ref, onMounted } from "vue";
 import dashboard from "@/components/adminpage/dashboard.vue";
 import application from "@/components/adminpage/application.vue";
 import users from "@/components/adminpage/users.vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+const Router = useRouter();
 
-export default {
-  components: { dashboard, application, users },
-  setup() {
-    const activeTab = ref("dashboard");
-    const stats = ref({
-      learners: 1245,
-      mentors: 86,
-      applicants: 324,
+// Set axios defaults
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
+// Cookie helper function
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
+
+// Reactive refs
+const activeTab = ref("dashboard");
+const stats = ref({
+  learners: 0,
+  mentors: 0,
+  applicants: 0,
+});
+
+// Add these refs for storing API data
+const usersFetch = ref([]);
+const applicantsList = ref([]);
+
+// Get current date in readable format
+const currentDate = ref(
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+);
+
+// Methods
+const handleLogout = () => {
+  alert("Logout clicked");
+  logout();
+  Router.push("/login");
+};
+
+// Update the fetch functions to store the data
+const fetchAll = async () => {
+  try {
+    const response = await axios.get("http://localhost:8000/api/admin", {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
     });
 
-    const handleLogout = () => {
-      console.log("Logout clicked");
+    // Map the response data to include gender and program/course
+    usersFetch.value = response.data.users.map((user) => ({
+      ...user,
+      gender: user.gender || "N/A",
+      program: user.course || "N/A", // Map course to program
+      role: user.role.toLowerCase(),
+      secondary_role: user.secondary_role?.toLowerCase() || "N/A",
+    }));
+
+    // Update stats
+    stats.value = {
+      learners: response.data.counts.learners || 0,
+      mentors: response.data.counts.approved_mentors || 0,
+      applicants: response.data.counts.pending_mentors || 0,
     };
 
-    // Get current date in readable format
-    const currentDate = ref(
-      new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    );
-
-    return { activeTab, stats, handleLogout, currentDate };
-  },
+    console.log("Users:", usersFetch.value);
+    console.log("Stats:", stats.value);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 };
 
 const fetchApplicants = async () => {
   try {
-    const response = await axios
-      .get("http://localhost:8000/api/admin/applicants", {
+    const response = await axios.get(
+      "http://localhost:8000/api/admin/applicants",
+      {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
-      })
-      .then((response) => {
-        console.log("pre-fetched:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+      }
+    );
+    applicantsList.value = response.data; // Store the applicants data
+    console.log("Applicants:", applicantsList.value);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching data:", error);
   }
 };
 
-const activeTab = ref("dashboard"); // Dashboard shows by default
-const stats = ref({
-  learners: 1245,
-  mentors: 86,
-  applicants: 324,
-});
-
-const handleLogout = () => {
-  console.log("Logout clicked");
+const logout = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/logout/web",
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      }
+    );
+    console.log("Logout response:", response.data);
+  } catch (error) {
+    console.error("Error during logout:", error);
+  }
 };
 
+// Lifecycle hook
 onMounted(async () => {
   await fetchAll();
   await fetchApplicants();

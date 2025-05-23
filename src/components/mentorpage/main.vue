@@ -47,7 +47,7 @@ console.log("props:", props);
 				</div>
 				<div class="lower-element">
 					<p>{{ user.yearLevel }}</p>
-					<p>{{ user.course }}</p>
+					<p>{{ user.course.match(/\(([^)]+)\)/)?.[1] }}</p>
 					<button @click="openView(user.id)">See More</button>
 				</div>
 			</div>
@@ -63,79 +63,121 @@ console.log("props:", props);
 
 <style scoped>
 .main-wrapper {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 100%;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 1.5rem;
 }
 
 .user-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 25px;
-	width: 100%;
-	height: 100%;
-	padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 1100px;
 }
 
 .user-card {
-	background-color: #006981;
-	border: 3px solid #0c434d;
-	border-radius: 25px;
-	padding: 20px;
+  background: #e3e6e7; 
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  border: 1px solid #e0dcd7;
 }
 
-.user-card img {
-	width: 120px;
-	height: 120px;
-	object-fit: cover;
-	border-radius: 50%;
-}
-
-.user-card h1 {
-	color: #fff;
-	font-size: 17px;
-	text-align: center;
-	margin: 10px 0;
+.user-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
 }
 
 .upper-element {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #eaeef1;
+  position: relative;
+}
+
+.upper-element::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d8d5d0, transparent);
+}
+
+.user-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #f5f3f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-card h1 {
+  color: #3a3631;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.4rem;
+  text-align: center;
 }
 
 .lower-element {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #eaeef1;
 }
 
 .lower-element p {
-	color: #fff;
-	font-size: 14px;
-	text-align: center;
+  color: #5a5651;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0.15rem 0;
+  line-height: 1.4;
 }
 
 .lower-element button {
-	background-color: #349eb1;
-	color: #fff;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 20px;
-	width: 8rem;
-	cursor: pointer;
-	margin-top: 20px;
+  background: #f5f3f0;
+  color: #3a3631;
+  border: 1px solid #c4c0ba;
+  padding: 0.5rem 1.25rem;
+  border-radius: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.lower-element button:hover {
+  background: #e0dcd7;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .view-popup {
-	position: fixed;
-	top: 50%;
-	left: 55%;
-	transform: translate(-50%, -50%);
-	z-index: 2000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

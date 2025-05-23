@@ -5,24 +5,24 @@
         <i class="fas fa-users header-icon"></i>
         Users
       </h2>
-      
+
       <div class="filter-buttons">
-        <button 
-          class="filter-btn" 
+        <button
+          class="filter-btn"
           :class="{ active: activeFilter === 'all' }"
           @click="activeFilter = 'all'"
         >
           All
         </button>
-        <button 
-          class="filter-btn" 
+        <button
+          class="filter-btn"
           :class="{ active: activeFilter === 'mentors' }"
           @click="activeFilter = 'mentors'"
         >
           Mentors
         </button>
-        <button 
-          class="filter-btn" 
+        <button
+          class="filter-btn"
           :class="{ active: activeFilter === 'learners' }"
           @click="activeFilter = 'learners'"
         >
@@ -33,20 +33,19 @@
       <div class="search-container">
         <div class="search-wrapper">
           <i class="fas fa-search search-icon"></i>
-          <input 
-            type="text" 
-            v-model="searchQuery" 
+          <input
+            type="text"
+            v-model="searchQuery"
             placeholder="Search users..."
             class="search-input"
-          >
+          />
         </div>
         <button class="export-btn" @click="exportUsersToCSV">
           <i class="fas fa-download"></i> Export
         </button>
-
       </div>
     </div>
-    
+
     <div class="table-scroll-container">
       <table class="data-table">
         <thead>
@@ -57,19 +56,32 @@
             <th>Year</th>
             <th>Program</th>
             <th>Role</th>
+            <th>Alternative Role</th>
             <th>Details</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in displayedUsers" :key="user.id">
-            <td><span class="id-badge">{{ user.id }}</span></td>
+            <td>
+              <span class="id-badge">{{ user.id }}</span>
+            </td>
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
-            <td>{{ user.year || 'N/A' }}</td>
-            <td>{{ user.program || 'N/A' }}</td>
+            <td>{{ user.year || "N/A" }}</td>
+            <td>{{ user.course.match(/\(([^)]+)\)/)?.[1] || user.course }}</td>
             <td>
-              <span :class="`role-badge ${user.role.toLowerCase()}`">
-                {{ user.role }}
+              <span :class="`role-badge ${user.role}`">{{ user.role }}</span>
+            </td>
+            <td>
+              <span
+                class="secondary-role-badge"
+                :class="
+                  user.secondary_role?.toLowerCase() === 'n/a'
+                    ? 'na'
+                    : user.secondary_role?.toLowerCase()
+                "
+              >
+                {{ user.secondary_role || "N/A" }}
               </span>
             </td>
             <td>
@@ -79,16 +91,18 @@
             </td>
           </tr>
           <tr v-if="displayedUsers.length === 0">
-            <td colspan="7" class="no-users">
-              No users to display
-            </td>
+            <td colspan="7" class="no-users">No users to display</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- User Details Modal -->
-    <div v-if="showUserModal" class="modal-overlay" @click.self="hideUserDetails">
+    <div
+      v-if="showUserModal"
+      class="modal-overlay"
+      @click.self="hideUserDetails"
+    >
       <div class="user-modal">
         <!-- Modal Header -->
         <div class="modal-header">
@@ -100,58 +114,91 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-        
+
         <!-- Modal Body -->
         <div class="modal-body">
           <!-- User Profile Section -->
           <div class="user-profile">
             <div class="profile-image-container">
-              <img :src="currentUser.image" :alt="`Portrait of ${currentUser.name}`" class="profile-image"/>
-              <div class="role-badge-large" :class="currentUser.role.toLowerCase()">
+              <img
+                :src="'http://localhost:8000/api/image/' + currentUser.image"
+                :alt="`Portrait of ${currentUser.name}`"
+                class="profile-image"
+              />
+              <div
+                class="role-badge-large"
+                :class="currentUser.role.toLowerCase()"
+              >
                 {{ currentUser.role }}
               </div>
             </div>
-            
+
             <div class="profile-info">
               <h4 class="user-name">{{ currentUser.name }}</h4>
               <hr class="divider" />
               <div class="info-grid">
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
+                  <span class="info-label"
+                    ><i class="fas fa-envelope"></i> Email</span
+                  >
                   <span class="info-value">{{ currentUser.email }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-phone"></i> Contact Number</span>
-                  <span class="info-value">{{ currentUser.phone || 'Not provided' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-phone"></i> Contact Number</span
+                  >
+                  <span class="info-value">{{
+                    currentUser.phoneNum || "Not provided"
+                  }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-calendar-alt"></i> Year Level</span>
-                  <span class="info-value">{{ currentUser.year || 'N/A' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-calendar-alt"></i> Year Level</span
+                  >
+                  <span class="info-value">{{
+                    currentUser.year || "N/A"
+                  }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-graduation-cap"></i> Program</span>
-                  <span class="info-value">{{ currentUser.program || 'N/A' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-graduation-cap"></i> Program</span
+                  >
+                  <span class="info-value">{{
+                    currentUser.program || "N/A"
+                  }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-university"></i> Department</span>
-                  <span class="info-value">{{ currentUser.department || 'College of Computer Studies' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-university"></i> Department</span
+                  >
+                  <span class="info-value">{{
+                    currentUser.department || "College of Computer Studies"
+                  }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
-                  <span class="info-value">{{ currentUser.gender || 'Not specified' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-venus-mars"></i> Gender</span
+                  >
+                  <span class="info-value">{{
+                    capitalizeFirstLetter(currentUser.gender)
+                  }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label"><i class="fas fa-map-marker-alt"></i> Address</span>
-                  <span class="info-value">{{ currentUser.address || 'Not provided' }}</span>
+                  <span class="info-label"
+                    ><i class="fas fa-map-marker-alt"></i> Address</span
+                  >
+                  <span class="info-value">{{
+                    currentUser.address || "Not provided"
+                  }}</span>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <!-- Role-Specific Details Section -->
           <div class="details-section">
             <!-- Mentor Specific Information -->
-            <template v-if="currentUser.role === 'Mentor'">
+            <template v-if="currentUser.role?.toLowerCase() === 'mentor'">
               <div class="details-card">
                 <h4 class="section-title">
                   <i class="fas fa-chalkboard-teacher"></i> Teaching Information
@@ -160,31 +207,51 @@
                 <div class="details-content">
                   <div class="detail-item">
                     <span class="detail-label">Teaching Modality:</span>
-                    <span class="detail-value">{{ currentUser.teachingModality || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.learn_modality || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Days of Availability:</span>
-                    <span class="detail-value">{{ currentUser.availability || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      Array.isArray(currentUser.availability)
+                        ? currentUser.availability.join(", ")
+                        : currentUser.availability || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Proficiency Level:</span>
-                    <span class="detail-value">{{ currentUser.proficiency || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.proficiency || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Teaching Style:</span>
-                    <span class="detail-value">{{ currentUser.teachingStyle || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      Array.isArray(currentUser.teach_sty)
+                        ? currentUser.teach_sty.join(", ")
+                        : currentUser.teach_sty || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Preferred Session Duration:</span>
-                    <span class="detail-value">{{ currentUser.sessionDuration || 'Not specified' }}</span>
+                    <span class="detail-label"
+                      >Preferred Session Duration:</span
+                    >
+                    <span class="detail-value">{{
+                      currentUser.prefSessDur || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Course Offered:</span>
-                    <span class="detail-value">{{ currentUser.coursesOffered || 'Not specified' }}</span>
+                    <span class="detail-label">Subjects:</span>
+                    <span class="detail-value">{{
+                      Array.isArray(currentUser.subjects)
+                        ? currentUser.subjects.join(", ")
+                        : currentUser.subjects || "Not specified"
+                    }}</span>
                   </div>
                 </div>
               </div>
-              
+
               <div class="bio-card">
                 <h4 class="section-title">
                   <i class="fas fa-user-edit"></i> Bio & Experience
@@ -193,44 +260,22 @@
                 <div class="bio-content">
                   <div class="detail-item2">
                     <span class="detail-label">Short Bio:</span>
-                    <span class="detail-value2">{{ currentUser.bio || 'No bio provided' }}</span>
+                    <span class="detail-value2">{{
+                      currentUser.bio || "No bio provided"
+                    }}</span>
                   </div>
                   <div class="detail-item2">
                     <span class="detail-label">Tutoring Experience:</span>
-                    <span class="detail-value2">{{ currentUser.experience || 'No experience provided' }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Credentials Section -->
-              <div class="credentials-section" v-if="currentUser.credentialsFiles">
-                <h4 class="section-title">
-                  <i class="fas fa-file-alt"></i> Credentials
-                </h4>
-                <div class="credentials-grid">
-                  <div v-for="(file, index) in currentUser.credentialsFiles" :key="index" class="credential-card">
-                    <div class="file-icon">
-                      <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div class="file-info">
-                      <span class="file-name">{{ file.name }}</span>
-                      <div class="file-actions">
-                        <button class="action-btn preview">
-                          <i class="fas fa-eye"></i> Preview
-                        </button>
-                        <button class="action-btn download" @click="downloadFile(file)">
-
-                          <i class="fas fa-download"></i> Download
-                        </button>
-                      </div>
-                    </div>
+                    <span class="detail-value2">{{
+                      currentUser.exp || "No experience provided"
+                    }}</span>
                   </div>
                 </div>
               </div>
             </template>
 
             <!-- Learner Specific Information -->
-            <template v-else-if="currentUser.role === 'Learner'">
+            <template v-else-if="currentUser.role?.toLowerCase() === 'learner'">
               <div class="details-card">
                 <h4 class="section-title">
                   <i class="fas fa-book-open"></i> Learning Preferences
@@ -239,27 +284,39 @@
                 <div class="details-content">
                   <div class="detail-item">
                     <span class="detail-label">Learning Modality:</span>
-                    <span class="detail-value">{{ currentUser.learningModality || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.learningModality || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Days of Availability:</span>
-                    <span class="detail-value">{{ currentUser.availability || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.availability || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Learning Style:</span>
-                    <span class="detail-value">{{ currentUser.learningStyle || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.learningStyle || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Preferred Session Duration:</span>
-                    <span class="detail-value">{{ currentUser.sessionDuration || 'Not specified' }}</span>
+                    <span class="detail-label"
+                      >Preferred Session Duration:</span
+                    >
+                    <span class="detail-value">{{
+                      currentUser.sessionDuration || "Not specified"
+                    }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Subject of Interest:</span>
-                    <span class="detail-value">{{ currentUser.subjectsInterest || 'Not specified' }}</span>
+                    <span class="detail-value">{{
+                      currentUser.subjectsInterest || "Not specified"
+                    }}</span>
                   </div>
                 </div>
               </div>
-              
+
               <div class="bio-card">
                 <h4 class="section-title">
                   <i class="fas fa-user-edit"></i> Bio & Goals
@@ -268,28 +325,34 @@
                 <div class="bio-content">
                   <div class="detail-item2">
                     <span class="detail-label">Short Bio:</span>
-                    <span class="detail-value2">{{ currentUser.bio || 'No bio provided' }}</span>
+                    <span class="detail-value2">{{
+                      currentUser.bio || "No bio provided"
+                    }}</span>
                   </div>
                   <div class="detail-item2">
                     <span class="detail-label">Learning Goals:</span>
-                    <span class="detail-value2">{{ currentUser.learningGoals || 'No goals provided' }}</span>
+                    <span class="detail-value2">{{
+                      currentUser.learningGoals || "No goals provided"
+                    }}</span>
                   </div>
                 </div>
               </div>
             </template>
           </div>
         </div>
-        
+
         <!-- Modal Footer -->
         <div class="modal-footer">
           <div class="footer-actions">
             <button class="footer-btn back" @click="hideUserDetails">
               <i class="fas fa-arrow-left"></i> Back to Users
             </button>
-            <button class="footer-btn export" @click="exportUserToPDF(currentUser)">
+            <button
+              class="footer-btn export"
+              @click="exportUserToPDF(currentUser)"
+            >
               <i class="fas fa-file-pdf"></i> Export PDF
             </button>
-
           </div>
         </div>
       </div>
@@ -297,170 +360,152 @@
   </div>
 </template>
 
+<script setup>
+import { ref, computed } from "vue";
+import * as XLSX from "xlsx";
+import html2pdf from "html2pdf.js";
+import logoGccoed from "@/assets/logo_gccoed.png";
+import axios from "axios";
 
-<script>
-import { ref, computed } from 'vue';
-import * as XLSX from 'xlsx';
-import html2pdf from 'html2pdf.js';
-import logoGccoed from '@/assets/logo_gccoed.png';
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
+const getCookies = () => {
+  const cookies = document.cookie.split("; ");
+  const cookieObj = {};
+  cookies.forEach((cookie) => {
+    const [name, value] = cookie.split("=");
+    cookieObj[name] = decodeURIComponent(value);
+  });
+  return cookieObj;
+};
 
-export default {
-  setup() {
-    const searchQuery = ref('');
-    const activeFilter = ref('all');
-    const showUserModal = ref(false);
-    const currentUser = ref({});
+const props = defineProps({
+  users: {
+    type: Array, // Changed from Object to Array since we expect an array of users
+    required: true,
+    default: () => [], // Add default empty array
+  },
+});
 
-    const allUsers = ref([
-      { 
-        id: 1, 
-        name: 'Mark Luis Torre', 
-        email: 'mark.torre@example.com',
-        year: '2nd Year',
-        program: 'BSIT',
-        role: 'Mentor',
-        phone: '+1 (555) 123-4567',
-        image: 'https://storage.googleapis.com/a1aa/image/4f0273a6-c19f-4d79-805a-06a27be15e04.jpg',
-        department: 'College of Computer Studies',
-        gender: 'Male',
-        address: '123 Main St, Olongapo City',
-        teachingModality: 'Online and In-Person',
-        availability: 'Monday, Wednesday, Friday',
-        proficiency: 'Advanced',
-        teachingStyle: 'Interactive',
-        sessionDuration: '1-2 hours',
-        coursesOffered: 'Web Development, Database Management',
-        bio: 'Passionate tutor with a love for helping students excel in technology and programming.',
-        experience: '2 years of experience in tutoring web development and database management.',
-        credentialsFiles: [
-          { name: 'Web Development Certificate.pdf', url: '#' },
-          { name: 'Teaching Credentials.pdf', url: '#' },
-          { name: 'Microsoft Certified.pdf', url: '#' }
-        ]
-      },
-      { 
-        id: 2, 
-        name: 'Jane Smith', 
-        email: 'jane.smith@example.com',
-        year: '3rd Year',
-        program: 'BSCS',
-        role: 'Learner',
-        phone: '+1 (555) 987-6543',
-        image: 'https://randomuser.me/api/portraits/women/44.jpg',
-        department: 'College of Computer Studies',
-        gender: 'Female',
-        address: '456 Oak St, Subic',
-        learningModality: 'Online Only',
-        availability: 'Tuesday, Thursday',
-        learningStyle: 'Visual',
-        sessionDuration: '1 hour',
-        subjectsInterest: 'Data Structures, Algorithms',
-        bio: 'Enthusiastic learner interested in computer science concepts.',
-        learningGoals: 'Master data structures and algorithms for competitive programming.'
-      }
-    ]);
+const searchQuery = ref("");
+const activeFilter = ref("all");
+const showUserModal = ref(false);
+const currentUser = ref({});
 
-    const displayedUsers = computed(() => {
-      let users = [...allUsers.value];
-      
-      if (activeFilter.value === 'mentors') {
-        users = users.filter(user => user.role === 'Mentor');
-      } else if (activeFilter.value === 'learners') {
-        users = users.filter(user => user.role === 'Learner');
-      }
+const displayedUsers = computed(() => {
+  // Start with the users from props
+  let users = props.users ? [...props.users] : [];
 
-      return users.filter(user => 
-        user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        user.program?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        user.year?.toLowerCase().includes(searchQuery.value.toLowerCase())
-      );
-    });
+  // Apply role filters
+  if (activeFilter.value === "mentors") {
+    users = users.filter(
+      (user) =>
+        user.role?.toLowerCase() === "mentor" ||
+        user.secondary_role?.toLowerCase() === "mentor"
+    );
+  } else if (activeFilter.value === "learners") {
+    users = users.filter(
+      (user) =>
+        user.role?.toLowerCase() === "learner" ||
+        user.secondary_role?.toLowerCase() === "learner"
+    );
+  }
 
-    const showUserDetails = (user) => {
-      currentUser.value = user;
-      showUserModal.value = true;
+  // Apply search filter
+  return users.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.role?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.program?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.year?.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+const showUserDetails = (user) => {
+  currentUser.value = user;
+  showUserModal.value = true;
+};
+
+const hideUserDetails = () => {
+  showUserModal.value = false;
+};
+
+const exportUsersToCSV = () => {
+  const data = displayedUsers.value.map((user) => ({
+    ID: user.id,
+    Name: user.name,
+    Email: user.email,
+    Year: user.year || "N/A",
+    Program: user.program || "N/A",
+    Role: user.role,
+    Phone: user.phoneNum || "N/A",
+    Department: user.department || "N/A",
+    Gender: user.gender || "N/A",
+    Address: user.address || "N/A",
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  const colWidths = [
+    { wch: 8 },
+    { wch: 25 },
+    { wch: 30 },
+    { wch: 10 },
+    { wch: 20 },
+    { wch: 12 },
+    { wch: 20 },
+    { wch: 25 },
+    { wch: 10 },
+    { wch: 30 },
+  ];
+  worksheet["!cols"] = colWidths;
+
+  const headerRange = XLSX.utils.decode_range(worksheet["!ref"]);
+  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+    const cellAddress = XLSX.utils.encode_cell({ r: headerRange.s.r, c: C });
+    if (!worksheet[cellAddress]) continue;
+    worksheet[cellAddress].s = {
+      font: { bold: true },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "D3D3D3" } },
     };
+  }
 
-    const hideUserDetails = () => {
-      showUserModal.value = false;
-    };
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
 
-    const exportUsersToCSV = () => {
-      const data = displayedUsers.value.map(user => ({
-        ID: user.id,
-        Name: user.name,
-        Email: user.email,
-        Year: user.year || 'N/A',
-        Program: user.program || 'N/A',
-        Role: user.role,
-        Phone: user.phone || 'N/A',
-        Department: user.department || 'N/A',
-        Gender: user.gender || 'N/A',
-        Address: user.address || 'N/A'
-      }));
+  let reportType = "users";
+  if (activeFilter.value === "mentors") reportType = "mentors";
+  if (activeFilter.value === "learners") reportType = "learners";
+  const formattedDate = new Date().toISOString().slice(0, 10);
 
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      
-      const colWidths = [
-        { wch: 8 }, { wch: 25 }, { wch: 30 }, 
-        { wch: 10 }, { wch: 20 }, { wch: 12 },
-        { wch: 20 }, { wch: 25 }, { wch: 10 }, 
-        { wch: 30 }
-      ];
-      worksheet['!cols'] = colWidths;
-      
-      const headerRange = XLSX.utils.decode_range(worksheet['!ref']);
-      for(let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
-        const cellAddress = XLSX.utils.encode_cell({r: headerRange.s.r, c: C});
-        if(!worksheet[cellAddress]) continue;
-        worksheet[cellAddress].s = { 
-          font: { bold: true },
-          alignment: { horizontal: 'center' },
-          fill: { fgColor: { rgb: "D3D3D3" } }
-        };
-      }
-      
-      for(let R = headerRange.s.r + 1; R <= headerRange.e.r; ++R) {
-        worksheet['!rows'] = worksheet['!rows'] || [];
-        worksheet['!rows'][R] = { hpx: 20 };
-      }
+  XLSX.writeFile(workbook, `${reportType}_report_${formattedDate}.xlsx`);
+};
 
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
-      
-      let reportType = 'users';
-      if (activeFilter.value === 'mentors') reportType = 'mentors';
-      if (activeFilter.value === 'learners') reportType = 'learners';
-      const formattedDate = new Date().toISOString().slice(0, 10);
-      
-      XLSX.writeFile(workbook, `${reportType}_report_${formattedDate}.xlsx`);
-    };
+const exportUserToPDF = async (user) => {
+  const element = document.createElement("div");
 
-    const exportUserToPDF = async (user) => {
-      const element = document.createElement('div');
-      
-      // Convert logo to base64
-      const getBase64Logo = () => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
-          };
-          img.src = logoGccoed;
-        });
+  // Convert logo to base64
+  const getBase64Logo = () => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
       };
+      img.src = logoGccoed;
+    });
+  };
 
-      const logoBase64 = await getBase64Logo();
+  const logoBase64 = await getBase64Logo();
 
-      element.innerHTML = `
+  element.innerHTML = `
         <style>
           .pdf-header {
             text-align: center; 
@@ -540,7 +585,9 @@ export default {
         </div>
         
         <h2 class="user-title">
-          ${user.name} <span style="font-size: 16px; color: #666;">(${user.role})</span>
+          ${user.name} <span style="font-size: 16px; color: #666;">(${
+    user.role
+  })</span>
         </h2>
         
         <h3 class="section-title">Basic Information</h3>
@@ -551,97 +598,105 @@ export default {
           </tr>
           <tr>
             <td class="info-label">Contact Number</td>
-            <td>${user.phone || 'Not provided'}</td>
+            <td>${user.phoneNum || "Not provided"}</td>
           </tr>
           <tr>
             <td class="info-label">Year Level</td>
-            <td>${user.year || 'N/A'}</td>
+            <td>${user.year || "N/A"}</td>
           </tr>
           <tr>
             <td class="info-label">Program</td>
-            <td>${user.program || 'N/A'}</td>
+            <td>${user.program || "N/A"}</td>
           </tr>
           <tr>
             <td class="info-label">Department</td>
-            <td>${user.department || 'College of Computer Studies'}</td>
+            <td>${user.department || "College of Computer Studies"}</td>
           </tr>
           <tr>
             <td class="info-label">Gender</td>
-            <td>${user.gender || 'Not specified'}</td>
+            <td>${user.gender || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Address</td>
-            <td>${user.address || 'Not provided'}</td>
+            <td>${user.address || "Not provided"}</td>
           </tr>
         </table>
         
-        ${user.role === 'Mentor' ? `
+        ${
+          user.role === "Mentor"
+            ? `
         <h3 class="section-title">Teaching Information</h3>
         <table class="info-table">
           <tr>
             <td class="info-label">Teaching Modality</td>
-            <td>${user.teachingModality || 'Not specified'}</td>
+            <td>${user.teachingModality || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Days of Availability</td>
-            <td>${user.availability || 'Not specified'}</td>
+            <td>${user.availability || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Proficiency Level</td>
-            <td>${user.proficiency || 'Not specified'}</td>
+            <td>${user.proficiency || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Teaching Style</td>
-            <td>${user.teachingStyle || 'Not specified'}</td>
+            <td>${user.teachingStyle || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Preferred Session Duration</td>
-            <td>${user.sessionDuration || 'Not specified'}</td>
+            <td>${user.sessionDuration || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Course Offered</td>
-            <td>${user.coursesOffered || 'Not specified'}</td>
+            <td>${user.coursesOffered || "Not specified"}</td>
           </tr>
         </table>
         
         <h3 class="section-title">Bio & Experience</h3>
         <p style="margin-bottom: 10px;"><strong>Short Bio:</strong></p>
-        <p style="margin-bottom: 20px;">${user.bio || 'No bio provided'}</p>
+        <p style="margin-bottom: 20px;">${user.bio || "No bio provided"}</p>
         <p style="margin-bottom: 10px;"><strong>Tutoring Experience:</strong></p>
-        <p>${user.experience || 'No experience provided'}</p>
-        ` : ''}
+        <p>${user.experience || "No experience provided"}</p>
+        `
+            : ""
+        }
         
-        ${user.role === 'Learner' ? `
+        ${
+          user.role === "Learner"
+            ? `
         <h3 class="section-title">Learning Preferences</h3>
         <table class="info-table">
           <tr>
             <td class="info-label">Learning Modality</td>
-            <td>${user.learningModality || 'Not specified'}</td>
+            <td>${user.learningModality || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Days of Availability</td>
-            <td>${user.availability || 'Not specified'}</td>
+            <td>${user.availability || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Learning Style</td>
-            <td>${user.learningStyle || 'Not specified'}</td>
+            <td>${user.learningStyle || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Preferred Session Duration</td>
-            <td>${user.sessionDuration || 'Not specified'}</td>
+            <td>${user.sessionDuration || "Not specified"}</td>
           </tr>
           <tr>
             <td class="info-label">Subjects of Interest</td>
-            <td>${user.subjectsInterest || 'Not specified'}</td>
+            <td>${user.subjectsInterest || "Not specified"}</td>
           </tr>
         </table>
         
         <h3 class="section-title">Bio & Goals</h3>
         <p style="margin-bottom: 10px;"><strong>Short Bio:</strong></p>
-        <p style="margin-bottom: 20px;">${user.bio || 'No bio provided'}</p>
+        <p style="margin-bottom: 20px;">${user.bio || "No bio provided"}</p>
         <p style="margin-bottom: 10px;"><strong>Learning Goals:</strong></p>
-        <p>${user.learningGoals || 'No goals provided'}</p>
-        ` : ''}
+        <p>${user.learningGoals || "No goals provided"}</p>
+        `
+            : ""
+        }
         
         <div class="pdf-footer">
           <p>GCCoEd</p>
@@ -649,56 +704,45 @@ export default {
         </div>
       `;
 
-      const opt = {
-        margin: 10,
-        filename: `user_${user.id}_${user.name.replace(' ', '_')}_report.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
-          logging: true,
-          useCORS: true
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
-        }
-      };
+  const opt = {
+    margin: 10,
+    filename: `user_${user.id}_${user.name.replace(" ", "_")}_report.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      logging: true,
+      useCORS: true,
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
+  };
 
-      html2pdf().from(element).set(opt).save();
-    };
+  html2pdf().from(element).set(opt).save();
+};
 
-    const downloadFile = (file) => {
-      alert(`Downloading file: ${file.name}`);
-    };
+const downloadFile = (file) => {
+  alert(`Downloading file: ${file.name}`);
+};
 
-
-    return {
-      searchQuery,
-      activeFilter,
-      displayedUsers,
-      showUserDetails,
-      hideUserDetails,
-      showUserModal,
-      currentUser,
-      exportUsersToCSV,
-      exportUserToPDF,
-      downloadFile
-    };
-  }
+// Add this computed property or helper function
+const capitalizeFirstLetter = (str) => {
+  if (!str) return "Not specified";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 </script>
 
-
 <style scoped>
 :root {
-  --primary: #3B9AA9;
-  --primary-light: #6DD1E3;
-  --primary-dark: #0B3E8A;
-  --secondary: #FFC107;
-  --danger: #F44336;
-  --success: #4CAF50;
-  --warning: #FFA000;
+  --primary: #3b9aa9;
+  --primary-light: #6dd1e3;
+  --primary-dark: #0b3e8a;
+  --secondary: #ffc107;
+  --danger: #f44336;
+  --success: #4caf50;
+  --warning: #ffa000;
   --text-dark: #0b2548;
   --text-light: #f5f7fa;
   --bg-light: #ffffff;
@@ -714,13 +758,10 @@ export default {
   margin: 0 auto;
   padding: 0 1rem 0 1rem;
   text-align: center;
-  max-height: 465px; 
-  height: 460px; 
+  max-height: 465px;
+  height: 460px;
   overflow-y: auto;
-     margin-top: 2rem;
-
-
-
+  margin-top: 2rem;
 }
 
 .table-header {
@@ -768,15 +809,15 @@ export default {
   font-weight: 600;
 }
 
-.filter-btn:nth-child(2) { 
-  color: rgba(39, 74, 148, 0.9); 
+.filter-btn:nth-child(2) {
+  color: rgba(39, 74, 148, 0.9);
 }
 
 .filter-btn:hover:nth-child(2) {
   background: rgba(156, 173, 255, 0.5);
 }
 
-.filter-btn:nth-child(3) { 
+.filter-btn:nth-child(3) {
   color: rgba(19, 74, 26, 0.9);
 }
 
@@ -865,11 +906,32 @@ export default {
 }
 
 .role-badge.mentor {
-  background-color: #3B9AA9;
+  background-color: #3b9aa9;
 }
 
 .role-badge.learner {
-  background-color: #4CAF50;
+  background-color: #4caf50;
+}
+
+.secondary-role-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.secondary-role-badge.mentor {
+  background-color: #3b9aa9;
+}
+
+.secondary-role-badge.learner {
+  background-color: #4caf50;
+}
+
+.secondary-role-badge.na {
+  background-color: #8a8a8f;
 }
 
 .details-btn {
@@ -925,7 +987,7 @@ export default {
 
 .modal-header {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0B3E8A, #3B9AA9);
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -1009,11 +1071,11 @@ export default {
 }
 
 .role-badge-large.mentor {
-  background-color: #3B9AA9;
+  background-color: #3b9aa9;
 }
 
 .role-badge-large.learner {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .profile-info {
@@ -1076,7 +1138,8 @@ export default {
   margin-bottom: 2rem;
 }
 
-.details-card, .bio-card {
+.details-card,
+.bio-card {
   background: #f9fafb;
   border-radius: 10px;
   padding: 1.5rem;
@@ -1087,7 +1150,7 @@ export default {
 .section-title {
   margin: 0 0 1.25rem 0;
   font-size: 1.1rem;
-  color: #0B3E8A;
+  color: #0b3e8a;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1116,7 +1179,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   text-align: left;
-  margin-bottom: 1.1rem; 
+  margin-bottom: 1.1rem;
 }
 
 .detail-label {
@@ -1225,7 +1288,7 @@ export default {
 
 .action-btn.preview {
   background-color: rgba(59, 154, 169, 0.1);
-  color: #0B3E8A;
+  color: #0b3e8a;
 }
 
 .action-btn.preview:hover {
@@ -1288,7 +1351,7 @@ export default {
 
 .footer-btn.warning {
   background-color: rgba(255, 193, 7, 0.1);
-  color: #FFA000;
+  color: #ffa000;
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
@@ -1298,7 +1361,7 @@ export default {
 
 .footer-btn.suspend {
   background-color: rgba(244, 67, 54, 0.1);
-  color: #D32F2F;
+  color: #d32f2f;
   border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
@@ -1339,7 +1402,6 @@ export default {
   background-color: #c62828;
 }
 
-
 /* Action Modal */
 .action-modal {
   background: white;
@@ -1352,7 +1414,7 @@ export default {
 
 .action-modal .modal-header {
   padding: 1.25rem;
-  background: linear-gradient(135deg, #0B3E8A, #3B9AA9);
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
   color: white;
   text-align: center;
 }
@@ -1444,34 +1506,34 @@ export default {
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .search-container {
     margin-left: 0;
     width: 100%;
   }
-  
+
   .search-input {
     width: 100%;
   }
-  
+
   .user-profile {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .details-section {
     grid-template-columns: 1fr;
   }
-  
+
   .credentials-section {
     grid-column: span 1;
   }
-  
+
   .info-value {
     margin-left: 0;
     text-align: left;
@@ -1482,17 +1544,17 @@ export default {
     width: 100%;
     margin-bottom: 1rem;
   }
-  
+
   .footer-btn.warning,
   .footer-btn.suspend {
     width: 100%;
     justify-content: center;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
-  
+
   .modal-btn {
     width: 100%;
   }
@@ -1503,39 +1565,40 @@ export default {
     display: block;
     overflow-x: auto;
   }
-  
+
   .filter-buttons {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 0.5rem;
   }
-  
+
   .filter-btn {
     flex-shrink: 0;
   }
-  
+
   .modal-body {
     padding: 1rem;
   }
-  
+
   .user-profile {
     gap: 1.5rem;
   }
-  
+
   .profile-image {
     width: 100px;
     height: 100px;
   }
-  
-  .details-card, .bio-card {
+
+  .details-card,
+  .bio-card {
     padding: 1rem;
   }
-  
+
   .credential-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .file-actions {
     justify-content: center;
   }

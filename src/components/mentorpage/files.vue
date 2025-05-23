@@ -475,4 +475,5 @@
   .upload-btn:hover {
 	background-color: #066678;
   }
+  
 </style>
