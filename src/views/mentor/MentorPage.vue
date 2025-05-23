@@ -2,7 +2,6 @@
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
-import help from "@/components/mentorpage/help.vue";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
@@ -181,7 +180,6 @@ const feedbacks = ref([]);
 const files = ref([]);
 const isEdit = ref(false);
 const confirmLogout = ref(false);
-const isHelp = ref(false);
 const showAllCourses = ref(false);
 const searchQuery = ref("");
 
@@ -271,6 +269,7 @@ onMounted(async () => {
 <template>
   <div class="sidebar">
     <div class="upper-element">
+      
       <div>
         <h1>Hi, Mentor!</h1>
         <img
@@ -298,12 +297,6 @@ onMounted(async () => {
     </div>
     <!-- <div class="wave-curve"></div> -->
     <div class="footer-element">
-      <div class="bio-container">
-        <h1>BIO</h1>
-        <div>
-          <p>{{ userData.ment.bio }}</p>
-        </div>
-      </div>
       <div class="user-information">
         <h1>User Information</h1>
         <div class="lines">
@@ -321,26 +314,19 @@ onMounted(async () => {
         <div class="lines">
           <h3>Program:</h3>
           <div>
-            <p>{{ userData.ment.course }}</p>
+            <p>{{ userData.ment.course.match(/\(([^)]+)\)/)?.[1] || userData.ment.course }}</p>
           </div>
         </div>
       </div>
-      <div class="availability">
-        <h1>Availability</h1>
+    <div class="availability">
+      <h1>Availability</h1>
         <div class="lines">
-          <h3>Days:</h3>
-          <div>
-            <ul>
-              <li
-                v-for="(day, index) in userData.ment.availability"
-                :key="index"
-              >
-                {{ day }}
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="lines">
+           <h3>Days:</h3>
+        <div>
+      <p>{{ userData.ment.availability.join(', ') }}</p>
+    </div>
+  </div>
+  <div class="lines">
           <h3>Duration:</h3>
           <div>
             <p>{{ userData.ment.prefSessDur }}</p>
@@ -396,15 +382,7 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- help -->
-  <Transition name="fade">
-    <div v-if="!isHelp" class="help-section">
-      <div @click="openHelp" class="help">
-        <img src="/help.svg" alt="help" />
-        <p>Help</p>
-      </div>
-    </div>
-  </Transition>
+
 
   <!-- topbar -->
   <div class="topbar">
@@ -466,12 +444,6 @@ onMounted(async () => {
   <Transition name="fade" mode="out-in">
     <div v-if="confirmLogout" class="logout-popup">
       <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
-    </div>
-  </Transition>
-
-  <Transition name="fade" mode="out-in">
-    <div v-if="isHelp" class="help-popup">
-      <help @close="isHelp = false" />
     </div>
   </Transition>
 </template>
