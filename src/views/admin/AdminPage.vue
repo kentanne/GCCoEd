@@ -117,12 +117,50 @@ export default {
     }))
 
     return { activeTab, stats, handleLogout, currentDate }
+
   }
-}
+};
+
+const fetchApplicants = async () => {
+  try {
+    const response = await axios
+      .get("http://localhost:8000/api/admin/applicants", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("pre-fetched:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const activeTab = ref("dashboard"); // Dashboard shows by default
+const stats = ref({
+  learners: 1245,
+  mentors: 86,
+  applicants: 324,
+});
+
+const handleLogout = () => {
+  console.log("Logout clicked");
+};
+
+onMounted(async () => {
+  await fetchAll();
+  await fetchApplicants();
+});
 </script>
 
 <style scoped>
-/* Modern Admin Dashboard Styles */
 :root {
   --primary: #4361ee;       /* Vibrant blue */
   --primary-light: #4895ef; /* Lighter blue */
@@ -308,3 +346,4 @@ export default {
   margin: 1.5rem 1.5rem 1.5rem 0;
 }
 </style>
+

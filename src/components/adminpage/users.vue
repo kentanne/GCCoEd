@@ -42,6 +42,7 @@
         <button class="export-btn" @click="exportUsersToCSV">
           <i class="fas fa-download"></i> Export
         </button>
+
       </div>
     </div>
     
@@ -217,6 +218,7 @@
                           <i class="fas fa-eye"></i> Preview
                         </button>
                         <button class="action-btn download" @click="downloadFile(file)">
+
                           <i class="fas fa-download"></i> Download
                         </button>
                       </div>
@@ -286,6 +288,7 @@
             <button class="footer-btn export" @click="exportUserToPDF(currentUser)">
               <i class="fas fa-file-pdf"></i> Export PDF
             </button>
+
           </div>
         </div>
       </div>
@@ -299,6 +302,7 @@ import { ref, computed } from 'vue';
 import * as XLSX from 'xlsx';
 import html2pdf from 'html2pdf.js';
 import logoGccoed from '@/assets/logo_gccoed.png';
+
 
 export default {
   setup() {
@@ -667,6 +671,7 @@ export default {
       alert(`Downloading file: ${file.name}`);
     };
 
+
     return {
       searchQuery,
       activeFilter,
@@ -712,6 +717,7 @@ export default {
   height: 460px; 
   overflow-y: auto;
      margin-top: 2rem;
+
 
 
 }
@@ -1331,6 +1337,7 @@ export default {
 .footer-btn.export:hover {
   background-color: #c62828;
 }
+
 
 /* Action Modal */
 .action-modal {

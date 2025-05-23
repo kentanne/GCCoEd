@@ -2,7 +2,12 @@
 import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
+import help from "@/components/mentorpage/help.vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
+
+// Initialize router
+const router = useRouter();
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -141,6 +146,48 @@ const getFiles = async () => {
     // return response.data
   } catch (error) {
     console.error("Error fetching files:", error);
+    return null;
+  }
+};
+
+const registerLearnerRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/set/2nd_role", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Learner registration:", response.data);
+        router.push("/learner-info/alt");
+      });
+  } catch (error) {
+    console.error("Error registering as learner:", error);
+    return null;
+  }
+};
+
+const switchRole = async () => {
+  try {
+    const response = await axios
+      .post("http://localhost:8000/api/switch", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("Role switched:", response.data);
+        router.push("/login");
+      });
+  } catch (error) {
+    console.error("Error switching role:", error);
     return null;
   }
 };
@@ -378,6 +425,10 @@ onMounted(async () => {
         <button @click="openEditInformation">
           {{ isEdit ? "Save" : "Edit" }}
         </button>
+      </div>
+      <div>
+        <button @click="registerLearnerRole">Register as Learner</button>
+        <button @click="switchRole">switch Account Role</button>
       </div>
     </div>
   </div>
