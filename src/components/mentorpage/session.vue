@@ -3,9 +3,10 @@ import { ref, onMounted, onUnmounted } from "vue";
 import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   schedule: {
@@ -42,17 +43,14 @@ function getCookie(name) {
 
 const sendReminder = async (item) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/send/session/reminder/" + item.id,
-      {
-        withCredentials: true,
-        header: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.post("/api/send/session/reminder/" + item.id, {
+      withCredentials: true,
+      header: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
     console.log(response.data);
     // Show success message or notification
   } catch (error) {
@@ -64,17 +62,14 @@ const sendReminder = async (item) => {
 
 const cancelSession = async (item) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/send/session/cancel/" + item.id,
-      {
-        withCredentials: true,
-        header: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.post("/api/send/session/cancel/" + item.id, {
+      withCredentials: true,
+      header: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
     console.log(response.data);
     todaySchedule.value = todaySchedule.value.filter(
       (session) => session.id !== item.id
@@ -102,7 +97,7 @@ const togglePopup = (type, index, event) => {
 const handleOptionClick = (option, item, event) => {
   event.stopPropagation();
   selectedItem.value = item;
-  
+
   switch (option) {
     case "remind":
       showRemindConfirmation.value = true;
@@ -152,7 +147,7 @@ onUnmounted(() => {
         Session Schedule
       </h2>
     </div>
-    
+
     <!-- Main Content Section - Updated Design -->
     <div class="lower-element">
       <div class="session-grid">
@@ -386,13 +381,24 @@ onUnmounted(() => {
             <h3>Send Reminder</h3>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to send a reminder for <strong>{{ selectedItem?.subject }}</strong> to <strong>{{ selectedItem?.learner.user.name }}</strong>?</p>
+            <p>
+              Are you sure you want to send a reminder for
+              <strong>{{ selectedItem?.subject }}</strong> to
+              <strong>{{ selectedItem?.learner.user.name }}</strong
+              >?
+            </p>
           </div>
           <div class="modal-footer">
-            <button class="modal-button cancel" @click="showRemindConfirmation = false">
+            <button
+              class="modal-button cancel"
+              @click="showRemindConfirmation = false"
+            >
               Cancel
             </button>
-            <button class="modal-button confirm" @click="sendReminder(selectedItem)">
+            <button
+              class="modal-button confirm"
+              @click="sendReminder(selectedItem)"
+            >
               Send Reminder
             </button>
           </div>
@@ -408,14 +414,25 @@ onUnmounted(() => {
             <h3>Cancel Session</h3>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to cancel <strong>{{ selectedItem?.subject }}</strong> with <strong>{{ selectedItem?.learner.user.name }}</strong>?</p>
+            <p>
+              Are you sure you want to cancel
+              <strong>{{ selectedItem?.subject }}</strong> with
+              <strong>{{ selectedItem?.learner.user.name }}</strong
+              >?
+            </p>
             <p class="warning-text">This action cannot be undone.</p>
           </div>
           <div class="modal-footer">
-            <button class="modal-button cancel" @click="showCancelConfirmation = false">
+            <button
+              class="modal-button cancel"
+              @click="showCancelConfirmation = false"
+            >
               No, Keep It
             </button>
-            <button class="modal-button confirm danger" @click="cancelSession(selectedItem)">
+            <button
+              class="modal-button confirm danger"
+              @click="cancelSession(selectedItem)"
+            >
               Yes, Cancel Session
             </button>
           </div>
@@ -747,19 +764,19 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(0,0,0,0.1);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
   color: rgb(36, 56, 92);
 }
 
 .close-button {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: rgb(30, 50, 73);
   font-size: 1.2rem;
@@ -774,7 +791,7 @@ onUnmounted(() => {
 }
 
 .close-button:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .modal-body {
@@ -855,12 +872,12 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     grid-gap: 1rem;
   }
-  
+
   .lower-element {
     height: auto;
     padding: 0.5rem;
   }
-  
+
   .session-card {
     padding: 0 0.3rem 0.5rem 0.3rem;
   }
@@ -876,7 +893,7 @@ onUnmounted(() => {
   .table-header {
     padding: 1rem;
   }
-  
+
   .table-title {
     font-size: 1.1rem;
   }
@@ -885,16 +902,16 @@ onUnmounted(() => {
     width: 95%;
     max-width: 400px;
   }
-  
+
   .today-card,
   .upcomming-card {
     padding: 0.7rem 0.9rem;
   }
-  
+
   .card-header h1 {
     font-size: 0.9rem;
   }
-  
+
   .info h2 {
     font-size: 0.85rem;
   }
@@ -911,19 +928,19 @@ onUnmounted(() => {
     width: 100%;
     justify-content: center;
   }
-  
+
   .session-card h1 {
     font-size: 1rem;
   }
-  
+
   .info p {
     font-size: 0.8rem;
   }
-  
+
   .action-icons {
     gap: 0.6rem;
   }
-  
+
   .envelope {
     width: 16px !important;
   }

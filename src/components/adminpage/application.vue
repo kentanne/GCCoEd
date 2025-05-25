@@ -362,10 +362,12 @@
 <script setup>
 import { ref, computed, onMounted, capitalize } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 // import { get } from "core-js/core/dict";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+const baseURL = api.defaults.baseURL;
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -375,15 +377,15 @@ const getCookie = (name) => {
 
 const approve = async (id) => {
   try {
-    const response = await axios.patch(
-      `http://localhost:8000/api/admin/mentor/approve/${id}`,
+    const response = await api.patch(
+      `/api/admin/mentor/approve/${id}`,
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
+          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
@@ -401,15 +403,15 @@ const approve = async (id) => {
 
 const reject = async (id) => {
   try {
-    const response = await axios.patch(
-      `http://localhost:8000/api/admin/mentor/reject/${id}`,
+    const response = await api.patch(
+      `/api/admin/mentor/reject/${id}`,
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
+          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
@@ -427,14 +429,11 @@ const reject = async (id) => {
 
 const getApplicantDetails = async (applicantId) => {
   try {
-    const response = await axios.get(
-      `http://localhost:8000/api/admin/${applicantId}`,
-      {
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.get(`/api/admin/${applicantId}`, {
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    });
 
     if (response.status === 200) {
       console.log("User details fetched successfully:", response.data);
@@ -449,17 +448,14 @@ const getApplicantDetails = async (applicantId) => {
 
 const getApplicantCreds = async (applicationId) => {
   try {
-    const response = await axios.get(
-      "http://localhost:8000/api/admin/cred/" + applicationId,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.get("/api/admin/cred/" + applicationId, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    });
 
     if (response.status === 200) {
       console.log("Applicant credentials fetched successfully:", response.data);
@@ -712,7 +708,7 @@ const showCredentials = async (app) => {
       // ... existing user details ...
       applicant: data.user.name || "N/A",
       image: data.info.image
-        ? "http://localhost:8000/api/image/" + data.info.image
+        ? `${baseURL}/api/image/` + data.info.image
         : "default-image-url",
       // Update status to show "Pending" as default
       status: data.info.approval_status

@@ -2,9 +2,10 @@
 import { ref, onMounted } from "vue";
 import { useDropZone } from "@vueuse/core";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -19,12 +20,12 @@ const uploadFiles = async () => {
     files.value.forEach((file) => {
       formData.append("files[]", file);
     });
-    const response = await axios
-      .post("http://localhost:8000/api/mentor/file/upload", formData, {
+    const response = await api
+      .post("/api/mentor/file/upload", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -311,7 +312,6 @@ onMounted(() => {
   max-height: 37.4rem;
   overflow-y: scroll;
 }
-
 
 .table-header {
   display: flex;

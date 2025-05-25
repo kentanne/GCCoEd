@@ -9,6 +9,8 @@ import api from "@/axios.js"; // Adjust the path as necessary
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
 
+const baseURL = api.defaults.baseURL;
+
 library.add(faBook, faXmark);
 
 const props = defineProps({
@@ -31,13 +33,13 @@ const records = ref([]);
 const filteredRecords = computed(() => {
   if (!searchQuery.value) return records.value;
   const query = searchQuery.value.toLowerCase();
-  return records.value.filter(record => {
+  return records.value.filter((record) => {
     return (
       record.date.toLowerCase().includes(query) ||
       (record.subject && record.subject.toLowerCase().includes(query)) ||
-      (record.mentor.user.name.toLowerCase().includes(query)) ||
-      (record.mentor.year.toLowerCase().includes(query)) ||
-      (record.mentor.course.toLowerCase().includes(query))
+      record.mentor.user.name.toLowerCase().includes(query) ||
+      record.mentor.year.toLowerCase().includes(query) ||
+      record.mentor.course.toLowerCase().includes(query)
     );
   });
 });
@@ -67,14 +69,14 @@ const sendFeedback = async (record) => {
         feedback: record.feedback?.feedback || "",
         rating: tempRating.value,
       },
-      has_feedback: true
+      has_feedback: true,
     };
-    
-    const index = records.value.findIndex(r => r.id === record.id);
+
+    const index = records.value.findIndex((r) => r.id === record.id);
     if (index !== -1) {
       records.value[index] = updatedRecord;
     }
-    
+
     if (recordView.value.id === record.id) {
       recordView.value = updatedRecord;
     }
@@ -171,18 +173,24 @@ onMounted(async () => {
             <td class="small-text">{{ record.subject }}</td>
             <td class="small-text">{{ record.mentor.user.name }}</td>
             <td class="small-text">{{ record.mentor.year }}</td>
-            <td class="small-text">{{ record.mentor.course.match(/\(([^)]+)\)/)?.[1] }}</td>
+            <td class="small-text">
+              {{ record.mentor.course.match(/\(([^)]+)\)/)?.[1] }}
+            </td>
             <td>
               <div class="stars">
                 <span v-for="i in 5" :key="i" class="star">
-                  <span v-if="i <= (record.feedback?.rating || 0)" class="filled">★</span>
+                  <span
+                    v-if="i <= (record.feedback?.rating || 0)"
+                    class="filled"
+                    >★</span
+                  >
                   <span v-else>☆</span>
                 </span>
               </div>
             </td>
             <td>
-              <button 
-                @click="viewFeedback(record)" 
+              <button
+                @click="viewFeedback(record)"
                 class="details-btn small-text"
                 :class="{ sent: record.has_feedback }"
               >
@@ -191,7 +199,9 @@ onMounted(async () => {
             </td>
           </tr>
           <tr v-if="filteredRecords.length === 0">
-            <td colspan="7" class="no-users small-text">No records to display</td>
+            <td colspan="7" class="no-users small-text">
+              No records to display
+            </td>
           </tr>
         </tbody>
       </table>
@@ -214,33 +224,44 @@ onMounted(async () => {
             <div class="user-profile">
               <div class="profile-image-container">
                 <img
-                  :src="'http://localhost:8000/api/image/' + recordView.mentor.image || 'https://placehold.co/600x400'"
+                  :src="
+                    `${baseURL}/api/image/` + recordView.mentor.image ||
+                    'https://placehold.co/600x400'
+                  "
                   :alt="`Portrait of ${recordView.mentor.user.name}`"
                   class="profile-image"
                 />
               </div>
 
               <div class="profile-info">
-                <h4 class="user-name small-text">{{ recordView.mentor.user.name }}</h4>
+                <h4 class="user-name small-text">
+                  {{ recordView.mentor.user.name }}
+                </h4>
                 <hr class="divider" />
                 <div class="info-grid">
                   <div class="info-item">
                     <span class="info-label small-text"
                       ><i class="fas fa-graduation-cap"></i> Course</span
                     >
-                    <span class="info-value small-text">{{ recordView.mentor.course.match(/\(([^)]+)\)/)?.[1] }}</span>
+                    <span class="info-value small-text">{{
+                      recordView.mentor.course.match(/\(([^)]+)\)/)?.[1]
+                    }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label small-text"
                       ><i class="fas fa-calendar-alt"></i> Year Level</span
                     >
-                    <span class="info-value small-text">{{ recordView.mentor.year }}</span>
+                    <span class="info-value small-text">{{
+                      recordView.mentor.year
+                    }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label small-text"
                       ><i class="fas fa-star"></i> Session Date</span
                     >
-                    <span class="info-value small-text">{{ recordView.date }}</span>
+                    <span class="info-value small-text">{{
+                      recordView.date
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -268,7 +289,10 @@ onMounted(async () => {
                     ★
                   </span>
                 </div>
-                <div v-if="recordView.has_feedback" class="current-rating small-text">
+                <div
+                  v-if="recordView.has_feedback"
+                  class="current-rating small-text"
+                >
                   Your rating: {{ recordView.feedback.rating }} stars
                 </div>
               </div>
@@ -280,7 +304,9 @@ onMounted(async () => {
                 <hr class="divider2" />
                 <textarea
                   v-model="recordView.feedback.feedback"
-                  :placeholder="recordView.has_feedback ? '' : 'Enter your feedback here...'"
+                  :placeholder="
+                    recordView.has_feedback ? '' : 'Enter your feedback here...'
+                  "
                   class="feedback-input small-text"
                   :disabled="recordView.has_feedback"
                 ></textarea>
@@ -290,9 +316,9 @@ onMounted(async () => {
 
           <div class="modal-footer">
             <div class="footer-actions">
-              <button 
-                v-if="!recordView.has_feedback" 
-                @click="sendFeedback(recordView)" 
+              <button
+                v-if="!recordView.has_feedback"
+                @click="sendFeedback(recordView)"
                 class="footer-btn submit small-text"
                 :disabled="tempRating === 0"
               >
@@ -764,7 +790,7 @@ onMounted(async () => {
 }
 
 .footer-btn.submit {
-    background: linear-gradient(135deg, #3b9aa9, #0b3e8a);
+  background: linear-gradient(135deg, #3b9aa9, #0b3e8a);
   color: rgb(225, 232, 235);
 }
 
@@ -793,17 +819,17 @@ onMounted(async () => {
     height: auto;
     max-height: 80vh;
   }
-  
+
   .table-header {
     position: relative;
     top: auto;
   }
-  
+
   .table-head {
     position: relative;
     top: auto;
   }
-  
+
   .table-wrapper {
     overflow-y: visible;
   }
@@ -857,12 +883,12 @@ onMounted(async () => {
     width: 70px;
     height: 70px;
   }
-  
+
   .footer-actions {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .footer-btn {
     width: 100%;
     justify-content: center;

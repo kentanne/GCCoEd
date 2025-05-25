@@ -121,7 +121,7 @@
           <div class="user-profile">
             <div class="profile-image-container">
               <img
-                :src="'http://localhost:8000/api/image/' + currentUser.image"
+                :src="`${baseURL}/api/image/` + currentUser.image"
                 :alt="`Portrait of ${currentUser.name}`"
                 class="profile-image"
               />
@@ -360,9 +360,12 @@ import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import logoGccoed from "@/assets/logo_gccoed.png";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const getCookies = () => {
   const cookies = document.cookie.split("; ");

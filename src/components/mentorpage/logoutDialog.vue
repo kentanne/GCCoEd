@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 import router from "@/router";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -14,11 +15,11 @@ function getCookie(name) {
 }
 
 const logOut = async () => {
-  const response = await axios
-    .post("http://localhost:8000/api/logout/web", {
+  const response = await api
+    .post("/api/logout/web", {
       withCredentials: true,
       headers: {
-        "X-CSRFToken": getCookie("csrftoken"),
+        // "X-CSRFToken": getCookie("csrftoken"),
         "Content-Type": "application/json",
         Accept: "application/json",
       },

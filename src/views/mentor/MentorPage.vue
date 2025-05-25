@@ -4,7 +4,10 @@ import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
 import api from "@/axios.js";
+import axios from "axios";
 import Offer from "@/components/mentorpage/offer.vue";
+
+const baseURL = api.defaults.baseURL;
 
 // Initialize router
 const router = useRouter();
@@ -21,13 +24,13 @@ function getCookie(name) {
 
 const loggedUserDets = async () => {
   try {
-    await axios
-      .get("http://localhost:8000/api/mentor/details", {
+    await api
+      .get("/api/mentor/details", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -56,13 +59,13 @@ const loggedUserDets = async () => {
 
 const learnersProfile = async () => {
   try {
-    const response = await axios
-      .get("http://localhost:8000/api/mentor/users", {
+    const response = await api
+      .get("/api/mentor/users", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -84,13 +87,13 @@ const learnersProfile = async () => {
 
 const sessionInfo = async () => {
   try {
-    const sessionDeets = await axios
-      .get(`http://localhost:8000/api/mentor/schedule`, {
+    const sessionDeets = await api
+      .get(`/api/mentor/schedule`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -106,13 +109,13 @@ const sessionInfo = async () => {
 
 const getFeedbacks = async () => {
   try {
-    const response = await axios
-      .get("http://localhost:8000/api/mentor/getFeedback", {
+    const response = await api
+      .get("/api/mentor/getFeedback", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -127,13 +130,13 @@ const getFeedbacks = async () => {
 
 const getFiles = async () => {
   try {
-    const response = await axios
-      .get("http://localhost:8000/api/mentor/files", {
+    const response = await api
+      .get("/api/mentor/files", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -148,13 +151,13 @@ const getFiles = async () => {
 
 const registerLearnerRole = async () => {
   try {
-    const response = await axios
-      .post("http://localhost:8000/api/set/2nd_role", {
+    const response = await api
+      .post("/api/set/2nd_role", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -169,13 +172,13 @@ const registerLearnerRole = async () => {
 
 const switchRole = async () => {
   try {
-    const response = await axios
-      .post("http://localhost:8000/api/switch", {
+    const response = await api
+      .post("/api/switch", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -190,15 +193,15 @@ const switchRole = async () => {
 
 const logout = async () => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/logout/web",
+    const response = await api.post(
+      "/api/logout/web",
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
@@ -360,7 +363,7 @@ onMounted(async () => {
         <h1>Hi, Mentor!</h1>
         <img
           :src="
-            'http://localhost:8000/api/image/' + userData.ment.image ||
+            `${baseURL}/api/image/` + userData.ment.image ||
             'http://placehold.co/600x400'
           "
           alt="profile-pic"

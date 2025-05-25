@@ -19,8 +19,11 @@
         <div class="lower-upper">
           <div class="profile-image-container">
             <img
-              :src="'http://localhost:8000/api/image/' + profilePic || 'https://placehold.co/600x400'"
-              alt="Profile Image"
+              :src="
+                `${baseURL}/api/image/` + profilePic ||
+                'https://placehold.co/600x400'
+              "
+              alt="profile-pic"
               class="profile-image"
             />
           </div>
@@ -30,31 +33,45 @@
             <hr class="divider" />
             <div class="info-grid">
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                <span class="info-label"
+                  ><i class="fas fa-venus-mars"></i> Gender</span
+                >
                 <span class="info-value">{{ gender || "N/A" }}</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-calendar-alt"></i> Year</span>
+                <span class="info-label"
+                  ><i class="fas fa-calendar-alt"></i> Year</span
+                >
                 <span class="info-value">{{ year || "N/A" }}</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-graduation-cap"></i> Program</span>
+                <span class="info-label"
+                  ><i class="fas fa-graduation-cap"></i> Program</span
+                >
                 <span class="info-value">{{ course || "N/A" }}</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-university"></i> College</span>
+                <span class="info-label"
+                  ><i class="fas fa-university"></i> College</span
+                >
                 <span class="info-value">College of Computer Studies</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-map-marker-alt"></i> Location</span>
+                <span class="info-label"
+                  ><i class="fas fa-map-marker-alt"></i> Location</span
+                >
                 <span class="info-value">{{ address || "N/A" }}</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-phone"></i> Contact</span>
+                <span class="info-label"
+                  ><i class="fas fa-phone"></i> Contact</span
+                >
                 <span class="info-value">{{ contact || "N/A" }}</span>
               </div>
               <div class="info-item">
-                <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
+                <span class="info-label"
+                  ><i class="fas fa-envelope"></i> Email</span
+                >
                 <span class="info-value">{{ email || "N/A" }}</span>
               </div>
             </div>
@@ -72,23 +89,33 @@
               <div class="details-content">
                 <div class="detail-item">
                   <span class="detail-label">Subjects Offered:</span>
-                  <span class="detail-value right-align wrap-text">{{ subjects || "N/A" }}</span>
+                  <span class="detail-value right-align wrap-text">{{
+                    subjects || "N/A"
+                  }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Teaching Modality:</span>
-                  <span class="detail-value right-align">{{ modality || "N/A" }}</span>
+                  <span class="detail-value right-align">{{
+                    modality || "N/A"
+                  }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Teaching Style:</span>
-                  <span class="detail-value right-align">{{ learnStyle || "N/A" }}</span>
+                  <span class="detail-value right-align">{{
+                    learnStyle || "N/A"
+                  }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Availability:</span>
-                  <span class="detail-value availability-text right-align">{{ availability || "N/A" }}</span>
+                  <span class="detail-value availability-text right-align">{{
+                    availability || "N/A"
+                  }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Session Duration:</span>
-                  <span class="detail-value right-align">{{ sessionDur || "N/A" }}</span>
+                  <span class="detail-value right-align">{{
+                    sessionDur || "N/A"
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -101,11 +128,15 @@
               <div class="bio-content">
                 <div class="detail-item2">
                   <span class="detail-label">Bio:</span>
-                  <span class="detail-value2 wrap-text">{{ bio || "No bio provided" }}</span>
+                  <span class="detail-value2 wrap-text">{{
+                    bio || "No bio provided"
+                  }}</span>
                 </div>
                 <div class="detail-item2">
                   <span class="detail-label">Experience:</span>
-                  <span class="detail-value2 wrap-text">{{ goal || "No experience provided" }}</span>
+                  <span class="detail-value2 wrap-text">{{
+                    goal || "No experience provided"
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -155,6 +186,8 @@ import api from "@/axios.js"; // Adjust the path as necessary
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const props = defineProps({
   userId: {
@@ -258,7 +291,7 @@ onMounted(() => {
   border-radius: 12px;
   width: 800px;
   max-height: 80vh;
-  height: 80vh; 
+  height: 80vh;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;

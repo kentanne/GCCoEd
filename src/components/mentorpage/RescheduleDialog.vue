@@ -3,9 +3,10 @@ import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   id: {
@@ -46,9 +47,9 @@ const rescheduleSession = async () => {
       hour12: false,
     }); // Format: HH:mm
 
-    const response = await axios
+    const response = await api
       .patch(
-        "http://localhost:8000/api/resched/" + props.id,
+        "/api/resched/" + props.id,
         {
           date: formattedDate,
           time: formattedTime,
@@ -57,7 +58,7 @@ const rescheduleSession = async () => {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
           },
         }
       )
@@ -123,7 +124,7 @@ const rescheduleSession = async () => {
   padding: 0;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
   border: 1px solid #eaeaea;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   z-index: 1000;
 }
 
@@ -246,4 +247,3 @@ const rescheduleSession = async () => {
   box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
 }
 </style>
-

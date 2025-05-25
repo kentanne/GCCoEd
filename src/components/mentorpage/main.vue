@@ -1,9 +1,13 @@
 <script setup>
 import { ref, computed } from "vue";
 import viewUser from "@/components/mentorpage/viewUser.vue";
+import api from "@/axios.js";
+import axios from "axios";
 
 const isView = ref(false);
 const selectedUserId = ref();
+
+const baseURL = api.defaults.baseURL;
 
 const openView = (id) => {
   console.log("Selected user ID:", id);
@@ -48,7 +52,7 @@ console.log("props:", props);
         <div class="upper-element">
           <img
             :src="
-              'http://localhost:8000/api/image/' + user.image_id ||
+              `${baseURL}/api/image/` + user.image_id ||
               'https://placehold.co/600x400'
             "
             alt="profile-pic"

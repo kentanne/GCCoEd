@@ -405,9 +405,10 @@
 // import { define } from "core-js/core/object";
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFTokens = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFTokens = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -457,18 +458,14 @@ const saveChanges = async () => {
   };
 
   try {
-    const response = await axios.patch(
-      "http://localhost:8000/api/mentor/edit",
-      combinedData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.patch("/api/mentor/edit", combinedData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-CSRFToken": getCookie("csrftoken"),
+      },
+    });
 
     if (response.status === 200) {
       alert("Changes saved successfully!");

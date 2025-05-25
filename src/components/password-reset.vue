@@ -75,7 +75,7 @@ function getCookie(name) {
 
 const csrf = async () => {
   try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie", {
+    await api.get("/sanctum/csrf-cookie", {
       withCredentials: true,
     });
     console.log("CSRF cookie set successfully");

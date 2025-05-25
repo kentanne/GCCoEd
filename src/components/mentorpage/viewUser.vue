@@ -1,10 +1,13 @@
 <script setup>
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 import { onMounted, ref } from "vue";
 import Offer from "./offer.vue"; // Add this import
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const props = defineProps({
   userId: {
@@ -32,13 +35,13 @@ function getCookie(name) {
 const userInfo = async (id) => {
   console.log(id);
   try {
-    const userDeets = await axios
-      .get(`http://localhost:8000/api/mentor/users/${id}`, {
+    const userDeets = await api
+      .get(`/api/mentor/users/${id}`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -157,7 +160,7 @@ onMounted(() => {
         <div class="profile-image-container">
           <img
             :src="
-              'http://localhost:8000/api/image/' + profilePic ||
+              `${baseURL}/api/image/` + profilePic ||
               'https://placehold.co/600x400'
             "
             alt="Profile Image"

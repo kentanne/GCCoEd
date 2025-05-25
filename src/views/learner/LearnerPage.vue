@@ -6,10 +6,12 @@ import { useRouter } from "vue-router";
 import api from "@/axios.js";
 import axios from "axios";
 
+const baseURL = api.defaults.baseURL;
+
 const router = useRouter();
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -154,7 +156,7 @@ const switchRole = async () => {
 const mentFiles = async () => {
   try {
     const response = await api
-      .get("http://localhost:8000/api/learner/mentFiles", {
+      .get("/api/learner/mentFiles", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -175,17 +177,14 @@ const mentFiles = async () => {
 
 const fetchMentFiles = async () => {
   try {
-    const response = await api.get(
-      "http://localhost:8000/api/learner/mentFiles",
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.get("/api/learner/mentFiles", {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
     console.log("Mentor files fetched:", response.data);
     mentorFiles.value = response.data;
   } catch (error) {
@@ -196,7 +195,7 @@ const fetchMentFiles = async () => {
 const logout = async () => {
   try {
     const response = await api.post(
-      "http://localhost:8000/api/logout/web",
+      "/api/logout/web",
       {},
       {
         withCredentials: true,
@@ -378,16 +377,16 @@ onMounted(async () => {
   <!-- sidebar -->
   <div class="sidebar">
     <div class="logo-container">
-      <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo">
+      <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo" />
       <span class="logo-text">GCCoEd</span>
     </div>
-    
+
     <div class="upper-element">
       <div>
         <h1>Hi, Learner!</h1>
         <img
           :src="
-            'http://localhost:8000/api/image/' + userData.learn.image ||
+            `${baseURL}/api/image/` + userData.learn.image ||
             'https://placehold.co/600x400'
           "
           alt="profile-pic"
@@ -395,11 +394,15 @@ onMounted(async () => {
       </div>
       <div>
         <h2>{{ userData.user.name }}</h2>
-        <i><p>{{ userData.learn.year }}</p></i>
-        <i><p>{{ userData.learn.course.match(/\(([^)]+)\)/)?.[1] }}</p></i>
+        <i
+          ><p>{{ userData.learn.year }}</p></i
+        >
+        <i
+          ><p>{{ userData.learn.course.match(/\(([^)]+)\)/)?.[1] }}</p></i
+        >
       </div>
     </div>
-    
+
     <div class="footer-element">
       <div class="bio-container">
         <h1>BIO</h1>
@@ -409,13 +412,13 @@ onMounted(async () => {
           </p>
         </div>
       </div>
-      
+
       <div class="availability">
         <h1>Availability</h1>
         <div class="lines">
           <h3>Days:</h3>
           <div>
-            <p>{{ userData.learn.availability.join(', ') }}</p>
+            <p>{{ userData.learn.availability.join(", ") }}</p>
           </div>
         </div>
         <div class="lines">
@@ -425,7 +428,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      
+
       <div class="subject-interest">
         <h1>Subject of Interest</h1>
         <div class="course-grid">
@@ -467,7 +470,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      
+
       <div class="account-actions">
         <div class="account-dropdown">
           <button class="account-dropbtn">
@@ -496,34 +499,41 @@ onMounted(async () => {
   <!-- updated topbar with icon beside text -->
   <div class="topbar">
     <div class="topbar-left">
-      <div 
-        @click="switchComponent('main')" 
+      <div
+        @click="switchComponent('main')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'main' }"
+        :class="{ active: activeComponent === 'main' }"
       >
         <img src="/main.svg" alt="Main" class="nav-icon" />
         <span class="nav-text">Main</span>
       </div>
-      <div 
-        @click="switchComponent('session')" 
+      <div
+        @click="switchComponent('session')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'session' }"
+        :class="{ active: activeComponent === 'session' }"
       >
         <img src="/calendar.svg" alt="Session" class="nav-icon" />
         <span class="nav-text">Sessions</span>
       </div>
-      <div 
-        @click="switchComponent('records')" 
+      <div
+        @click="switchComponent('records')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'records' }"
+        :class="{ active: activeComponent === 'records' }"
       >
         <img src="/records.svg" alt="Records" class="nav-icon" />
         <span class="nav-text">Records</span>
       </div>
     </div>
-<div class="topbar-date">
-  {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
-</div>
+    <div class="topbar-date">
+      {{
+        new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      }}
+    </div>
   </div>
 
   <!-- main content -->
@@ -630,7 +640,7 @@ onMounted(async () => {
 }
 
 .stars {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 18px;
   display: flex;
   gap: 3px;
@@ -645,7 +655,7 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.bio-container h1{
+.bio-container h1 {
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   padding-top: 17px;
@@ -688,18 +698,18 @@ onMounted(async () => {
 .lines div {
   color: white;
   font-size: 12px;
-  white-space: nowrap;    
-  overflow-x: auto;          
-  overflow-y: hidden;      
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   max-width: 100%;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;     
-  -ms-overflow-style: none;  
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .lines p::-webkit-scrollbar,
 .lines div::-webkit-scrollbar {
-  display: none;            
+  display: none;
 }
 .bio-container .lines {
   white-space: normal;
@@ -723,11 +733,11 @@ onMounted(async () => {
   max-height: 30px;
   overflow-y: scroll;
   scrollbar-width: none;
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
 }
 
 .bio-container .lines p::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 /* Subjects Grid */
 .subject-interest .course-grid {
@@ -747,7 +757,7 @@ onMounted(async () => {
 .subject-interest .course-card .lines {
   padding: 5px;
   background-color: #cee1e6b6;
-  overflow: hidden; 
+  overflow: hidden;
   margin-bottom: 0;
 }
 
@@ -759,7 +769,7 @@ onMounted(async () => {
   font-weight: 500;
   color: rgb(32, 71, 92);
   display: block;
-  width: 100%;        
+  width: 100%;
 }
 
 .subject-interest .remaining-courses {
@@ -768,7 +778,7 @@ onMounted(async () => {
 }
 
 .subject-interest .remaining-courses .lines {
-  justify-content: center; 
+  justify-content: center;
 }
 
 .subject-interest .remaining-courses .lines p {
@@ -877,13 +887,13 @@ onMounted(async () => {
   position: absolute;
   background-color: #f9f9f9;
   min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   bottom: 100%;
   left: 6rem;
   border-radius: 5px;
   overflow: hidden;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .account-dropdown-content a {
@@ -965,7 +975,7 @@ onMounted(async () => {
 }
 
 .topbar-option.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1060,34 +1070,34 @@ onMounted(async () => {
   .sidebar {
     width: 250px;
   }
-  
+
   .main-content {
     padding-left: 270px;
   }
-  
+
   .topbar {
     left: 250px;
     padding: 0 20px;
   }
-  
+
   .topbar-left {
     gap: 15px;
   }
-  
+
   .topbar-option {
     padding: 0 10px;
     gap: 6px;
   }
-  
+
   .nav-icon {
     width: 18px;
     height: 18px;
   }
-  
+
   .nav-text {
     font-size: 13px;
   }
-  
+
   .topbar-date {
     font-size: 12px;
     padding: 5px 10px;
@@ -1099,7 +1109,7 @@ onMounted(async () => {
     left: 0;
     padding-left: 270px;
   }
-  
+
   .topbar-date {
     display: none;
   }

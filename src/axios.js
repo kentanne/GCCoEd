@@ -1,8 +1,11 @@
 import axios from "axios";
 
+const baseURLConst = "https://gccoed.onrender.com";
+// const baseURLConst = "http://localhost:8000";
+
 const api = axios.create({
-  baseURL: 'https://gccoed.onrender.com',
-  // baseURL: "http://localhost:8000",
+  // baseURL: baseURLConst,
+  baseURL: baseURLConst,
   withCredentials: true,
   withXSRFToken: true,
   headers: {
@@ -16,7 +19,7 @@ api.interceptors.request.use(
   async (config) => {
     // Only fetch CSRF token if it doesn't exist
     if (!document.cookie.includes("XSRF-TOKEN")) {
-      await axios.get(`${BASE_URL}/sanctum/csrf-cookie`, {
+      await axios.get(`${baseURLConst}/sanctum/csrf-cookie`, {
         withCredentials: true,
         headers: {
           Accept: "application/json",
@@ -40,7 +43,7 @@ api.interceptors.response.use(
       const originalRequest = error.config;
       if (!originalRequest._retry) {
         originalRequest._retry = true;
-        await axios.get(`${BASE_URL}/sanctum/csrf-cookie`, {
+        await axios.get(`${baseURLConst}/sanctum/csrf-cookie`, {
           withCredentials: true,
         });
         return api(originalRequest);

@@ -6,6 +6,8 @@ import api from "@/axios.js";
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
 
+const baseURL = api.defaults.baseURL;
+
 const props = defineProps({
   info: {
     type: Array,
@@ -310,7 +312,7 @@ const isToday = (date) => {
         alt="Profile image"
         :src="
           mentorProfilePic
-            ? 'http://localhost:8000/api/image/' + mentorProfilePic
+            ? `${baseURL}/api/image/` + mentorProfilePic
             : 'https://placehold.co/400x400'
         "
         width="64"
@@ -489,10 +491,10 @@ const isToday = (date) => {
   margin-left: 10rem;
   margin-right: -10rem;
   top: 3rem;
-  max-height: 85vh; 
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .header {
@@ -508,7 +510,6 @@ const isToday = (date) => {
   top: 0;
   z-index: 10;
 }
-
 
 .header h1 {
   font-weight: 800;
@@ -908,7 +909,7 @@ const isToday = (date) => {
 @-moz-document url-prefix() {
   .subject-dropdown {
     text-indent: 0.01px;
-    text-overflow: '';
+    text-overflow: "";
   }
   .subject-dropdown option {
     padding-left: 1rem;

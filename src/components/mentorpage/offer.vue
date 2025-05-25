@@ -1,9 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const props = defineProps({
   info: {
@@ -124,18 +127,14 @@ const confirmSchedule = async () => {
   };
 
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/mentor/send-offer",
-      scheduleData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.post("/api/mentor/send-offer", scheduleData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
 
     // Debug logs
     console.log("Selected Subject:", selectedSubject.value);
@@ -343,7 +342,7 @@ const currentMonthYear = computed(() => {
       <img
         :src="
           learnerPic
-            ? `http://localhost:8000/api/image/${learnerPic}`
+            ? `${baseURL}/api/image/${learnerPic}`
             : 'https://placehold.co/400x400'
         "
         alt="Profile image"
