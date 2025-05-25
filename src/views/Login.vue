@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
@@ -90,53 +90,50 @@ async function csrf() {
 
 async function login() {
   try {
-    await csrf().then((success) => {
-      if (!success) {
-        console.error("Failed to set CSRF cookie");
-        return;
-      }
+    // await csrf().then((success) => {
+    //   if (!success) {
+    //     console.error("Failed to set CSRF cookie");
+    //     return;
+    //   }
 
-      console.log("All cookies:", document.cookie);
-      const token = getCookie("XSRF-TOKEN");
-      console.log("Retrieved XSRF-TOKEN:", token);
+    console.log("All cookies:", document.cookie);
+    const token = getCookie("XSRF-TOKEN");
+    console.log("Retrieved XSRF-TOKEN:", token);
 
-      const loginData = {
-        login: email.value,
-        password: password.value,
-      };
+    const loginData = {
+      login: email.value,
+      password: password.value,
+    };
 
-      const response = api
-        .post("/api/login", loginData, {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          console.log("Login successful:", response.data);
+    const response = api
+      .post("/api/login", loginData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Login successful:", response.data);
 
-          switch (response.data.user_role) {
-            case null:
-              router.push("/signup");
-              break;
-            case "learner":
-              router.push("/learner");
-              break;
-            case "mentor":
-              router.push("/mentor");
-              break;
-            case "admin":
-              router.push("/admin");
-              break;
-            default:
-              console.error("Unknown user role:", response.data.user_role);
-              break;
-          }
-          // return response;
-        });
-    });
-
-    // Debug cookie information
+        switch (response.data.user_role) {
+          case null:
+            router.push("/signup");
+            break;
+          case "learner":
+            router.push("/learner");
+            break;
+          case "mentor":
+            router.push("/mentor");
+            break;
+          case "admin":
+            router.push("/admin");
+            break;
+          default:
+            console.error("Unknown user role:", response.data.user_role);
+            break;
+        }
+        // return response;
+      });
   } catch (error) {
     console.error("Login failed:", error);
   }
@@ -145,6 +142,10 @@ async function login() {
 function togglePasswordVisibility() {
   passwordVisible.value = !passwordVisible.value;
 }
+
+onMounted(async () => {
+  await csrf();
+});
 </script>
 
 <style scoped>
