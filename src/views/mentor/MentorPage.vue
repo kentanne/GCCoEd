@@ -3,13 +3,14 @@ import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios.js";
+import Offer from "@/components/mentorpage/offer.vue";
 
 // Initialize router
 const router = useRouter();
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -242,6 +243,8 @@ const isEdit = ref(false);
 const confirmLogout = ref(false);
 const showAllCourses = ref(false);
 const searchQuery = ref("");
+const showOffer = ref(false);
+const userId = ref(null);
 
 const activeComponent = ref("main");
 const switchComponent = (component) => {
@@ -311,13 +314,13 @@ const filteredUsers = computed(() => {
 });
 
 const currentDate = computed(() => {
-  const options = { month: 'long', day: 'numeric', year: 'numeric' };
-  return new Date().toLocaleDateString('en-US', options);
+  const options = { month: "long", day: "numeric", year: "numeric" };
+  return new Date().toLocaleDateString("en-US", options);
 });
 
 const currentDay = computed(() => {
-  const options = { weekday: 'long' };
-  return new Date().toLocaleDateString('en-US', options);
+  const options = { weekday: "long" };
+  return new Date().toLocaleDateString("en-US", options);
 });
 
 const handleLogout = () => {
@@ -325,6 +328,13 @@ const handleLogout = () => {
   confirmLogout.value = false;
   logout();
   router.push("/login");
+};
+
+const handleOfferConfirm = () => {
+  // Handle the offer confirmation logic here
+  console.log("Offer confirmed for user ID:", userId.value);
+  // You can also close the offer modal here if needed
+  showOffer.value = false;
 };
 
 onMounted(async () => {
@@ -341,10 +351,10 @@ onMounted(async () => {
   <!-- sidebar -->
   <div class="sidebar">
     <div class="logo-container">
-      <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo">
+      <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo" />
       <span class="logo-text">GCCoEd</span>
     </div>
-    
+
     <div class="upper-element">
       <div>
         <h1>Hi, Mentor!</h1>
@@ -358,16 +368,20 @@ onMounted(async () => {
       </div>
       <div>
         <h2>{{ userData.user.name }}</h2>
-        <i><p>{{ userData.ment.proficiency }}</p></i>
+        <i
+          ><p>{{ userData.ment.proficiency }}</p></i
+        >
         <div class="stars">
           <span class="filledStar" v-for="i in 5" :key="i">
-            <span v-if="i <= Math.round(userData?.ment?.rating_ave || 0)">★</span>
+            <span v-if="i <= Math.round(userData?.ment?.rating_ave || 0)"
+              >★</span
+            >
             <span v-else>☆</span>
           </span>
         </div>
       </div>
     </div>
-    
+
     <div class="footer-element">
       <div class="user-information">
         <h1>User Information</h1>
@@ -386,17 +400,21 @@ onMounted(async () => {
         <div class="lines">
           <h3>Program:</h3>
           <div>
-            <p>{{ userData.ment.course.match(/\(([^)]+)\)/)?.[1] || userData.ment.course }}</p>
+            <p>
+              {{
+                userData.ment.course.match(/\(([^)]+)\)/)?.[1] ||
+                userData.ment.course
+              }}
+            </p>
           </div>
         </div>
       </div>
-      
       <div class="availability">
         <h1>Availability</h1>
         <div class="lines">
           <h3>Days:</h3>
           <div>
-            <p>{{ userData.ment.availability.join(', ') }}</p>
+            <p>{{ userData.ment.availability.join(", ") }}</p>
           </div>
         </div>
         <div class="lines">
@@ -406,7 +424,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      
+
       <div class="course-offered">
         <h1>Course Offered</h1>
         <div class="course-grid">
@@ -448,7 +466,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      
+
       <!-- Account Actions Dropdown -->
       <div class="account-actions">
         <div class="account-dropdown">
@@ -475,45 +493,45 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- updated topbar with icon beside text -->
+  <!-- topbar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div 
-        @click="switchComponent('main')" 
+      <div
+        @click="switchComponent('main')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'main' }"
+        :class="{ active: activeComponent === 'main' }"
       >
         <img src="/main.svg" alt="Main" class="nav-icon" />
         <span class="nav-text">Main</span>
       </div>
-      <div 
-        @click="switchComponent('session')" 
+      <div
+        @click="switchComponent('session')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'session' }"
+        :class="{ active: activeComponent === 'session' }"
       >
         <img src="/calendar.svg" alt="Session" class="nav-icon" />
         <span class="nav-text">Sessions</span>
       </div>
-      <div 
-        @click="switchComponent('records')" 
+      <div
+        @click="switchComponent('records')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'records' }"
+        :class="{ active: activeComponent === 'records' }"
       >
         <img src="/records.svg" alt="Records" class="nav-icon" />
         <span class="nav-text">Records</span>
       </div>
-      <div 
-        @click="switchComponent('files')" 
+      <div
+        @click="switchComponent('files')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'files' }"
+        :class="{ active: activeComponent === 'files' }"
       >
         <img src="/uploadCloud.svg" alt="Upload" class="nav-icon" />
         <span class="nav-text">Files</span>
       </div>
-      <div 
-        @click="switchComponent('fileManage')" 
+      <div
+        @click="switchComponent('fileManage')"
         class="topbar-option"
-        :class="{ 'active': activeComponent === 'fileManage' }"
+        :class="{ active: activeComponent === 'fileManage' }"
       >
         <img src="/files.svg" alt="Files" class="nav-icon" />
         <span class="nav-text">File Manager</span>
@@ -539,6 +557,7 @@ onMounted(async () => {
     <component
       :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
+      :mentorData="userData"
       :schedule="todaySchedule"
       :upcomingSchedule="upcommingSchedule"
       :feedbacks="feedbacks"
@@ -556,6 +575,16 @@ onMounted(async () => {
     <div v-if="confirmLogout" class="logout-popup">
       <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
+  </Transition>
+
+  <Transition name="fade" mode="out-in">
+    <Offer
+      v-if="showOffer"
+      :userId="userId"
+      :mentorData="userData"
+      @close="showOffer = false"
+      @confirm="handleOfferConfirm"
+    />
   </Transition>
 </template>
 
@@ -637,7 +666,7 @@ onMounted(async () => {
 }
 
 .stars {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 18px;
   display: flex;
   gap: 3px;
@@ -686,18 +715,18 @@ onMounted(async () => {
 .lines div {
   color: white;
   font-size: 12px;
-  white-space: nowrap;    
-  overflow-x: auto;          
-  overflow-y: hidden;      
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   max-width: 100%;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;     
-  -ms-overflow-style: none;  
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .lines p::-webkit-scrollbar,
 .lines div::-webkit-scrollbar {
-  display: none;            
+  display: none;
 }
 
 /* Subjects Grid */
@@ -718,7 +747,7 @@ onMounted(async () => {
 .course-offered .course-card .lines {
   padding: 5px;
   background-color: #cee1e6b6;
-  overflow: hidden; 
+  overflow: hidden;
   margin-bottom: 0;
 }
 
@@ -730,7 +759,7 @@ onMounted(async () => {
   font-weight: 500;
   color: rgb(32, 71, 92);
   display: block;
-  width: 100%;        
+  width: 100%;
 }
 
 .course-offered .remaining-courses {
@@ -739,7 +768,7 @@ onMounted(async () => {
 }
 
 .course-offered .remaining-courses .lines {
-  justify-content: center; 
+  justify-content: center;
 }
 
 .course-offered .remaining-courses .lines p {
@@ -848,13 +877,13 @@ onMounted(async () => {
   position: absolute;
   background-color: #f9f9f9;
   min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   bottom: 100%;
   left: 6rem;
   border-radius: 5px;
   overflow: hidden;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .account-dropdown-content a {
@@ -936,7 +965,7 @@ onMounted(async () => {
 }
 
 .topbar-option.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1080,42 +1109,42 @@ input::placeholder {
   .sidebar {
     width: 250px;
   }
-  
+
   .main-content {
     padding-left: 270px;
   }
-  
+
   .topbar {
     left: 250px;
     padding: 0 20px;
   }
-  
+
   .topbar-left {
     gap: 15px;
   }
-  
+
   .topbar-option {
     padding: 0 10px;
     gap: 6px;
   }
-  
+
   .nav-icon {
     width: 18px;
     height: 18px;
   }
-  
+
   .nav-text {
     font-size: 13px;
   }
-  
+
   .topbar-right {
     margin-right: 80px;
   }
-  
+
   .topbar-right input {
     width: 180px;
   }
-  
+
   .date-display {
     display: none;
   }
@@ -1126,7 +1155,7 @@ input::placeholder {
     left: 0;
     padding-left: 270px;
   }
-  
+
   .topbar-right {
     display: none;
   }

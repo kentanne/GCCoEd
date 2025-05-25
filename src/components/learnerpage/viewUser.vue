@@ -151,9 +151,10 @@
 import { ref, onMounted } from "vue";
 import Schedule from "@/components/learnerpage/schedule.vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   userId: {
@@ -177,45 +178,47 @@ function getCookie(name) {
 
 const userInfo = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:8000/api/learner/users/${id}`, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    });
-    
-    const data = response.data;
-    mentor_no.value = data.user_info.mentor_no;
-    name.value = data.user.name;
-    year.value = data.user_info.year;
-    course.value = data.user_info.course;
-    gender.value = data.user_info.gender;
-    contact.value = data.user_info.phoneNum;
-    email.value = data.user.email;
-    address.value = data.user_info.address;
-    bio.value = data.user_info.bio;
-    subjects.value = data.user_info.subjects;
-    modality.value = data.user_info.learn_modality;
-    learnStyle.value = data.user_info.teach_sty;
-    availability.value = data.user_info.availability;
-    sessionDur.value = data.user_info.prefSessDur;
-    goal.value = data.user_info.exp;
-    profilePic.value = data.user_info.image;
-    userDeetsForSched.value = [
-      mentor_no.value,
-      name.value,
-      year.value,
-      course.value,
-      sessionDur.value,
-      modality.value,
-      learnStyle.value,
-      availability.value,
-      modality.value,
-      profilePic.value,
-      subjects.value,
-    ];
+    const userDeets = await api
+      .get(`/api/learner/users/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("user details:", response.data);
+        mentor_no.value = response.data.user_info.mentor_no;
+        name.value = response.data.user.name;
+        year.value = response.data.user_info.year;
+        course.value = response.data.user_info.course;
+        gender.value = response.data.user_info.gender;
+        contact.value = response.data.user_info.phoneNum;
+        email.value = response.data.user.email;
+        address.value = response.data.user_info.address;
+        bio.value = response.data.user_info.bio;
+        subjects.value = response.data.user_info.subjects; //response.data.user_info.subjects;
+        modality.value = response.data.user_info.learn_modality;
+        learnStyle.value = response.data.user_info.teach_sty;
+        availability.value = response.data.user_info.availability;
+        sessionDur.value = response.data.user_info.prefSessDur;
+        goal.value = response.data.user_info.exp;
+        profilePic.value = response.data.user_info.image;
+        userDeetsForSched.value = [
+          mentor_no.value, // mentorNo
+          name.value, // mentorName
+          year.value, // mentorYear
+          course.value, // mentorCourse
+          sessionDur.value, // mentorSessionDur
+          modality.value, // mentorModality
+          learnStyle.value, // mentorTeachStyle
+          availability.value, // mentorAvailability
+          modality.value, // mentorLearnModality
+          profilePic.value, // mentorProfilePic
+          subjects.value, // mentorSubjects
+        ];
+      });
   } catch (error) {
     console.error("Error fetching user details:", error);
   }
@@ -573,7 +576,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   z-index: 2000;
-    left: 10rem;
+  left: 10rem;
   width: 100%;
 }
 
@@ -643,7 +646,7 @@ onMounted(() => {
     width: 95%;
     max-width: 95vw;
   }
-  
+
   .details-section {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -684,7 +687,7 @@ onMounted(() => {
   .bio-card {
     padding: 1rem;
   }
-  
+
   .profile-image {
     width: 100px;
     height: 100px;

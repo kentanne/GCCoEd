@@ -4,9 +4,10 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faBook, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 library.add(faBook, faXmark);
 
@@ -43,8 +44,8 @@ const filteredRecords = computed(() => {
 
 const sendFeedback = async (record) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/learner/feedback/" + record.id,
+    const response = await api.post(
+      "/api/learner/feedback/" + record.id,
       {
         feedback: record.feedback?.feedback || "",
         rating: tempRating.value,

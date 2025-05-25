@@ -6,59 +6,73 @@ const isView = ref(false);
 const selectedUserId = ref();
 
 const openView = (id) => {
-	console.log("Selected user ID:", id);
-	selectedUserId.value = id;
-	isView.value = true;
+  console.log("Selected user ID:", id);
+  selectedUserId.value = id;
+  isView.value = true;
 };
 
 const closeView = () => {
-	isView.value = false;
+  isView.value = false;
 };
 
 const props = defineProps({
-	userInformation: {
-		type: Array,
-		required: false,
-	},
-	schedule: {
-		type: Object,
-		required: false,
-	},
-	upcomingSchedule: {
-		type: Object,
-		required: false,
-	},
+  userInformation: {
+    type: Array,
+    required: true,
+  },
+  schedule: {
+    type: Object,
+    required: true,
+  },
+  upcomingSchedule: {
+    type: Object,
+    required: true,
+  },
+  mentorData: {
+    type: Object,
+    required: true,
+  },
 });
 
 console.log("props:", props);
 </script>
 
 <template>
-	<div class="main-wrapper">
-		<div class="user-grid">
-			<div
-				v-for="user in props.userInformation"
-				:key="user.id"
-				class="user-card"
-			>
-				<div class="upper-element">
-					<img :src="'http://localhost:8000/api/image/' + user.image_id || 'https://placehold.co/600x400'" alt="profile-pic" />
-					<h1>{{ user.userName }}</h1>
-				</div>
-				<div class="lower-element">
-					<p>{{ user.yearLevel }}</p>
-					<p>{{ user.course.match(/\(([^)]+)\)/)?.[1] }}</p>
-					<button @click="openView(user.id)">See More</button>
-				</div>
-			</div>
-		</div>
+  <div class="main-wrapper">
+    <div class="user-grid">
+      <div
+        v-for="user in props.userInformation"
+        :key="user.id"
+        class="user-card"
+      >
+        <div class="upper-element">
+          <img
+            :src="
+              'http://localhost:8000/api/image/' + user.image_id ||
+              'https://placehold.co/600x400'
+            "
+            alt="profile-pic"
+          />
+          <h1>{{ user.userName }}</h1>
+        </div>
+        <div class="lower-element">
+          <p>{{ user.yearLevel }}</p>
+          <p>{{ user.course.match(/\(([^)]+)\)/)?.[1] }}</p>
+          <button @click="openView(user.id)">See More</button>
+        </div>
+      </div>
+    </div>
 
-		<Transition name="fade" mode="out-in">
-			<div v-if="isView" class="view-popup">
-				<viewUser :userId="selectedUserId" @close="closeView" />
-			</div>
-		</Transition>
-	</div>
+    <Transition name="fade" mode="out-in">
+      <div v-if="isView" class="view-popup">
+        <viewUser
+          :userId="selectedUserId"
+          :mentorData="props.mentorData"
+          @close="closeView"
+        />
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <style scoped>
@@ -78,7 +92,7 @@ console.log("props:", props);
 }
 
 .user-card {
-  background: #e3e6e7; 
+  background: #e3e6e7;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);

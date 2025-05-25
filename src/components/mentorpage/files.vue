@@ -1,169 +1,180 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useDropZone } from "@vueuse/core";
+import axios from "axios";
 
-  
-  <script setup>
-  import { ref, onMounted } from "vue";
-  import { useDropZone } from "@vueuse/core";
-  import axios from "axios";
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
-  axios.defaults.withCredentials = true;
-  axios.defaults.withXSRFToken = true;
-
-  function getCookie(name){
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(';').shift();
-	return null;
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
 }
 
-  const uploadFiles = async () => {
-    try {
-      const formData = new FormData();
-      files.value.forEach((file) => {
-        formData.append("files[]", file);
+const uploadFiles = async () => {
+  try {
+    const formData = new FormData();
+    files.value.forEach((file) => {
+      formData.append("files[]", file);
+    });
+    const response = await axios
+      .post("http://localhost:8000/api/mentor/file/upload", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        console.log("File upload response:", response.data);
+        files.value = []; // Clear the files after upload
       });
-      const response = await axios.post(
-        "http://localhost:8000/api/mentor/file/upload",
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-          },
-        })
-		.then((response) => {
-			console.log("File upload response:", response.data);
-			files.value = []; // Clear the files after upload
-		});
-    } catch (error) {
-      console.error("Error uploading files:", error);
-    }
-  };
+  } catch (error) {
+    console.error("Error uploading files:", error);
+  }
+};
 
-  const fileInput = ref(null);
-  const files = ref([]);
-  const dropZoneRef = ref(null);
+const fileInput = ref(null);
+const files = ref([]);
+const dropZoneRef = ref(null);
 
-  const triggerFileInput = () => {
-    fileInput.value.click();
-  };
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
 
-  const removeFile = (index) => {
-    files.value = files.value.filter((_, i) => i !== index);
-  };
+const removeFile = (index) => {
+  files.value = files.value.filter((_, i) => i !== index);
+};
 
-  const getFileIcon = (fileType, fileName) => {
-    const extension = fileName.split(".").pop().toLowerCase();
+const getFileIcon = (fileType, fileName) => {
+  const extension = fileName.split(".").pop().toLowerCase();
 
-    // Image files
-    if (
-      fileType.includes("image") ||
-      ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/1829/1829548.png";
-    }
-    // PDF files
-    else if (fileType.includes("pdf") || extension === "pdf") {
-      return "https://cdn-icons-png.flaticon.com/512/2921/2921222.png";
-    }
-    // Word documents
-    else if (
-      fileType.includes("word") ||
-      fileType.includes("document") ||
-      ["doc", "docx"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/281/281760.png";
-    }
-    // Excel files
-    else if (
-      fileType.includes("spreadsheet") ||
-      fileType.includes("excel") ||
-      ["xls", "xlsx", "csv"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/281/281778.png";
-    }
-    // PowerPoint files
-    else if (
-      fileType.includes("presentation") ||
-      fileType.includes("powerpoint") ||
-      fileType.includes("ppt") ||
-      ["ppt", "pptx"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/888/888879.png";
-    }
-    // Video files
-    else if (
-      fileType.includes("video") ||
-      ["mp4", "mov", "avi", "wmv", "flv", "mkv", "webm"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/2965/2965300.png";
-    }
-    // Zip/compressed files
-    else if (
-      fileType.includes("zip") ||
-      fileType.includes("compressed") ||
-      ["zip", "7z", "rar", "tar", "gz"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/888/888879.png";
-    }
-    // Text files
-    else if (
-      fileType.includes("text") ||
-      ["txt", "md", "log", "ini", "conf"].includes(extension)
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/1250/1250615.png";
-    }
-    // Code files
-    else if (
-      ["js", "ts", "py", "java", "cs", "cpp", "c", "h", "php", "html", "css", "scss", "json", "xml", "yaml", "yml"].includes(
-        extension
-      )
-    ) {
-      return "https://cdn-icons-png.flaticon.com/512/2881/2881142.png";
-    }
-    // Default icon
-    else {
-      return "https://cdn-icons-png.flaticon.com/512/25/25657.png";
-    }
-  };
+  // Image files
+  if (
+    fileType.includes("image") ||
+    ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/1829/1829548.png";
+  }
+  // PDF files
+  else if (fileType.includes("pdf") || extension === "pdf") {
+    return "https://cdn-icons-png.flaticon.com/512/2921/2921222.png";
+  }
+  // Word documents
+  else if (
+    fileType.includes("word") ||
+    fileType.includes("document") ||
+    ["doc", "docx"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/281/281760.png";
+  }
+  // Excel files
+  else if (
+    fileType.includes("spreadsheet") ||
+    fileType.includes("excel") ||
+    ["xls", "xlsx", "csv"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/281/281778.png";
+  }
+  // PowerPoint files
+  else if (
+    fileType.includes("presentation") ||
+    fileType.includes("powerpoint") ||
+    fileType.includes("ppt") ||
+    ["ppt", "pptx"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/888/888879.png";
+  }
+  // Video files
+  else if (
+    fileType.includes("video") ||
+    ["mp4", "mov", "avi", "wmv", "flv", "mkv", "webm"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/2965/2965300.png";
+  }
+  // Zip/compressed files
+  else if (
+    fileType.includes("zip") ||
+    fileType.includes("compressed") ||
+    ["zip", "7z", "rar", "tar", "gz"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/888/888879.png";
+  }
+  // Text files
+  else if (
+    fileType.includes("text") ||
+    ["txt", "md", "log", "ini", "conf"].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/1250/1250615.png";
+  }
+  // Code files
+  else if (
+    [
+      "js",
+      "ts",
+      "py",
+      "java",
+      "cs",
+      "cpp",
+      "c",
+      "h",
+      "php",
+      "html",
+      "css",
+      "scss",
+      "json",
+      "xml",
+      "yaml",
+      "yml",
+    ].includes(extension)
+  ) {
+    return "https://cdn-icons-png.flaticon.com/512/2881/2881142.png";
+  }
+  // Default icon
+  else {
+    return "https://cdn-icons-png.flaticon.com/512/25/25657.png";
+  }
+};
 
-  const onFileInputChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-    if (selectedFiles.length > 0) {
-      handleFiles(selectedFiles);
+const onFileInputChange = (event) => {
+  const selectedFiles = Array.from(event.target.files);
+  if (selectedFiles.length > 0) {
+    handleFiles(selectedFiles);
+  }
+  event.target.value = "";
+};
+
+const handleFiles = (newFiles) => {
+  if (!newFiles || newFiles.length === 0) return;
+
+  // Prevent duplicate files
+  const existingFileNames = files.value.map((file) => file.name);
+  const uniqueFiles = newFiles.filter(
+    (file) => !existingFileNames.includes(file.name)
+  );
+
+  files.value = [...files.value, ...uniqueFiles];
+  console.log("Files received:", uniqueFiles);
+};
+
+const { isOverDropZone } = useDropZone(dropZoneRef, {
+  onDrop: (droppedFiles) => {
+    if (droppedFiles) {
+      handleFiles(Array.from(droppedFiles));
     }
-    event.target.value = "";
-  };
+  },
+  onEnter: () => console.log("Files entered drop zone"),
+  onLeave: () => console.log("Files left drop zone"),
+});
 
-  const handleFiles = (newFiles) => {
-    if (!newFiles || newFiles.length === 0) return;
+onMounted(() => {
+  // files.value = props.files;
+  console.log(files);
+});
+</script>
 
-    // Prevent duplicate files
-    const existingFileNames = files.value.map((file) => file.name);
-    const uniqueFiles = newFiles.filter(
-      (file) => !existingFileNames.includes(file.name)
-    );
-
-    files.value = [...files.value, ...uniqueFiles];
-    console.log("Files received:", uniqueFiles);
-  };
-
-  const { isOverDropZone } = useDropZone(dropZoneRef, {
-    onDrop: (droppedFiles) => {
-      if (droppedFiles) {
-        handleFiles(Array.from(droppedFiles));
-      }
-    },
-    onEnter: () => console.log("Files entered drop zone"),
-    onLeave: () => console.log("Files left drop zone"),
-  });
-
-  onMounted(() => {
-	// files.value = props.files;
-	console.log(files);	
-  });
-  </script>
-  
 <template>
   <div class="files-wrapper">
     <!-- Header Section -->
@@ -172,9 +183,8 @@
         <i class="fas fa-folder-open header-icon"></i>
         Files and Documents
       </h2>
-      
     </div>
-    
+
     <!-- Main Content Section -->
     <div class="lower-element">
       <div class="lower-grid">
@@ -197,10 +207,14 @@
               }"
             />
             <p>
-              {{ isOverDropZone ? "Drop Files Here" : "Click or Drag Files to Upload" }}
+              {{
+                isOverDropZone
+                  ? "Drop Files Here"
+                  : "Click or Drag Files to Upload"
+              }}
             </p>
           </div>
-          
+
           <div class="browse-file">
             <input
               type="file"
@@ -212,19 +226,19 @@
               style="display: none"
             />
           </div>
-          
+
           <button @click="triggerFileInput" class="custom-file-upload">
             <i class="fas fa-folder-open"></i> Browse Files
           </button>
         </div>
-        
+
         <!-- Uploaded Files Display Section -->
         <div class="displayed-files">
           <div class="files-header">
             <h3><i class="fas fa-file-alt"></i> Uploaded Files</h3>
             <div class="file-count">{{ files.length }} files</div>
           </div>
-          
+
           <div class="displayed-container">
             <template v-if="files.length > 0">
               <div
@@ -236,7 +250,9 @@
                   <img :src="getFileIcon(file.type, file.name)" alt="file" />
                   <div class="file-info">
                     <p class="file-name" :title="file.name">{{ file.name }}</p>
-                    <span class="file-type">{{ file.type || getFileExtension(file.name) }}</span>
+                    <span class="file-type">{{
+                      file.type || getFileExtension(file.name)
+                    }}</span>
                   </div>
                 </div>
                 <div class="file-actions">
@@ -253,7 +269,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Upload Button -->
     <div class="upload-button">
       <button @click="uploadFiles" class="upload-btn">
@@ -322,7 +338,6 @@
 .header-icon {
   font-size: 1.4rem;
 }
-
 
 /* Main Content Styles */
 .lower-element {
@@ -600,13 +615,13 @@
     grid-template-columns: 1fr;
     grid-gap: 20px;
   }
-  
+
   .upload-file {
     border-right: none;
     border-bottom: 1px solid var(--border);
     padding-bottom: 2rem;
   }
-  
+
   .lower-element {
     height: auto;
   }
@@ -633,7 +648,7 @@
   .files-wrapper {
     width: 95%;
   }
-  
+
   .file-name {
     max-width: 180px;
   }

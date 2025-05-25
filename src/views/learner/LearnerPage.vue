@@ -3,6 +3,7 @@ import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
 import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
+import api from "@/axios.js";
 import axios from "axios";
 
 const router = useRouter();
@@ -19,13 +20,12 @@ function getCookie(name) {
 
 const getLearnerDets = async () => {
   try {
-    await axios
-      .get("http://localhost:8000/api/learner/details", {
+    await api
+      .get("/api/learner/details", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -52,13 +52,12 @@ const getLearnerDets = async () => {
 
 const sessionInfo = async () => {
   try {
-    const sessionDeets = await axios
-      .get(`http://localhost:8000/api/learner/sched`, {
+    const sessionDeets = await api
+      .get(`/api/learner/sched`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -74,13 +73,12 @@ const sessionInfo = async () => {
 
 const sessionForReview = async () => {
   try {
-    const pastSessionDeets = await axios
-      .get(`http://localhost:8000/api/learner/doneSched`, {
+    const pastSessionDeets = await api
+      .get(`/api/learner/doneSched`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -95,13 +93,12 @@ const sessionForReview = async () => {
 
 const mentorProfile = async () => {
   try {
-    await axios
-      .get("http://localhost:8000/api/learner/users", {
+    await api
+      .get("/api/learner/users", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -136,13 +133,12 @@ const registerMentorRole = async () => {
 
 const switchRole = async () => {
   try {
-    const response = await axios
-      .post("http://localhost:8000/api/switch", {
+    const response = await api
+      .post("/api/switch", {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -157,7 +153,7 @@ const switchRole = async () => {
 
 const mentFiles = async () => {
   try {
-    const response = await axios
+    const response = await api
       .get("http://localhost:8000/api/learner/mentFiles", {
         withCredentials: true,
         headers: {
@@ -179,7 +175,7 @@ const mentFiles = async () => {
 
 const fetchMentFiles = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       "http://localhost:8000/api/learner/mentFiles",
       {
         withCredentials: true,
@@ -199,7 +195,7 @@ const fetchMentFiles = async () => {
 
 const logout = async () => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       "http://localhost:8000/api/logout/web",
       {},
       {

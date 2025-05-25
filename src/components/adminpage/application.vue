@@ -12,7 +12,6 @@
           :class="{ active: activeFilter === 'all' }"
           @click="activeFilter = 'all'"
         >
-        
           All
         </button>
         <button
@@ -185,8 +184,9 @@
                 class="profile-image"
               />
               <div
-                v-if="currentApp.status !== 'resubmission'"
+                v-if="currentApp.status"
                 class="status-badge"
+                :class="currentApp.status.toLowerCase()"
               >
                 {{ currentApp.status }}
               </div>
@@ -664,14 +664,28 @@ const confirmAction = async () => {
       console.log("Application rejected successfully");
     }
 
-    // Refresh the applications list or update local state
-    const appIndex = props.applicantsList.applicants.findIndex(
-      (app) => app.user_id === currentAppId.value
-    );
+    // Get the array based on status
+    const status = actionToConfirm.value.toLowerCase();
+    const mentorsList = props.applicantsList.mentors;
 
-    if (appIndex !== -1) {
-      props.applicantsList.applicants[appIndex].status =
-        actionToConfirm.value.toLowerCase();
+    if (mentorsList) {
+      // Find the application in the pending array
+      const pendingIndex = mentorsList.pending.findIndex(
+        (app) => app.user_id === currentAppId.value
+      );
+
+      if (pendingIndex !== -1) {
+        // Remove from pending
+        const updatedApp = mentorsList.pending.splice(pendingIndex, 1)[0];
+        // Update status
+        updatedApp.status = status;
+        // Add to appropriate array
+        if (status === "approved") {
+          mentorsList.approved.push(updatedApp);
+        } else if (status === "rejected") {
+          mentorsList.rejected.push(updatedApp);
+        }
+      }
     }
 
     // Close the confirmation modal
@@ -700,9 +714,10 @@ const showCredentials = async (app) => {
       image: data.info.image
         ? "http://localhost:8000/api/image/" + data.info.image
         : "default-image-url",
-      status:
-        capitalizeFirstLetter(data.info.approval_status) ||
-        data.info.approval_status,
+      // Update status to show "Pending" as default
+      status: data.info.approval_status
+        ? capitalizeFirstLetter(data.info.approval_status)
+        : "Pending",
       gender: data.info.gender?.toUpperCase() || "N/A",
       year: data.info.year || "N/A",
       program: data.info.course || "N/A",
@@ -1237,7 +1252,12 @@ onMounted(async () => {
   color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transform: translateY(25%);
-  background-color: #ef6c00; /* Default color for pending */
+}
+
+/* Status-specific colors */
+.status-badge.pending,
+.status-badge.pending_approval {
+  background-color: #ef6c00;
 }
 
 .status-badge.approved {
@@ -1246,11 +1266,6 @@ onMounted(async () => {
 
 .status-badge.rejected {
   background-color: #c62828;
-}
-
-.status-badge.pending,
-.status-badge.pending_approval {
-  background-color: #ef6c00;
 }
 
 .profile-info {

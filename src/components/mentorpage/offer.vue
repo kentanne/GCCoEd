@@ -1,14 +1,17 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
-import api from "@/axios.js";
 
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   info: {
     type: Array,
+    required: true,
+  },
+  mentorId: {
+    type: Number,
     required: true,
   },
 });
@@ -21,6 +24,32 @@ function getCookie(name) {
 }
 
 const emit = defineEmits(["close", "confirm"]);
+
+// First, update the destructuring to match the order from viewUser.vue
+const [
+  learnerId, // userId
+  learnerNo, // userId
+  learnerName, // userName
+  learnerYear, // userYear
+  learnerCourse, // userCourse
+  learnerDur, // sessionDur
+  learnerModality, // modality
+  learnerStyle, // learnStyle
+  learnerAvail, // availability
+  learnerMode, // modality again
+  learnerPic, // profilePic
+  learnerSubjects, // subjects
+] = props.info || [];
+
+// Parse subjects
+const subjectOptions = computed(() => {
+  try {
+    return JSON.parse(learnerSubjects || "[]");
+  } catch (e) {
+    console.error("Error parsing subjects:", e);
+    return [];
+  }
+});
 
 const selectedDate = ref("");
 const availableTimes = ref([
@@ -39,23 +68,24 @@ const selectedTime = ref("");
 const sessionType = ref("in-person");
 const notes = ref("");
 const meetingLocation = ref("");
-const selectedSubject = ref("");
-const showConfirmationModal = ref(false); // Add this for modal control
+const selectedSubject = ref(""); // Add this with other refs
 
 // Calendar variables
 const currentDate = ref(new Date());
 const days = ref([]);
 const showYearSelection = ref(false);
 
-const prepareSchedule = () => {
+const confirmSchedule = async () => {
   if (!selectedDate.value || !selectedTime.value || !selectedSubject.value) {
     alert("Please select date, time and subject");
     return;
   }
-  showConfirmationModal.value = true;
-};
 
-const confirmSchedule = async () => {
+  if (isInPersonModality.value && !meetingLocation.value) {
+    alert("Please enter a meeting location for in-person session");
+    return;
+  }
+
   // Format date to match required format MM/DD/YYYY
   const formattedDate = new Date(selectedDate.value).toLocaleDateString(
     "en-US",
@@ -77,30 +107,37 @@ const confirmSchedule = async () => {
 
   const formattedTime = `${String(hours).padStart(2, "0")}:${minutes}`;
 
-  // Create the JSON structure with subject included
+  // Update how modality is determined
+  let selectedModality = learnerModality?.toLowerCase() || "";
+  if (isHybridModality.value) {
+    selectedModality = sessionType.value;
+  }
+
   const scheduleData = {
-    participant_id: mentorNo,
+    learner_id: learnerId,
+    mentor_id: props.mentorId,
     date: formattedDate,
     time: formattedTime,
-    location:
-      sessionType.value === "in-person" ? meetingLocation.value : "online",
+    modality: selectedModality,
+    location: isInPersonModality.value ? meetingLocation.value : "online",
     subject: selectedSubject.value,
   };
 
   try {
-    const response = await api.post(
-      "/api/learner/scheduleCreate",
+    const response = await axios.post(
+      "http://localhost:8000/api/mentor/send-offer",
       scheduleData,
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
 
+    // Debug logs
     console.log("Selected Subject:", selectedSubject.value);
     console.log("Schedule Data:", scheduleData);
 
@@ -108,8 +145,7 @@ const confirmSchedule = async () => {
     emit("close");
   } catch (error) {
     console.error("Error in schedule confirmation:", error);
-  } finally {
-    showConfirmationModal.value = false;
+    alert(error.response?.data?.message || "Error sending tutoring offer");
   }
 };
 
@@ -117,6 +153,44 @@ const confirmSchedule = async () => {
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
   return Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+});
+
+// Add these computed properties after your existing computed properties
+const isInPersonModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "in-person" || modality === "hybrid";
+});
+
+const isOnlineModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "online" || modality === "hybrid";
+});
+
+const isHybridModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "hybrid";
+});
+
+// Add this function before generateDays
+const isToday = (date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+// Update onMounted to include error handling and null checks
+onMounted(() => {
+  try {
+    if (currentDate.value) {
+      selectedDate.value = formatDateForInput(currentDate.value);
+      generateDays();
+    }
+  } catch (error) {
+    console.error("Error in mounted hook:", error);
+  }
 });
 
 // Format date as YYYY-MM-DD for the input
@@ -127,12 +201,10 @@ const formatDateForInput = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Add these computed properties and helpers
+// Add these computed properties and helpers after the existing calendar variables
 const availableDays = computed(() => {
   try {
-    return JSON.parse(mentorAvailability || "[]").map((day) =>
-      day.toLowerCase()
-    );
+    return JSON.parse(learnerAvail || "[]").map((day) => day.toLowerCase());
   } catch (e) {
     console.error("Error parsing available days:", e);
     return [];
@@ -216,7 +288,7 @@ const selectDate = (day) => {
   generateDays();
 };
 
-// Update the navigation functions
+// Keep these month navigation functions
 const prevMonth = () => {
   const newDate = new Date(currentDate.value);
   newDate.setMonth(newDate.getMonth() - 1);
@@ -231,12 +303,14 @@ const nextMonth = () => {
   generateDays();
 };
 
+// Update the goToToday function
 const goToToday = () => {
   currentDate.value = new Date();
   selectedDate.value = formatDateForInput(currentDate.value);
   generateDays();
 };
 
+// Update the selectYear function
 const selectYear = (year) => {
   const newDate = new Date(currentDate.value);
   newDate.setFullYear(year);
@@ -245,53 +319,13 @@ const selectYear = (year) => {
   generateDays();
 };
 
+// Update the currentMonthYear computed property
 const currentMonthYear = computed(() => {
   return new Date(currentDate.value).toLocaleDateString("default", {
     month: "long",
     year: "numeric",
   });
 });
-
-// Initialize the calendar
-onMounted(() => {
-  selectedDate.value = formatDateForInput(new Date());
-  generateDays();
-});
-
-// First, update the destructuring to match the order from viewUser.vue
-const [
-  mentorNo,
-  mentorName,
-  mentorYear,
-  mentorCourse,
-  mentorSessionDur,
-  mentorModality,
-  mentorTeachStyle,
-  mentorAvailability,
-  mentorLearnModality,
-  mentorProfilePic,
-  mentorSubjects,
-] = props.info || [];
-
-// Parse subjects from mentorTeachStyle string
-const subjectOptions = computed(() => {
-  try {
-    return JSON.parse(mentorSubjects || "[]");
-  } catch (e) {
-    console.error("Error parsing subjects:", e);
-    return [];
-  }
-});
-
-// Add this helper function before generateDays
-const isToday = (date) => {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
-};
 </script>
 
 <template>
@@ -299,7 +333,7 @@ const isToday = (date) => {
     <!-- Header -->
     <div class="header">
       <div class="flex items-center space-x-3">
-        <h1>Book a Session</h1>
+        <h1>Send Offer</h1>
       </div>
       <button @click="emit('close')" aria-label="Close" type="button">×</button>
     </div>
@@ -307,20 +341,20 @@ const isToday = (date) => {
     <!-- Profile info -->
     <div class="profile">
       <img
-        alt="Profile image"
         :src="
-          mentorProfilePic
-            ? 'http://localhost:8000/api/image/' + mentorProfilePic
+          learnerPic
+            ? `http://localhost:8000/api/image/${learnerPic}`
             : 'https://placehold.co/400x400'
         "
+        alt="Profile image"
         width="64"
         height="64"
       />
       <div>
         <p>
-          <strong>{{ mentorName }}</strong>
+          <strong>{{ learnerName }}</strong>
         </p>
-        <p>{{ mentorYear }} - {{ mentorCourse }}</p>
+        <p>{{ learnerYear }} - {{ learnerCourse }}</p>
         <p>College of Computer Studies</p>
       </div>
     </div>
@@ -331,7 +365,7 @@ const isToday = (date) => {
       <div class="left">
         <div class="time-header">
           <h2>Select Time Slots</h2>
-          <p>({{ mentorSessionDur }} duration)</p>
+          <p>({{ learnerDur }} duration)</p>
         </div>
         <div class="time-slots">
           <button
@@ -351,7 +385,7 @@ const isToday = (date) => {
             type="button"
             @click="sessionType = 'in-person'"
             :class="{ 'mode-active': sessionType === 'in-person' }"
-            :disabled="!mentorModality?.toLowerCase().includes('in-person')"
+            :disabled="!isInPersonModality"
             class="mode-btn"
           >
             <span aria-label="In Person"><i class="fas fa-user"></i></span>
@@ -361,7 +395,7 @@ const isToday = (date) => {
             type="button"
             @click="sessionType = 'online'"
             :class="{ 'mode-active': sessionType === 'online' }"
-            :disabled="!mentorModality?.toLowerCase().includes('online')"
+            :disabled="!isOnlineModality"
             class="mode-btn"
           >
             <span aria-label="Online"><i class="fas fa-laptop"></i></span>
@@ -369,17 +403,19 @@ const isToday = (date) => {
           </button>
         </div>
 
+        <!-- Add location input when in-person is selected -->
         <div v-if="sessionType === 'in-person'" class="location-input">
           <input
-            type="text"
             v-model="meetingLocation"
+            type="text"
             placeholder="Enter meeting location"
             class="location-field"
+            required
           />
         </div>
       </div>
 
-      <!-- Right side - Calendar -->
+      <!-- Right side -->
       <div class="right" style="margin-left: -20px">
         <div class="calendar">
           <div class="calendar-header">
@@ -452,6 +488,7 @@ const isToday = (date) => {
           </div>
         </div>
 
+        <!-- Subject selection -->
         <div class="subject-select">
           <h3 class="subject-header">Select Subject</h3>
           <select v-model="selectedSubject" class="subject-dropdown" required>
@@ -460,7 +497,6 @@ const isToday = (date) => {
               v-for="subject in subjectOptions"
               :key="subject"
               :value="subject"
-              class="subject option"
             >
               {{ subject }}
             </option>
@@ -469,12 +505,12 @@ const isToday = (date) => {
       </div>
     </div>
 
-    <!-- Footer buttons -->
+    <!-- Footer -->
     <div class="footer">
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button @click="prepareSchedule" type="button" class="btn-proceed">
+      <button @click="confirmSchedule" type="button" class="btn-proceed">
         PROCEED
       </button>
     </div>
@@ -486,13 +522,6 @@ const isToday = (date) => {
   border-bottom-width: 4px;
   width: 1000px;
   max-width: 1000px;
-  margin-left: 10rem;
-  margin-right: -10rem;
-  top: 3rem;
-  max-height: 85vh; 
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; 
 }
 
 .header {
@@ -504,12 +533,7 @@ const isToday = (date) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
-
-
 .header h1 {
   font-weight: 800;
   font-size: 1.125rem;
@@ -546,16 +570,12 @@ const isToday = (date) => {
   gap: 1.5rem;
   padding: 2.5rem;
   background-color: white;
-  overflow-y: auto; /* Make content scrollable */
-  flex-grow: 1; /* Take up remaining space */
 }
-
 @media (min-width: 768px) {
   .content {
     flex-direction: row;
   }
 }
-
 .left,
 .right {
   flex: 1;
@@ -630,6 +650,7 @@ const isToday = (date) => {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #f3f4f6;
+  border-color: #e5e7eb;
 }
 
 .mode-btn:disabled:hover {
@@ -761,11 +782,33 @@ const isToday = (date) => {
   height: 8px;
   border-radius: 50%;
 }
+
 .legend-dot.available {
   background-color: #0b3b44;
 }
+
 .legend-dot.unavailable {
   background-color: #e5e7eb;
+}
+
+.day.available {
+  color: #000000;
+  cursor: pointer;
+}
+
+.day.unavailable {
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.day.unavailable:hover {
+  background-color: #f3f4f6;
+}
+
+.day.selected.available {
+  background-color: #0b3b44;
+  color: white;
 }
 .weekdays {
   display: grid;
@@ -810,22 +853,6 @@ const isToday = (date) => {
   background-color: #0b3b44;
   color: white;
 }
-.day.available {
-  color: #000000;
-  cursor: pointer;
-}
-.day.unavailable {
-  color: #d1d5db;
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-}
-.day.unavailable:hover {
-  background-color: #f3f4f6;
-}
-.day.selected.available {
-  background-color: #0b3b44;
-  color: white;
-}
 .footer {
   display: flex;
   justify-content: flex-end;
@@ -835,9 +862,6 @@ const isToday = (date) => {
   background-color: white;
   border-bottom-left-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
 }
 .btn-cancel {
   color: #e11d1d;
@@ -866,10 +890,7 @@ const isToday = (date) => {
 }
 .subject-select {
   margin-top: 1.5rem;
-  width: 100%;
-  position: relative;
 }
-
 .subject-header {
   font-weight: 600;
   color: #0b3b44;
@@ -877,150 +898,20 @@ const isToday = (date) => {
   margin-bottom: 0.5rem;
   user-select: none;
 }
-
 .subject-dropdown {
   width: 100%;
-  padding: 0.625rem 1rem;
+  padding: 0.5rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   font-size: 0.875rem;
   background-color: white;
   color: #4b5563;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3b44' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
-  transition: all 0.2s ease;
 }
-
-/* Allow options to wrap text */
-.subject-dropdown option {
-  white-space: normal;
-  word-wrap: break-word;
-  padding: 8px 12px;
-}
-
-/* Firefox specific styling */
-@-moz-document url-prefix() {
-  .subject-dropdown {
-    text-indent: 0.01px;
-    text-overflow: '';
-  }
-  .subject-dropdown option {
-    padding-left: 1rem;
-  }
-}
-
-/* IE10+ specific fix */
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .subject-dropdown {
-    padding-right: 0;
-  }
-  .subject-dropdown::-ms-expand {
-    display: none;
-  }
-  .subject-dropdown:focus::-ms-value {
-    background: transparent;
-    color: #4b5563;
-  }
-}
-
-.subject-dropdown:hover {
-  border-color: #9ca3af;
-}
-
 .subject-dropdown:focus {
   outline: none;
   border-color: #0b3b44;
-  box-shadow: 0 0 0 2px rgba(11, 59, 68, 0.1);
-}
-
-.subject-dropdown option:disabled {
-  color: #9ca3af;
-}
-
-.subject-dropdown option:checked {
-  background-color: #f0f7f9;
-  color: #0b3b44;
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: -1.7rem;
-  left: 10rem;
-  right: -10rem;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  height: 109%;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-  color: #0b3b44;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-size: 1.25rem;
-  text-align: center;
-}
-
-.modal-details {
-  margin-bottom: 2rem;
-}
-
-.modal-details p {
-  margin: 0.75rem 0;
-  font-size: 1rem;
-}
-
-.modal-details strong {
-  color: #0b3b44;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.modal-btn-cancel {
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.modal-btn-confirm {
-  background-color: #0b3b44;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.modal-btn-confirm:hover {
-  background-color: #1f6d7e;
+  /* ring: 2px;
+  ring-color: #0b3b44; */
 }
 </style>
