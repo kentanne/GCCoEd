@@ -1,11 +1,15 @@
-// import axios from 'axios';
+import axios from "axios";
 
-// const api = axios.create({
-//   withCredentials: true,
- 
-// });
+const api = axios.create({
+  //   baseURL: 'https://gccoed.onrender.com',
+  baseURL: "http://localhost:8000",
+  withCredentials: true,
+  withXSRFToken: true,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  },
+});
 
-// axios.defaults.withCredentials = true; // Enable sending cookies with requests
-// axios.defaults.withXSRFToken = true; // Enable sending XSRF token with requests
-
-// export default api;
+export default api;
