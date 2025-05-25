@@ -1,9 +1,16 @@
 <template>
   <div class="learnerinfo-container">
-
     <button @click="scrollToGetStarted" class="back-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z"
+          clip-rule="evenodd"
+        />
       </svg>
       Back
     </button>
@@ -17,7 +24,7 @@
       <!-- Step 1 Content -->
       <div v-if="currentStep === 1">
         <h2 class="title">I. PERSONAL INFORMATION</h2>
-        
+
         <div class="personal-field">
           <label class="personal-label required" for="address">ADDRESS</label>
           <input
@@ -61,10 +68,7 @@
         <div class="personal-field">
           <label class="personal-label required" for="gender">GENDER</label>
           <div class="gender-dropdown">
-            <div
-              class="dropdown-container"
-              @click="toggleDropdown('gender')"
-            >
+            <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
                 type="text"
                 v-model="gender"
@@ -81,10 +85,7 @@
               <div class="dropdown-option" @click="selectGender('Male')">
                 Male
               </div>
-              <div
-                class="dropdown-option"
-                @click="selectGender('Non-binary')"
-              >
+              <div class="dropdown-option" @click="selectGender('Non-binary')">
                 Non-binary
               </div>
               <div class="dropdown-option" @click="selectGender('Other')">
@@ -142,10 +143,7 @@
         <div class="personal-field">
           <label class="personal-label" for="program">PROGRAM </label>
           <div class="program-dropdown">
-            <div
-              class="dropdown-container"
-              @click="toggleDropdown('program')"
-            >
+            <div class="dropdown-container" @click="toggleDropdown('program')">
               <input
                 type="text"
                 v-model="program"
@@ -184,8 +182,8 @@
                   )
                 "
               >
-                Bachelor of Science in Entertainment and Multimedia
-                Computing (BSEMC)
+                Bachelor of Science in Entertainment and Multimedia Computing
+                (BSEMC)
               </div>
             </div>
           </div>
@@ -196,40 +194,46 @@
       <div v-if="currentStep === 2">
         <h2 class="title">II. PROFILE INFORMATION</h2>
 
-<!-- Profile Picture Upload -->
-<div class="upload-container">
-  <div class="profile-picture-upload">
-    <label class="profile-label">PROFILE PICTURE</label>
-    <div class="profile-preview-container" @click="uploadProfilePicture">
-      <img
-        v-if="profileImage"
-        :src="profileImage"
-        alt="Profile Preview"
-        class="profile-preview"
-      />
-      <i v-else class="fas fa-user-circle default-icon"></i>
-    </div>
-    <div class="upload-controls">
-      <div class="upload-text">
-        <div class="choose-file-container" @click.stop="uploadProfilePicture">
-          <i class="fas fa-upload"></i>
-          <span>Choose File</span>
+        <!-- Profile Picture Upload -->
+        <div class="upload-container">
+          <div class="profile-picture-upload">
+            <label class="profile-label">PROFILE PICTURE</label>
+            <div
+              class="profile-preview-container"
+              @click="uploadProfilePicture"
+            >
+              <img
+                v-if="profileImage"
+                :src="profileImage"
+                alt="Profile Preview"
+                class="profile-preview"
+              />
+              <i v-else class="fas fa-user-circle default-icon"></i>
+            </div>
+            <div class="upload-controls">
+              <div class="upload-text">
+                <div
+                  class="choose-file-container"
+                  @click.stop="uploadProfilePicture"
+                >
+                  <i class="fas fa-upload"></i>
+                  <span>Choose File</span>
+                </div>
+                <input
+                  type="file"
+                  ref="profileInput"
+                  accept="image/*"
+                  style="display: none"
+                  @change="handleProfileUpload"
+                />
+                <span class="file-name">
+                  {{ profilePictureName || "No file chosen" }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-        <input
-          type="file"
-          ref="profileInput"
-          accept="image/*"
-          style="display: none"
-          @change="handleProfileUpload"
-        />
-        <span class="file-name">
-          {{ profilePictureName || "No file chosen" }}
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-       <div class="divider"></div>
+        <div class="divider"></div>
         <div class="profile-field">
           <label class="profile-label" for="availability-days"
             >DAYS OF AVAILABILITY</label
@@ -338,14 +342,9 @@
         </div>
 
         <div class="profile-field">
-          <label class="profile-label" for="modality"
-            >LEARNING MODALITY</label
-          >
+          <label class="profile-label" for="modality">LEARNING MODALITY</label>
           <div class="subjmodality-dropdown">
-            <div
-              class="dropdown-container"
-              @click="toggleDropdown('modality')"
-            >
+            <div class="dropdown-container" @click="toggleDropdown('modality')">
               <input
                 type="text"
                 v-model="modality"
@@ -356,22 +355,13 @@
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
             <div v-if="dropdownOpen.modality" class="dropdown-options">
-              <div
-                class="dropdown-option"
-                @click="selectModality('Online')"
-              >
+              <div class="dropdown-option" @click="selectModality('Online')">
                 Online
               </div>
-              <div
-                class="dropdown-option"
-                @click="selectModality('In-person')"
-              >
+              <div class="dropdown-option" @click="selectModality('In-person')">
                 In-person
               </div>
-              <div
-                class="dropdown-option"
-                @click="selectModality('Hybrid')"
-              >
+              <div class="dropdown-option" @click="selectModality('Hybrid')">
                 Hybrid
               </div>
             </div>
@@ -396,10 +386,7 @@
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
-            <div
-              v-if="dropdownOpen.sessionDuration"
-              class="dropdown-options"
-            >
+            <div v-if="dropdownOpen.sessionDuration" class="dropdown-options">
               <div
                 class="dropdown-option"
                 @click="selectSessionDuration('1 hour')"
@@ -498,7 +485,6 @@
         </div>
       </div>
 
-
       <!-- Step Indicator -->
       <div class="step-indicator-container">
         <div class="step-indicator">
@@ -519,7 +505,6 @@
     </button>
   </div>
 </template>
-
 
 <script>
 import { registrationStore } from "@/stores/registrationStore";
@@ -682,12 +667,12 @@ export default {
   },
 
   methods: {
-        scrollToGetStarted() {
-    this.$router.push("/signup");
+    scrollToGetStarted() {
+      this.$router.push("/signup");
       if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }
     },
@@ -977,18 +962,60 @@ export default {
           break;
 
         case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
-          this.availableSubjects = {
-            coreSubjects: [
-              "Game Development",
-              "Animation",
-              "Multimedia Design",
-            ],
-            gecSubjects: ["Art Appreciation", "Digital Media"],
-            peNstpSubjects: [
-              "National Service Training Program",
-              "Physical Education",
-            ],
-          };
+          availableSubjects.coreSubjects = [
+            "Introduction to EM Computing",
+            "Computer Programming 1",
+            "PC Troubleshooting with Basic Electronics",
+            "Computer Programming 2",
+            "Usability, HCI, UI Design",
+            "Free Hand and Digital Drawing",
+            "Data Structures and Algorithms",
+            "Information Management 1",
+            "Introduction to Game Design and Development",
+            "Computer Graphics Programming",
+            "Image and Video Processing",
+            "Script Writing and Storyboard Design",
+            "Applications Development and Emerging Technologies",
+            "Principles of 2D Animation",
+            "Audio Design and Sound Engineering Modelling and Rigging",
+            "Texture and Mapping",
+            "Social Issues and Professional Practice in Computing",
+            "Lighting and Effects",
+            "Principles of 3D Animation",
+            "Design and Production Process",
+            "Advanced Sound Production",
+            "Advanced 2D Animation",
+            "EMC Professional Elective 1",
+            "Research Methods",
+            "Advanced 3D Animation and Scripting",
+            "Compositing and Rendering",
+            "EMC Professional Elective 2",
+            "Animation Design and Production",
+            "EMC Professional Elective 3",
+            "Computing Seminars and Educational Trips",
+          ];
+          availableSubjects.gecSubjects = [
+            "Art Appreciation",
+            "Ethics",
+            "Mathematics in the Modern World",
+            "People and Earth's Ecosystem",
+            "Purposive Communication",
+            "Reading Visual Arts",
+            "Readings in Philippine History with Indigenous People Studies",
+            "Science, Technology and Society",
+            "The Contemporary World with Peace Studies",
+            "The Entrepreneurial Mind",
+            "The Life and Works of Rizal",
+            "Understanding the Self",
+          ];
+          availableSubjects.peNstpSubjects = [
+            "National Service Training Program with Anti-Smoking and Environmental Education",
+            "National Service Training Program with GAD and Peace Education",
+            "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
+            "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
+            "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
+            "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+          ];
           break;
 
         default:

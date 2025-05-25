@@ -1,6 +1,7 @@
 <script setup>
 import axios from "axios";
 import { onMounted, ref } from "vue";
+import Offer from "./offer.vue"; // Add this import
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -8,6 +9,10 @@ axios.defaults.withXSRFToken = true;
 const props = defineProps({
   userId: {
     type: Number,
+    required: true,
+  },
+  mentorData: {
+    type: Object,
     required: true,
   },
 });
@@ -52,6 +57,23 @@ const userInfo = async (id) => {
         sessionDur.value = response.data.user_info.prefSessDur;
         goal.value = response.data.user_info.goals;
         profilePic.value = response.data.user_info.image;
+        userSchoolId.value = response.data.user.id;
+
+        // Prepare data for offer component
+        userDeetsForOffer.value = [
+          userSchoolId.value, // userSchoolId
+          userId.value, // userId
+          name.value, // userName
+          year.value, // userYear
+          course.value, // userCourse
+          sessionDur.value, // userSessionDur
+          modality.value, // userModality
+          learnStyle.value, // userLearnStyle
+          availability.value, // userAvailability
+          modality.value, // userLearnModality
+          profilePic.value, // userProfilePic
+          subjects.value, // userSubjects
+        ];
       });
   } catch (error) {
     console.error("Error fetching user details:", error);
@@ -59,6 +81,7 @@ const userInfo = async (id) => {
   }
 };
 
+const userSchoolId = ref();
 const name = ref();
 const year = ref();
 const course = ref();
@@ -74,6 +97,31 @@ const availability = ref();
 const sessionDur = ref();
 const goal = ref();
 const profilePic = ref();
+const showOfferModal = ref(false); // Add this with your other refs
+const showOffer = ref(false);
+const userDeetsForOffer = ref();
+
+// Add this function to handle opening/closing the offer modal
+const toggleOfferModal = () => {
+  showOfferModal.value = !showOfferModal.value;
+};
+
+// Add this function to handle opening the offer modal
+const openOffer = () => {
+  showOffer.value = true;
+};
+
+// Add the handleOfferConfirm function
+const handleOfferConfirm = async (offerData) => {
+  try {
+    console.log("Offer confirmed:", offerData);
+    // Here you can add any additional logic needed after offer confirmation
+    showOffer.value = false;
+    emit("close");
+  } catch (error) {
+    console.error("Error handling offer confirmation:", error);
+  }
+};
 
 onMounted(() => {
   console.log("test mount");
@@ -147,9 +195,18 @@ onMounted(() => {
           <p>{{ goal }}</p>
         </div>
         <div class="action-button">
-          <button>Send Offer</button>
+          <button @click="openOffer">Send Offer</button>
         </div>
       </div>
+    </div>
+    <!-- Offer Modal -->
+    <div v-if="showOffer" class="popup-overlay">
+      <Offer
+        :info="userDeetsForOffer"
+        :mentorId="props.mentorData.user.id"
+        @close="showOffer = false"
+        @confirm="handleOfferConfirm"
+      />
     </div>
   </div>
 </template>
@@ -262,7 +319,7 @@ label {
   justify-content: flex-end;
 }
 
-.lower-lower button {
+.action-button button {
   background-color: #0c434d;
   color: #fff;
   border: none;
@@ -270,5 +327,27 @@ label {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
+}
+
+/* Add these new styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
 }
 </style>

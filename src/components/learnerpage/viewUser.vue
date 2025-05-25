@@ -2,9 +2,10 @@
 import { ref, onMounted } from "vue";
 import Schedule from "@/components/learnerpage/schedule.vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   userId: {
@@ -28,13 +29,13 @@ function getCookie(name) {
 const userInfo = async (id) => {
   console.log(id);
   try {
-    const userDeets = await axios
-      .get(`http://localhost:8000/api/learner/users/${id}`, {
+    const userDeets = await api
+      .get(`/api/learner/users/${id}`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {

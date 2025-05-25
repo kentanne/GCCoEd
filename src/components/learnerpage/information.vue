@@ -375,10 +375,8 @@ import {
   onBeforeUnmount,
   computed,
 } from "vue";
+import api from "@/axios.js";
 import axios from "axios";
-
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   userData: {
@@ -908,18 +906,13 @@ const saveChanges = async () => {
   });
 
   try {
-    const response = await axios.patch(
-      "http://localhost:8000/api/learner/edit",
-      combinedData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.patch("/api/learner/edit", combinedData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
     if (response.status === 200) {
       console.log("Saving goals:", profileData.learningGoals);

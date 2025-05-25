@@ -4,13 +4,14 @@ import Information from "../../components/mentorpage/information.vue";
 import logoutDialog from "@/components/mentorpage/logoutDialog.vue";
 import help from "@/components/mentorpage/help.vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios.js";
+import Offer from "@/components/mentorpage/offer.vue";
 
 // Initialize router
 const router = useRouter();
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -249,6 +250,8 @@ const isEdit = ref(false);
 const confirmLogout = ref(false);
 const showAllCourses = ref(false);
 const searchQuery = ref("");
+const showOffer = ref(false);
+const userId = ref(null);
 
 const activeComponent = ref("main");
 const switchComponent = (component) => {
@@ -324,6 +327,13 @@ const handleLogout = () => {
   router.push("/login");
 };
 
+const handleOfferConfirm = () => {
+  // Handle the offer confirmation logic here
+  console.log("Offer confirmed for user ID:", userId.value);
+  // You can also close the offer modal here if needed
+  showOffer.value = false;
+};
+
 onMounted(async () => {
   console.log("test kung namamount");
   await loggedUserDets();
@@ -338,7 +348,6 @@ onMounted(async () => {
 <template>
   <div class="sidebar">
     <div class="upper-element">
-      
       <div>
         <h1>Hi, Mentor!</h1>
         <img
@@ -383,19 +392,24 @@ onMounted(async () => {
         <div class="lines">
           <h3>Program:</h3>
           <div>
-            <p>{{ userData.ment.course.match(/\(([^)]+)\)/)?.[1] || userData.ment.course }}</p>
+            <p>
+              {{
+                userData.ment.course.match(/\(([^)]+)\)/)?.[1] ||
+                userData.ment.course
+              }}
+            </p>
           </div>
         </div>
       </div>
-    <div class="availability">
-      <h1>Availability</h1>
+      <div class="availability">
+        <h1>Availability</h1>
         <div class="lines">
-           <h3>Days:</h3>
-        <div>
-      <p>{{ userData.ment.availability.join(', ') }}</p>
-    </div>
-  </div>
-  <div class="lines">
+          <h3>Days:</h3>
+          <div>
+            <p>{{ userData.ment.availability.join(", ") }}</p>
+          </div>
+        </div>
+        <div class="lines">
           <h3>Duration:</h3>
           <div>
             <p>{{ userData.ment.prefSessDur }}</p>
@@ -455,8 +469,6 @@ onMounted(async () => {
     </div>
   </div>
 
-
-
   <!-- topbar -->
   <div class="topbar">
     <div class="topbar-left">
@@ -501,6 +513,7 @@ onMounted(async () => {
     <component
       :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
+      :mentorData="userData"
       :schedule="todaySchedule"
       :upcomingSchedule="upcommingSchedule"
       :feedbacks="feedbacks"
@@ -518,6 +531,16 @@ onMounted(async () => {
     <div v-if="confirmLogout" class="logout-popup">
       <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
+  </Transition>
+
+  <Transition name="fade" mode="out-in">
+    <Offer
+      v-if="showOffer"
+      :userId="userId"
+      :mentorData="userData"
+      @close="showOffer = false"
+      @confirm="handleOfferConfirm"
+    />
   </Transition>
 </template>
 

@@ -12,15 +12,15 @@
         <form @submit.prevent="login">
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
-              <div class="input-with-icon">
+            <div class="input-with-icon">
               <i class="fas fa-user"></i>
-            <input
-              type="text"
-              v-model="email"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+              <input
+                type="text"
+                v-model="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
@@ -37,9 +37,9 @@
                 required
               />
             </div>
-        <p class="switch-link">
-          <router-link to="/forgot-password">Forgot Password?</router-link>
-        </p>
+            <p class="switch-link">
+              <router-link to="/forgot-password">Forgot Password?</router-link>
+            </p>
           </div>
           <button type="submit">Login</button>
         </form>
@@ -57,14 +57,26 @@ import logo from "@/assets/logo_gccoed.png";
 // import api from "../axios.js"; // Adjust the path as necessary
 import axios from "axios";
 
-axios.defaults.withCredentials = true; // Enable sending cookies with requests
-axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+axios.defaults.xsrfCookieName = "XSRF-TOKEN";
+axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN";
 
+// axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
+// Updated getCookie function for better cookie parsing
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
+  try {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return decodeURIComponent(parts.pop().split(";").shift());
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting cookie:", error);
+    return null;
+  }
 }
 
 export default {
@@ -81,7 +93,22 @@ export default {
   methods: {
     async csrf() {
       try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        await axios.get("http://localhost:8000/sanctum/csrf-cookie", {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+
+        // Wait for a short time to ensure cookie is set
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const token = getCookie("XSRF-TOKEN");
+        if (!token) {
+          throw new Error("CSRF token not set after request");
+        }
+
         console.log("CSRF cookie set successfully");
         return true;
       } catch (error) {
@@ -91,12 +118,22 @@ export default {
     },
     async login() {
       try {
-        // Set CSRF token before login attempt
-        const csrfSet = await this.csrf();
-        if (!csrfSet) {
-          console.error("Failed to set CSRF token");
-          return;
-        }
+        await this.csrf();
+
+        // Debug cookie information
+        console.log("All cookies:", document.cookie);
+        const token = getCookie("XSRF-TOKEN");
+        console.log("Retrieved XSRF-TOKEN:", token);
+
+        // if (!token) {
+        //   console.warn("XSRF-TOKEN cookie not found");
+        //   // You might want to retry getting the CSRF token or handle the error
+        // }
+
+        // if (!csrfSet) {
+        //   console.error("Failed to set CSRF token");
+        //   return;
+        // }
 
         const loginData = {
           login: this.email,
@@ -107,9 +144,11 @@ export default {
           "http://localhost:8000/api/login",
           loginData,
           {
+            withCredentials: true,
             headers: {
               "Content-Type": "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+              Accept: "application/json",
+              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           }
         );
@@ -253,7 +292,7 @@ form {
 }
 
 .input-with-icon input {
-  padding: 0.8rem 2.5rem 0.8rem 1rem; 
+  padding: 0.8rem 2.5rem 0.8rem 1rem;
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
@@ -412,5 +451,4 @@ button:hover {
     padding: 2.5rem;
   }
 }
-
 </style>

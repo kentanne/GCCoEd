@@ -1,14 +1,17 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
-import api from "@/axios.js";
 
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   info: {
     type: Array,
+    required: true,
+  },
+  mentorId: {
+    type: Number,
     required: true,
   },
 });
@@ -21,6 +24,32 @@ function getCookie(name) {
 }
 
 const emit = defineEmits(["close", "confirm"]);
+
+// First, update the destructuring to match the order from viewUser.vue
+const [
+  learnerId, // userId
+  learnerNo, // userId
+  learnerName, // userName
+  learnerYear, // userYear
+  learnerCourse, // userCourse
+  learnerDur, // sessionDur
+  learnerModality, // modality
+  learnerStyle, // learnStyle
+  learnerAvail, // availability
+  learnerMode, // modality again
+  learnerPic, // profilePic
+  learnerSubjects, // subjects
+] = props.info || [];
+
+// Parse subjects
+const subjectOptions = computed(() => {
+  try {
+    return JSON.parse(learnerSubjects || "[]");
+  } catch (e) {
+    console.error("Error parsing subjects:", e);
+    return [];
+  }
+});
 
 const selectedDate = ref("");
 const availableTimes = ref([
@@ -52,6 +81,11 @@ const confirmSchedule = async () => {
     return;
   }
 
+  if (isInPersonModality.value && !meetingLocation.value) {
+    alert("Please enter a meeting location for in-person session");
+    return;
+  }
+
   // Format date to match required format MM/DD/YYYY
   const formattedDate = new Date(selectedDate.value).toLocaleDateString(
     "en-US",
@@ -73,26 +107,32 @@ const confirmSchedule = async () => {
 
   const formattedTime = `${String(hours).padStart(2, "0")}:${minutes}`;
 
-  // Create the JSON structure with subject included
+  // Update how modality is determined
+  let selectedModality = learnerModality?.toLowerCase() || "";
+  if (isHybridModality.value) {
+    selectedModality = sessionType.value;
+  }
+
   const scheduleData = {
-    participant_id: mentorNo,
+    learner_id: learnerId,
+    mentor_id: props.mentorId,
     date: formattedDate,
     time: formattedTime,
-    location:
-      sessionType.value === "in-person" ? meetingLocation.value : "online",
-    subject: selectedSubject.value, // Add subject to the payload
+    modality: selectedModality,
+    location: isInPersonModality.value ? meetingLocation.value : "online",
+    subject: selectedSubject.value,
   };
 
   try {
-    const response = await api.post(
-      "/api/learner/scheduleCreate",
+    const response = await axios.post(
+      "http://localhost:8000/api/mentor/send-offer",
       scheduleData,
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
@@ -105,6 +145,7 @@ const confirmSchedule = async () => {
     emit("close");
   } catch (error) {
     console.error("Error in schedule confirmation:", error);
+    alert(error.response?.data?.message || "Error sending tutoring offer");
   }
 };
 
@@ -112,6 +153,44 @@ const confirmSchedule = async () => {
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
   return Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+});
+
+// Add these computed properties after your existing computed properties
+const isInPersonModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "in-person" || modality === "hybrid";
+});
+
+const isOnlineModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "online" || modality === "hybrid";
+});
+
+const isHybridModality = computed(() => {
+  const modality = learnerModality?.toLowerCase() || "";
+  return modality === "hybrid";
+});
+
+// Add this function before generateDays
+const isToday = (date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+// Update onMounted to include error handling and null checks
+onMounted(() => {
+  try {
+    if (currentDate.value) {
+      selectedDate.value = formatDateForInput(currentDate.value);
+      generateDays();
+    }
+  } catch (error) {
+    console.error("Error in mounted hook:", error);
+  }
 });
 
 // Format date as YYYY-MM-DD for the input
@@ -122,12 +201,10 @@ const formatDateForInput = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Add these computed properties and helpers
+// Add these computed properties and helpers after the existing calendar variables
 const availableDays = computed(() => {
   try {
-    return JSON.parse(mentorAvailability || "[]").map((day) =>
-      day.toLowerCase()
-    );
+    return JSON.parse(learnerAvail || "[]").map((day) => day.toLowerCase());
   } catch (e) {
     console.error("Error parsing available days:", e);
     return [];
@@ -211,7 +288,7 @@ const selectDate = (day) => {
   generateDays();
 };
 
-// Update the navigation functions
+// Keep these month navigation functions
 const prevMonth = () => {
   const newDate = new Date(currentDate.value);
   newDate.setMonth(newDate.getMonth() - 1);
@@ -226,12 +303,14 @@ const nextMonth = () => {
   generateDays();
 };
 
+// Update the goToToday function
 const goToToday = () => {
   currentDate.value = new Date();
   selectedDate.value = formatDateForInput(currentDate.value);
   generateDays();
 };
 
+// Update the selectYear function
 const selectYear = (year) => {
   const newDate = new Date(currentDate.value);
   newDate.setFullYear(year);
@@ -240,53 +319,13 @@ const selectYear = (year) => {
   generateDays();
 };
 
+// Update the currentMonthYear computed property
 const currentMonthYear = computed(() => {
   return new Date(currentDate.value).toLocaleDateString("default", {
     month: "long",
     year: "numeric",
   });
 });
-
-// Initialize the calendar
-onMounted(() => {
-  selectedDate.value = formatDateForInput(new Date());
-  generateDays();
-});
-
-// First, update the destructuring to match the order from viewUser.vue
-const [
-  mentorNo,
-  mentorName,
-  mentorYear,
-  mentorCourse,
-  mentorSessionDur,
-  mentorModality,
-  mentorTeachStyle,
-  mentorAvailability,
-  mentorLearnModality,
-  mentorProfilePic,
-  mentorSubjects,
-] = props.info || [];
-
-// Parse subjects from mentorTeachStyle string
-const subjectOptions = computed(() => {
-  try {
-    return JSON.parse(mentorSubjects || "[]");
-  } catch (e) {
-    console.error("Error parsing subjects:", e);
-    return [];
-  }
-});
-
-// Add this helper function before generateDays
-const isToday = (date) => {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
-};
 </script>
 
 <template>
@@ -294,7 +333,7 @@ const isToday = (date) => {
     <!-- Header -->
     <div class="header">
       <div class="flex items-center space-x-3">
-        <h1>Book a Session</h1>
+        <h1>Send Offer</h1>
       </div>
       <button @click="emit('close')" aria-label="Close" type="button">×</button>
     </div>
@@ -302,20 +341,20 @@ const isToday = (date) => {
     <!-- Profile info -->
     <div class="profile">
       <img
-        alt="Profile image"
         :src="
-          mentorProfilePic
-            ? 'http://localhost:8000/api/image/' + mentorProfilePic
+          learnerPic
+            ? `http://localhost:8000/api/image/${learnerPic}`
             : 'https://placehold.co/400x400'
         "
+        alt="Profile image"
         width="64"
         height="64"
       />
       <div>
         <p>
-          <strong>{{ mentorName }}</strong>
+          <strong>{{ learnerName }}</strong>
         </p>
-        <p>{{ mentorYear }} - {{ mentorCourse }}</p>
+        <p>{{ learnerYear }} - {{ learnerCourse }}</p>
         <p>College of Computer Studies</p>
       </div>
     </div>
@@ -326,7 +365,7 @@ const isToday = (date) => {
       <div class="left">
         <div class="time-header">
           <h2>Select Time Slots</h2>
-          <p>({{ mentorSessionDur }} duration)</p>
+          <p>({{ learnerDur }} duration)</p>
         </div>
         <div class="time-slots">
           <button
@@ -346,7 +385,7 @@ const isToday = (date) => {
             type="button"
             @click="sessionType = 'in-person'"
             :class="{ 'mode-active': sessionType === 'in-person' }"
-            :disabled="!mentorModality?.toLowerCase().includes('in-person')"
+            :disabled="!isInPersonModality"
             class="mode-btn"
           >
             <span aria-label="In Person"><i class="fas fa-user"></i></span>
@@ -356,7 +395,7 @@ const isToday = (date) => {
             type="button"
             @click="sessionType = 'online'"
             :class="{ 'mode-active': sessionType === 'online' }"
-            :disabled="!mentorModality?.toLowerCase().includes('online')"
+            :disabled="!isOnlineModality"
             class="mode-btn"
           >
             <span aria-label="Online"><i class="fas fa-laptop"></i></span>
@@ -364,17 +403,19 @@ const isToday = (date) => {
           </button>
         </div>
 
+        <!-- Add location input when in-person is selected -->
         <div v-if="sessionType === 'in-person'" class="location-input">
           <input
-            type="text"
             v-model="meetingLocation"
+            type="text"
             placeholder="Enter meeting location"
             class="location-field"
+            required
           />
         </div>
       </div>
 
-      <!-- Right side - Calendar -->
+      <!-- Right side -->
       <div class="right" style="margin-left: -20px">
         <div class="calendar">
           <div class="calendar-header">
@@ -447,7 +488,7 @@ const isToday = (date) => {
           </div>
         </div>
 
-        <!-- Add this after the calendar div in the right side section -->
+        <!-- Subject selection -->
         <div class="subject-select">
           <h3 class="subject-header">Select Subject</h3>
           <select v-model="selectedSubject" class="subject-dropdown" required>
@@ -464,7 +505,7 @@ const isToday = (date) => {
       </div>
     </div>
 
-    <!-- Footer buttons -->
+    <!-- Footer -->
     <div class="footer">
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
@@ -609,6 +650,7 @@ const isToday = (date) => {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #f3f4f6;
+  border-color: #e5e7eb;
 }
 
 .mode-btn:disabled:hover {
@@ -740,11 +782,33 @@ const isToday = (date) => {
   height: 8px;
   border-radius: 50%;
 }
+
 .legend-dot.available {
   background-color: #0b3b44;
 }
+
 .legend-dot.unavailable {
   background-color: #e5e7eb;
+}
+
+.day.available {
+  color: #000000;
+  cursor: pointer;
+}
+
+.day.unavailable {
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.day.unavailable:hover {
+  background-color: #f3f4f6;
+}
+
+.day.selected.available {
+  background-color: #0b3b44;
+  color: white;
 }
 .weekdays {
   display: grid;
@@ -786,22 +850,6 @@ const isToday = (date) => {
   color: white;
 }
 .day.selected {
-  background-color: #0b3b44;
-  color: white;
-}
-.day.available {
-  color: #000000;
-  cursor: pointer;
-}
-.day.unavailable {
-  color: #d1d5db;
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-}
-.day.unavailable:hover {
-  background-color: #f3f4f6;
-}
-.day.selected.available {
   background-color: #0b3b44;
   color: white;
 }

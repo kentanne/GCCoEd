@@ -3,9 +3,10 @@ import { ref, onMounted, onUnmounted, computed } from "vue";
 import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   schedule: {
@@ -34,13 +35,13 @@ function getCookie(name) {
 
 const cancelSession = async (item) => {
   try {
-    const response = await axios
-      .post("http://localhost:8000/api/send/session/cancel/" + item.id, {
+    const response = await api
+      .post("/api/send/session/cancel/" + item.id, {
         withCredentials: true,
         header: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -156,13 +157,13 @@ onUnmounted(() => {
 });
 
 const previewFile = (fileId) => {
-  const response = axios
-    .get("http://localhost:8000/api/preview/file/" + fileId, {
+  const response = api
+    .get("/api/preview/file/" + fileId, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -175,14 +176,14 @@ const previewFile = (fileId) => {
 };
 
 const downloadFile = async (fileId, fileName) => {
-  axios
-    .get("http://localhost:8000/api/download/file/" + fileId, {
+  api
+    .get("/api/download/file/" + fileId, {
       responseType: "blob",
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
