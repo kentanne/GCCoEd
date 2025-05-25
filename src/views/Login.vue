@@ -55,10 +55,10 @@
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
 // import api from "../axios.js"; // Adjust the path as necessary
-import axios from "axios";
+import api from "@/axios";
 
-axios.defaults.withCredentials = true; // Enable sending cookies with requests
-axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+// axios.defaults.withCredentials = true; // Enable sending cookies with requests
+// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -81,7 +81,7 @@ export default {
   methods: {
     async csrf() {
       try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        await api.get("/sanctum/csrf-cookie");
         console.log("CSRF cookie set successfully");
         return true;
       } catch (error) {
@@ -103,13 +103,14 @@ export default {
           password: this.password,
         };
 
-        const response = await axios.post(
-          "http://localhost:8000/api/login",
+        const response = await api.post(
+          "/api/login",
           loginData,
           {
+            withCredentials: true, // Ensure cookies are sent with the request
             headers: {
               "Content-Type": "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           }
         );
