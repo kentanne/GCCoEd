@@ -625,10 +625,10 @@
 
 <script>
 import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
-import axios, { Axios } from "axios";
+import api from "@/axios.js";
 
-axios.default.withCredentials = true; // Enable sending cookies with requests
-axios.default.withXSRFToken = true; // Enable CSRF token handling
+// axios.default.withCredentials = true; // Enable sending cookies with requests
+// axios.default.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -799,7 +799,7 @@ export default {
   methods: {
     async csrf() {
       await axios
-        .get("http://localhost:8000/sanctum/csrf-cookie")
+        .get("/sanctum/csrf-cookie")
         .then((response) => {
           console.log("CSRF cookie set");
         })
@@ -1205,15 +1205,14 @@ export default {
       try {
         // First API call - Set secondary role
         try {
-          const secondaryRoleResponse = await axios.post(
-            "http://localhost:8000/api/set/2nd_role",
+          const secondaryRoleResponse = await api.post(
+            "/api/set/2nd_role",
             {},
             {
               withCredentials: true,
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
               },
             }
           );
@@ -1269,12 +1268,11 @@ export default {
         });
 
         // First API call - Mentor registration
-        await axios
-          .post("http://localhost:8000/api/mentor/register/2nd", formData, {
+        await api
+          .post("/api/mentor/register/2nd", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
               accept: "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           })
           .then((response) => {
@@ -1283,13 +1281,12 @@ export default {
 
         // Second API call - Set secondary role
         try {
-          const response = await axios
-            .post("http://localhost:8000/api/set/2nd_role", {
+          const response = await api
+            .post("/api/set/2nd_role", {
               withCredentials: true,
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
               },
             })
             .then((response) => {

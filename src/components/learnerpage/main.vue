@@ -93,7 +93,7 @@ const filteredUsers = computed(() => {
         </div>
         <div class="lower-element">
           <p>{{ user.yearLevel }}</p>
-          <p>{{ user.course }}</p>
+          <p>{{ user.course.match(/\(([^)]+)\)/)?.[1] }}</p>
           <p class="proficiency">{{ user.proficiency }}</p>
           <button @click="openView(user.id)">See More</button>
         </div>
@@ -176,13 +176,31 @@ const filteredUsers = computed(() => {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   border: 1px solid #e0dcd7;
+  position: relative;
+  z-index: 1;
 }
 
 .user-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-card:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg, 
+    rgba(138, 43, 226, 0.2) 0%, 
+    rgba(75, 0, 130, 0.3) 100%
+  );
+  z-index: -1;
+  border-radius: 10px;
 }
 
 .upper-element {
@@ -281,8 +299,8 @@ const filteredUsers = computed(() => {
 }
 
 .filledStar {
-  font-size: 1rem;
-}
+  font-size: 1.5rem;
+  bottom: -0.5;}
 
 .fade-enter-active,
 .fade-leave-active {

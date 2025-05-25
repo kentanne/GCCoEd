@@ -434,7 +434,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Base Styles */
 :root {
   --primary: #3b9aa9;
   --primary-light: #6dd1e3;
@@ -455,106 +454,122 @@ onUnmounted(() => {
   box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
   overflow: hidden;
   width: 90%;
-  margin: 2rem auto;
+  margin-top: 2rem;
+  margin-left: 2.5rem;
   text-align: center;
+  padding: 0.5rem;
+  max-height: 36.4rem;
+  overflow-y: scroll;
 }
 
-/* Header Styles */
 .table-header {
   display: flex;
   align-items: center;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  padding-bottom: 2rem;
+  background: rgb(255, 255, 255);
   gap: 1rem;
   flex-wrap: wrap;
   color: #0b2548;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .table-title {
   margin: 0;
-  font-size: 1.5rem;
-  color: var(--text-light);
+  font-size: 1.6rem;
+  color: var(--text-dark);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.8rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .header-icon {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
-/* Main Content Styles */
 .lower-element {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 1.5rem;
   background-color: #fff;
   overflow: hidden;
   height: 542px;
-  padding: 1rem;
+  padding: 0.8rem;
 }
 
 .session-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 50px;
+  grid-gap: 1.5rem;
   width: 100%;
   height: 100%;
+  padding: 0 0.5rem;
 }
 
 .session-card {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 0 0 20px 0;
+  gap: 0.8rem;
+  padding: 0 0.5rem 0.8rem 0.5rem;
+  max-width: 100%;
 }
 
 .session-card h1 {
   color: var(--primary-dark);
   font-size: 1.2rem;
   text-align: left;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
+  margin-top: 1rem;
+  padding-left: 0.5rem;
 }
 
 .today-card,
 .upcomming-card {
   display: flex;
   flex-direction: column;
-  padding: 15px 20px;
-  background-color: #f9f9f9;
+  padding: 0.5rem 0.8rem;
+  background-color: #e4f3f5;
   border-radius: 8px;
-  margin-bottom: 15px;
-  transition: all 0.2s ease;
-  border-left: 4px solid var(--primary);
+  margin-bottom: 0.8rem;
+  transition: all 0.3s ease;
+  border-left: 3px solid var(--primary);
+  max-width: 100%;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  transform: translateY(0);
 }
 
 .today-card:hover,
 .upcomming-card:hover {
-  background-color: rgba(59, 154, 169, 0.05);
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .today-card:nth-of-type(4n + 1) {
-  border-left: 4px solid #ff3131;
+  border-left: 5px solid #ff3131;
 }
 
 .today-card:nth-of-type(4n + 2) {
-  border-left: 4px solid #ff66c4;
+  border-left: 5px solid #ff66c4;
 }
 
 .today-card:nth-of-type(4n + 3) {
-  border-left: 4px solid #ffe063;
+  border-left: 5px solid #ffe063;
 }
 
 .today-card:nth-of-type(4n) {
-  border-left: 4px solid #ff914d;
+  border-left: 5px solid #ff914d;
 }
 
 .upcomming-card {
-  border-left: 4px solid #006981;
+  border-left: 5px solid #006981;
 }
 
 .card-header {
@@ -566,9 +581,10 @@ onUnmounted(() => {
 
 .card-header h1 {
   color: var(--text-dark);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  text-decoration: none;
+  margin-bottom: 0.2rem;
+  text-decoration: underline;
 }
 
 .ellipsis-container {
@@ -581,17 +597,17 @@ onUnmounted(() => {
   flex-direction: column;
   top: 100%;
   right: 0;
-  min-width: 160px;
+  min-width: 140px;
   background-color: white;
   border: 1px solid var(--border);
   border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: hidden;
 }
 
 .popup-option {
-  padding: 10px 15px;
+  padding: 0.5rem 0.8rem;
   cursor: pointer;
   transition: background-color 0.2s;
   display: flex;
@@ -605,8 +621,8 @@ onUnmounted(() => {
 }
 
 .option-icon {
-  margin-right: 12px;
-  width: 16px;
+  margin-right: 0.6rem;
+  width: 14px;
   flex-shrink: 0;
 }
 
@@ -615,30 +631,30 @@ onUnmounted(() => {
   text-align: left;
   white-space: nowrap;
   color: var(--text-dark);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .info {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
-  margin: 5px 0;
+  gap: 0.6rem;
+  margin: 0.2rem 0;
 }
 
 .info h2 {
   color: var(--text-dark);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
 .info p {
   color: var(--text-dark);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .info svg {
-  width: 15px;
+  width: 14px;
 }
 
 .last {
@@ -646,17 +662,33 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 0.5rem;
 }
 
-.last div:first-of-type {
+.location-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+}
+
+.action-icons {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .envelope {
-  width: 25px !important;
+  width: 18px !important;
   cursor: pointer;
   position: relative;
   transition: transform 0.2s;
@@ -684,7 +716,6 @@ onUnmounted(() => {
   z-index: 1000;
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -702,58 +733,99 @@ onUnmounted(() => {
   background-color: white;
   border-radius: 8px;
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  border: 2px solid #e0e0e0;
+  transform: translateX(170px);
 }
 
 .modal-header {
-  padding: 20px;
+  padding: 1.2rem 1.5rem;
   background-color: var(--primary);
   color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(0,0,0,0.1);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  color: rgb(36, 56, 92);
+}
+
+.close-button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: rgb(30, 50, 73);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255,255,255,0.3);
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 1.5rem;
   text-align: center;
+  background-color: #fff;
 }
 
 .modal-body p {
-  margin-bottom: 10px;
-  color: var(--text-dark);
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .warning-text {
   color: var(--danger);
   font-weight: bold;
+  font-size: 1rem;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  padding: 15px 20px;
-  background-color: #f9f9f9;
-  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  background-color: #f5f5f5;
+  border-top: 2px solid #e0e0e0;
+  gap: 12px;
 }
 
 .modal-button {
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  margin-left: 10px;
+  font-weight: 600;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  border: 2px solid transparent;
 }
 
 .modal-button.cancel {
-  background-color: #f0f0f0;
-  color: var(--text-dark);
-  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  color: #555;
+  border-color: #ccc;
 }
 
 .modal-button.cancel:hover {
@@ -763,7 +835,7 @@ onUnmounted(() => {
 .modal-button.confirm {
   background-color: var(--primary);
   color: white;
-  border: 1px solid var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 
 .modal-button.confirm:hover {
@@ -771,55 +843,89 @@ onUnmounted(() => {
 }
 
 .modal-button.confirm.danger {
-  background-color: var(--danger);
-  border-color: #c62828;
+  background-color: red;
 }
 
 .modal-button.confirm.danger:hover {
-  background-color: #c62828;
+  background-color: #f55050;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .session-grid {
     grid-template-columns: 1fr;
-    grid-gap: 20px;
+    grid-gap: 1rem;
   }
   
   .lower-element {
     height: auto;
+    padding: 0.5rem;
+  }
+  
+  .session-card {
+    padding: 0 0.3rem 0.5rem 0.3rem;
   }
 }
 
 @media (max-width: 768px) {
+  .session-wrapper {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 0.3rem;
+  }
+
   .table-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .table-title {
+    font-size: 1.1rem;
   }
 
   .modal-content {
     width: 95%;
+    max-width: 400px;
+  }
+  
+  .today-card,
+  .upcomming-card {
+    padding: 0.7rem 0.9rem;
+  }
+  
+  .card-header h1 {
+    font-size: 0.9rem;
+  }
+  
+  .info h2 {
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
-  .session-wrapper {
-    width: 95%;
-  }
-  
-  .card-header h1 {
-    font-size: 1rem;
-  }
-
   .modal-footer {
     flex-direction: column;
-    gap: 10px;
+    gap: 0.5rem;
   }
 
   .modal-button {
     margin-left: 0;
     width: 100%;
+    justify-content: center;
+  }
+  
+  .session-card h1 {
+    font-size: 1rem;
+  }
+  
+  .info p {
+    font-size: 0.8rem;
+  }
+  
+  .action-icons {
+    gap: 0.6rem;
+  }
+  
+  .envelope {
+    width: 16px !important;
   }
 }
 </style>

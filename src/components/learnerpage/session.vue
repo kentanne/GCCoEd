@@ -540,20 +540,28 @@ const downloadFile = async (fileId, fileName) => {
 .table-header {
   display: flex;
   align-items: center;
-  padding: 1.2rem 1.5rem; 
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  gap: 0.8rem; 
+  padding: 1.5rem;
+  padding-bottom: 2rem; /* Adjust the value as needed */
+  background: rgb(255, 255, 255);
+  gap: 1rem;
+  flex-wrap: wrap;
   color: #0b2548;
   position: sticky;
+  top: 0;
+  z-index: 20;
 }
+
 
 .table-title {
   margin: 0;
-  font-size: 1.6rem; 
+  font-size: 1.6rem;
   color: var(--text-light);
   display: flex;
   align-items: center;
-  gap: 0.8rem; 
+  gap: 0.8rem;
+    position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .header-icon {
@@ -606,10 +614,18 @@ const downloadFile = async (fileId, fileName) => {
   background-color: #e4f3f5;
   border-radius: 8px;
   margin-bottom: 0.8rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   border-left: 3px solid var(--primary);
   max-width: 100%;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5)
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  transform: translateY(0);
+}
+
+.today-card:hover,
+.upcomming-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .today-card:nth-of-type(4n + 1) {
@@ -795,75 +811,100 @@ const downloadFile = async (fileId, fileName) => {
   background-color: white;
   border-radius: 8px;
   width: 90%;
-  max-width: 480px; /* Slightly smaller */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* Lighter shadow */
+  max-width: 480px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  border: 2px solid #e0e0e0;
+  transform: translateX(170px); /* Moves it 10px to the right */
 }
 
+
 .modal-header {
-  padding: 1rem 1.2rem; /* Reduced padding */
+  padding: 1.2rem 1.5rem; /* Increased padding */
   background-color: var(--primary);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px solid rgba(0,0,0,0.1); /* Added separation */
 }
 
 .modal-header h3 {
   margin: 0;
-  font-size: 1.1rem; /* Smaller */
+  font-size: 1.2rem; /* Slightly larger */
+  font-weight: 600; /* Bolder */
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* Better contrast */
+  color: rgb(36, 56, 92);
 }
 
 .close-button {
-  background: none;
+  background: rgba(255,255,255,0.2);
   border: none;
-  color: white;
-  font-size: 1.1rem; /* Smaller */
+  color: rgb(30, 50, 73);
+  font-size: 1.2rem;
   cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255,255,255,0.3);
 }
 
 .modal-body {
-  padding: 1rem 1.2rem; /* Reduced padding */
+  padding: 1.5rem;
   text-align: center;
+  background-color: #fff; /* Ensure pure white */
 }
 
 .modal-body p {
-  margin-bottom: 0.8rem; /* Reduced */
-  color: var(--text-dark);
-  font-size: 0.9rem; /* Smaller */
+  margin-bottom: 1rem;
+  color: #333; /* Darker text */
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .warning-text {
   color: var(--danger);
   font-weight: bold;
-  font-size: 0.9rem; /* Smaller */
+  font-size: 1rem;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  padding: 0.8rem 1rem; /* Reduced padding */
-  background-color: #f9f9f9;
-  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  background-color: #f5f5f5; /* Slightly darker than before */
+  border-top: 2px solid #e0e0e0; /* Thicker border */
+  gap: 12px; /* Better button spacing */
 }
 
 .modal-button {
-  padding: 0.5rem 1rem; /* Reduced padding */
-  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  margin-left: 0.6rem; /* Reduced */
+  font-weight: 600; /* Bolder text */
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 0.4rem; /* Reduced */
-  font-size: 0.9rem; /* Smaller */
+  gap: 0.5rem;
+  font-size: 1rem;
+  border: 2px solid transparent; /* Added border */
 }
 
 .modal-button.cancel {
-  background-color: #f0f0f0;
-  color: var(--text-dark);
-  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  color: #555;
+  border-color: #ccc; /* Added border */
 }
 
 .modal-button.cancel:hover {
@@ -873,7 +914,7 @@ const downloadFile = async (fileId, fileName) => {
 .modal-button.confirm {
   background-color: var(--primary);
   color: white;
-  border: 1px solid var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 
 .modal-button.confirm:hover {
@@ -881,42 +922,31 @@ const downloadFile = async (fileId, fileName) => {
 }
 
 .modal-button.confirm.danger {
-  background-color: var(--danger);
-  border-color: #c62828;
+  background-color: red;
 }
 
 .modal-button.confirm.danger:hover {
-  background-color: #c62828;
-}
-
-.modal-button.preview {
-  background-color: var(--primary);
-  color: white;
-  padding: 0.4rem 0.8rem; /* Smaller */
-}
-
-.modal-button.download {
-  background-color: var(--success);
-  color: white;
-  padding: 0.4rem 0.8rem; /* Smaller */
+  background-color: #f55050;
+  
 }
 
 .file-item {
   display: flex;
   align-items: center;
-  padding: 0.8rem; /* Reduced */
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0; /* Darker border */
+  transition: all 0.2s;
+  background-color: #fff;
 }
 
 .file-item:hover {
-  background-color: #f8f8f8;
+  background-color: #f5f5f5;
 }
 
 .file-icon {
-  margin-right: 0.8rem; /* Reduced */
-  color: var(--primary);
-  font-size: 1rem; /* Smaller */
+  margin-right: 1rem;
+  color: rgb(52, 72, 99);
+  font-size: 1.2rem;
 }
 
 .file-name {
@@ -925,19 +955,49 @@ const downloadFile = async (fileId, fileName) => {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-  color: var(--text-dark);
-  font-size: 0.9rem; /* Smaller */
+  color: #2b3544; /* Darker text */
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .file-actions {
   display: flex;
-  gap: 0.5rem; /* Reduced */
+  gap: 0.8rem;
 }
 
 .no-files {
-  padding: 1rem; /* Reduced */
-  color: #666;
-  font-size: 0.9rem; /* Smaller */
+  padding: 1.5rem;
+  color: #304453;
+  font-size: 1rem;
+  background-color: #fafafa;
+  border-radius: 4px;
+  margin: 1rem;
+}
+
+.file-actions .modal-button.preview {
+  background-color: #2196F3; /* Blue for preview */
+  color: white;
+}
+
+.file-actions .modal-button.preview:hover {
+  background-color: #0d8bf2; /* Slightly darker blue on hover */
+}
+
+.file-actions .modal-button.download {
+  background-color: #4CAF50; /* Green for download */
+  color: white;
+}
+
+.file-actions .modal-button.download:hover {
+  background-color: #3e8e41; /* Slightly darker green on hover */
+}
+
+.file-actions .modal-button.preview:hover .fa-eye {
+  animation: pulse 0.5s ease;
+}
+
+.file-actions .modal-button.download:hover .fa-download {
+  animation: bounce 0.5s ease;
 }
 
 @media (max-width: 1024px) {

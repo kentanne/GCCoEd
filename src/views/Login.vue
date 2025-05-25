@@ -110,7 +110,7 @@ export default {
             withCredentials: true, // Ensure cookies are sent with the request
             headers: {
               "Content-Type": "application/json",
-              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           }
         );

@@ -434,6 +434,7 @@ const formattedSelectedDate = computed(() => {
               v-for="subject in subjectOptions"
               :key="subject"
               :value="subject"
+              class="subject option"
             >
               {{ subject }}
             </option>
@@ -485,7 +486,10 @@ const formattedSelectedDate = computed(() => {
   margin-left: 10rem;
   margin-right: -10rem;
   top: 3rem;
-  max-height: 950px;
+  max-height: 85vh; 
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
 }
 
 .header {
@@ -497,7 +501,12 @@ const formattedSelectedDate = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
+
 .header h1 {
   font-weight: 800;
   font-size: 1.125rem;
@@ -536,12 +545,16 @@ const formattedSelectedDate = computed(() => {
   gap: 1.5rem;
   padding: 2.5rem;
   background-color: white;
+  overflow-y: auto; /* Make content scrollable */
+  flex-grow: 1; /* Take up remaining space */
 }
+
 @media (min-width: 768px) {
   .content {
     flex-direction: row;
   }
 }
+
 .left,
 .right {
   flex: 1;
@@ -782,6 +795,9 @@ const formattedSelectedDate = computed(() => {
   background-color: white;
   border-bottom-left-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 .btn-cancel {
   color: #e11d1d;
@@ -810,7 +826,10 @@ const formattedSelectedDate = computed(() => {
 }
 .subject-select {
   margin-top: 1.5rem;
+  width: 100%;
+  position: relative;
 }
+
 .subject-header {
   font-weight: 600;
   color: #0b3b44;
@@ -818,19 +837,75 @@ const formattedSelectedDate = computed(() => {
   margin-bottom: 0.5rem;
   user-select: none;
 }
+
 .subject-dropdown {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.625rem 1rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   background-color: white;
   color: #4b5563;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3b44' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  transition: all 0.2s ease;
 }
+
+/* Allow options to wrap text */
+.subject-dropdown option {
+  white-space: normal;
+  word-wrap: break-word;
+  padding: 8px 12px;
+}
+
+/* Firefox specific styling */
+@-moz-document url-prefix() {
+  .subject-dropdown {
+    text-indent: 0.01px;
+    text-overflow: '';
+  }
+  .subject-dropdown option {
+    padding-left: 1rem;
+  }
+}
+
+/* IE10+ specific fix */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .subject-dropdown {
+    padding-right: 0;
+  }
+  .subject-dropdown::-ms-expand {
+    display: none;
+  }
+  .subject-dropdown:focus::-ms-value {
+    background: transparent;
+    color: #4b5563;
+  }
+}
+
+.subject-dropdown:hover {
+  border-color: #9ca3af;
+}
+
 .subject-dropdown:focus {
   outline: none;
   border-color: #0b3b44;
+  box-shadow: 0 0 0 2px rgba(11, 59, 68, 0.1);
+}
+
+.subject-dropdown option:disabled {
+  color: #9ca3af;
+}
+
+.subject-dropdown option:checked {
+  background-color: #f0f7f9;
+  color: #0b3b44;
 }
 
 /* Modal styles */

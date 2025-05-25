@@ -523,10 +523,10 @@
 
 <script>
 import { registrationStore } from "@/stores/registrationStore";
-import axios from "axios";
+import api from "@/axios.js";
 
-axios.defaults.withCredentials = true; // Enable sending cookies with requests
-axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+// axios.defaults.withCredentials = true; // Enable sending cookies with requests
+// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -693,7 +693,7 @@ export default {
     },
     async csrf() {
       await axios
-        .get("http://localhost:8000/sanctum/csrf-cookie")
+        .get("/sanctum/csrf-cookie")
         .then((response) => {
           console.log("CSRF cookie set");
         })
@@ -1060,12 +1060,12 @@ export default {
           throw new Error("Profile image is missing or invalid.");
         }
 
-        await axios
-          .post("http://localhost:8000/api/learner/register", formData, {
+        await api
+          .post("/api/learner/register", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
               accept: "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           })
           .then((response) => {

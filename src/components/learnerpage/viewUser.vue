@@ -11,110 +11,115 @@
       </button>
     </div>
 
-    <!-- Modal Body -->
-    <div class="lower-element">
-      <!-- Applicant Profile Section -->
-      <div class="lower-upper">
-        <div class="profile-image-container">
-          <img
-            :src="'http://localhost:8000/api/image/' + profilePic || 'https://placehold.co/600x400'"
-            alt="Profile Image"
-            class="profile-image"
-          />
+    <!-- Scrollable Content -->
+    <div class="scrollable-content">
+      <!-- Modal Body -->
+      <div class="lower-element">
+        <!-- Applicant Profile Section -->
+        <div class="lower-upper">
+          <div class="profile-image-container">
+            <img
+              :src="'http://localhost:8000/api/image/' + profilePic || 'https://placehold.co/600x400'"
+              alt="Profile Image"
+              class="profile-image"
+            />
+          </div>
+
+          <div class="profile-information">
+            <h4 class="applicant-name">{{ name }}</h4>
+            <hr class="divider" />
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                <span class="info-value">{{ gender || "N/A" }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-calendar-alt"></i> Year</span>
+                <span class="info-value">{{ year || "N/A" }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-graduation-cap"></i> Program</span>
+                <span class="info-value">{{ course || "N/A" }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-university"></i> College</span>
+                <span class="info-value">College of Computer Studies</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-map-marker-alt"></i> Location</span>
+                <span class="info-value">{{ address || "N/A" }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-phone"></i> Contact</span>
+                <span class="info-value">{{ contact || "N/A" }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
+                <span class="info-value">{{ email || "N/A" }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="profile-information">
-          <h4 class="applicant-name">{{ name }}</h4>
-          <hr class="divider" />
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
-              <span class="info-value">{{ gender || "N/A" }}</span>
+        <!-- Details Section -->
+        <div class="lower-lower">
+          <div class="details-section">
+            <div class="details-card">
+              <h4 class="section-title">
+                <i class="fas fa-info-circle"></i> Teaching Details
+              </h4>
+              <hr class="divider2" />
+              <div class="details-content">
+                <div class="detail-item">
+                  <span class="detail-label">Subjects Offered:</span>
+                  <span class="detail-value right-align wrap-text">{{ subjects || "N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Teaching Modality:</span>
+                  <span class="detail-value right-align">{{ modality || "N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Teaching Style:</span>
+                  <span class="detail-value right-align">{{ learnStyle || "N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Availability:</span>
+                  <span class="detail-value availability-text right-align">{{ availability || "N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Session Duration:</span>
+                  <span class="detail-value right-align">{{ sessionDur || "N/A" }}</span>
+                </div>
+              </div>
             </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-calendar-alt"></i> Year</span>
-              <span class="info-value">{{ year || "N/A" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-graduation-cap"></i> Program</span>
-              <span class="info-value">{{ course || "N/A" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-university"></i> College</span>
-              <span class="info-value">College of Computer Studies</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-map-marker-alt"></i> Location</span>
-              <span class="info-value">{{ address || "N/A" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-phone"></i> Contact</span>
-              <span class="info-value">{{ contact || "N/A" }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
-              <span class="info-value">{{ email || "N/A" }}</span>
+
+            <div class="bio-card">
+              <h4 class="section-title">
+                <i class="fas fa-user-edit"></i> Bio & Experience
+              </h4>
+              <hr class="divider2" />
+              <div class="bio-content">
+                <div class="detail-item2">
+                  <span class="detail-label">Bio:</span>
+                  <span class="detail-value2 wrap-text">{{ bio || "No bio provided" }}</span>
+                </div>
+                <div class="detail-item2">
+                  <span class="detail-label">Experience:</span>
+                  <span class="detail-value2 wrap-text">{{ goal || "No experience provided" }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Details Section -->
-      <div class="lower-lower">
-        <div class="details-section">
-          <div class="details-card">
-            <h4 class="section-title">
-              <i class="fas fa-info-circle"></i> Teaching Details
-            </h4>
-            <hr class="divider2" />
-            <div class="details-content">
-              <div class="detail-item">
-                <span class="detail-label">Subjects Offered:</span>
-                <span class="detail-value right-align wrap-text">{{ subjects || "N/A" }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Teaching Modality:</span>
-                <span class="detail-value right-align">{{ modality || "N/A" }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Teaching Style:</span>
-                <span class="detail-value right-align">{{ learnStyle || "N/A" }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Availability:</span>
-                <span class="detail-value availability-text right-align">{{ availability || "N/A" }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Session Duration:</span>
-                <span class="detail-value right-align">{{ sessionDur || "N/A" }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bio-card">
-            <h4 class="section-title">
-              <i class="fas fa-user-edit"></i> Bio & Experience
-            </h4>
-            <hr class="divider2" />
-            <div class="bio-content">
-              <div class="detail-item2">
-                <span class="detail-label">Bio:</span>
-                <span class="detail-value2 wrap-text">{{ bio || "No bio provided" }}</span>
-              </div>
-              <div class="detail-item2">
-                <span class="detail-label">Experience:</span>
-                <span class="detail-value2 wrap-text">{{ goal || "No experience provided" }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="action-button">
-          <button @click="showConfirmationModal = true">
-            <i class="fas fa-calendar-alt"></i> Schedule Session
-          </button>
-        </div>
+    <!-- Sticky Footer Button -->
+    <div class="sticky-footer">
+      <div class="action-button">
+        <button @click="showConfirmationModal = true">
+          <i class="fas fa-calendar-alt"></i> Schedule Session
+        </button>
       </div>
     </div>
   </div>
@@ -250,7 +255,7 @@ onMounted(() => {
   border-radius: 12px;
   width: 800px;
   max-height: 80vh;
-  overflow-y: auto;
+  height: 80vh; 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -258,12 +263,31 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
+  overflow: hidden; /* Added to contain the scrollable area */
 }
 
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 150;
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 1rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 120;
+}
+
+.scrollable-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 1.5rem;
 }
 
 .wrap-text {
@@ -291,7 +315,6 @@ onMounted(() => {
 
 .upper-element {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -337,7 +360,7 @@ onMounted(() => {
 }
 
 .lower-element {
-  padding: 1.5rem;
+  padding: 1.5rem 0;
 }
 
 .lower-upper {
@@ -509,8 +532,7 @@ onMounted(() => {
 .action-button {
   display: flex;
   justify-content: flex-end;
-  padding: 1.25rem 0;
-  margin-top: 1rem;
+  padding: 0;
 }
 
 .action-button button {
@@ -553,8 +575,6 @@ onMounted(() => {
   z-index: 2000;
     left: 10rem;
   width: 100%;
-
-
 }
 
 .confirmation-modal {
@@ -566,7 +586,6 @@ onMounted(() => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 2001;
   margin-left: 3rem;
-
 }
 
 .confirmation-modal h3 {
