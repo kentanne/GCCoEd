@@ -51,14 +51,17 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
-// import api from "../axios.js"; // Adjust the path as necessary
 import api from "@/axios";
 
-// axios.defaults.withCredentials = true; // Enable sending cookies with requests
-// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+const router = useRouter();
+const email = ref("");
+const password = ref("");
+const passwordVisible = ref(false);
 
 function getCookie(name) {
   try {
@@ -74,88 +77,71 @@ function getCookie(name) {
   }
 }
 
-export default {
-  name: "LoginComponent",
-  components: { Navbar },
-  data() {
-    return {
-      logo,
-      email: "",
-      password: "",
-      passwordVisible: false,
-    };
-  },
-  methods: {
-    async csrf() {
-      try {
-        await api.get("/sanctum/csrf-cookie");
-        console.log("CSRF cookie set successfully");
-        return true;
-      } catch (error) {
-        console.error("Error setting CSRF cookie:", error);
-        return false;
+async function csrf() {
+  try {
+    await api.get("/sanctum/csrf-cookie");
+    console.log("CSRF cookie set successfully");
+    return true;
+  } catch (error) {
+    console.error("Error setting CSRF cookie:", error);
+    return false;
+  }
+}
+
+async function login() {
+  try {
+    await csrf().then((success) => {
+      if (!success) {
+        console.error("Failed to set CSRF cookie");
+        return;
       }
-    },
-    async login() {
-      try {
-        await this.csrf();
 
-        // Debug cookie information
-        console.log("All cookies:", document.cookie);
-        const token = getCookie("XSRF-TOKEN");
-        console.log("Retrieved XSRF-TOKEN:", token);
+      console.log("All cookies:", document.cookie);
+      const token = getCookie("XSRF-TOKEN");
+      console.log("Retrieved XSRF-TOKEN:", token);
 
-        // if (!token) {
-        //   console.warn("XSRF-TOKEN cookie not found");
-        //   // You might want to retry getting the CSRF token or handle the error
-        // }
+      const loginData = {
+        login: email.value,
+        password: password.value,
+      };
 
-        // if (!csrfSet) {
-        //   console.error("Failed to set CSRF token");
-        //   return;
-        // }
+      const response = api.post("/api/login", loginData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        const loginData = {
-          login: this.email,
-          password: this.password,
-        };
+      console.log("Login successful:", response.data);
 
-        const response = await api.post("/api/login", loginData, {
-          withCredentials: true, // Ensure cookies are sent with the request
-          headers: {
-            "Content-Type": "application/json",
-            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-          },
-        });
-
-
-        console.log("Login successful:", response.data);
-
-        switch (response.data.user_role) {
-          case null:
-            this.$router.push("/signup");
-            break;
-          case "learner":
-            this.$router.push("/learner");
-            break;
-          case "mentor":
-            this.$router.push("/mentor");
-            break;
-          case "admin":
-            this.$router.push("/admin");
-            break;
-          default:
-            console.error("Unknown user role:", response.data.user_role);
-        }
-      } catch (error) {
-        console.error("Login failed:", error);
+      switch (response.data.user_role) {
+        case null:
+          router.push("/signup");
+          break;
+        case "learner":
+          router.push("/learner");
+          break;
+        case "mentor":
+          router.push("/mentor");
+          break;
+        case "admin":
+          router.push("/admin");
+          break;
+        default:
+          console.error("Unknown user role:", response.data.user_role);
+          break;
       }
-    },
-    togglePasswordVisibility() {
-      this.passwordVisible = !this.passwordVisible;
-    },
-  },
-};
+    });
+
+    // Debug cookie information
+  } catch (error) {
+    console.error("Login failed:", error);
+  }
+}
+
+function togglePasswordVisibility() {
+  passwordVisible.value = !passwordVisible.value;
+}
 </script>
 
 <style scoped>

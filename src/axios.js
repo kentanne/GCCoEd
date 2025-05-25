@@ -10,7 +10,8 @@ axios.defaults.withCredentials = true;
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
+  if (parts.length === 2)
+    return decodeURIComponent(parts.pop().split(";").shift());
 };
 
 const api = axios.create({
@@ -37,7 +38,7 @@ api.interceptors.request.use(
       });
     }
     // Add XSRF token to headers if it exists
-    const token = decodeURIComponent(getCookie("XSRF-TOKEN"));
+    const token = getCookie("XSRF-TOKEN");
     if (token) {
       config.headers["X-XSRF-TOKEN"] = token;
     }
