@@ -3,8 +3,17 @@ import axios from "axios";
 const baseURLConst = "https://gccoed.onrender.com";
 // const baseURLConst = "http://localhost:8000";
 
+// Add global defaults
+axios.defaults.withCredentials = true;
+
+// Helper function to get cookie value
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+};
+
 const api = axios.create({
-  // baseURL: baseURLConst,
   baseURL: baseURLConst,
   withCredentials: true,
   withXSRFToken: true,
@@ -26,6 +35,11 @@ api.interceptors.request.use(
           "X-Requested-With": "XMLHttpRequest",
         },
       });
+    }
+    // Add XSRF token to headers if it exists
+    const token = getCookie("XSRF-TOKEN");
+    if (token) {
+      config.headers["X-XSRF-TOKEN"] = token;
     }
     return config;
   },
