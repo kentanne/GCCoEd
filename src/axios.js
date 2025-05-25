@@ -37,7 +37,7 @@ api.interceptors.request.use(
       });
     }
     // Add XSRF token to headers if it exists
-    const token = getCookie("XSRF-TOKEN");
+    const token = decodeURIcomponent(getCookie("XSRF-TOKEN"));
     if (token) {
       config.headers["X-XSRF-TOKEN"] = token;
     }
