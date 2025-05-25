@@ -44,67 +44,85 @@ const close = () => {
 .message-wrapper {
 	display: flex;
 	flex-direction: column;
-	width: 430px;
-	height: 275px;
+	width: 400px;
+	height: 310px; 
+	border-radius: 12px;
+	overflow: hidden;
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .upper-element {
 	display: flex;
 	align-items: center;
-	padding: 1rem 2rem;
-	background-color: #0c434d;
-	border-radius: 0.5rem 0.5rem 0 0;
-	gap: 20px;
+	padding: 1.25rem 1.5rem;
+	background: linear-gradient(135deg, #2a5f6e, #0c434d);
 	justify-content: space-between;
 }
 
 .upper-element div:first-of-type {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 12px;
 }
 
 .upper-element h1 {
 	color: white;
-	font-size: 1.5rem;
-	font-weight: 600;
+	font-size: 1.3rem;
+	font-weight: 500;
+	margin: 0;
+	letter-spacing: 0.3px;
 }
 
 .lower-element {
-	background-color: #349eb1;
+	background-color: #ffffff;
 	height: 100%;
-	border-radius: 0 0 0.5rem 0.5rem;
 	display: flex;
-	padding: 20px 0;
+	padding: 1.5rem;
 	flex-direction: column;
-	align-items: center;
-	justify-content: space-between;
+	gap: 1rem; 
 }
 
 textarea {
 	resize: none;
-	height: 70%;
-	width: 85%;
-	border: none;
-	font-family: "Montserrat", sans-serif;
-	border-radius: 10px;
-	padding: 10px;
+	height: 120px; 
+	width: 93%;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 12px;
+	font-family: inherit;
+	font-size: 0.95rem;
+	background: #fafafa;
+	transition: all 0.2s ease;
 }
 
 textarea:focus {
 	outline: none;
+	border-color: #2a5f6e;
+	background: white;
+	box-shadow: 0 0 0 2px rgba(42, 95, 110, 0.1);
 }
 
 .lower-element button {
-	background-color: #0c434d;
+	align-self: flex-end;
+	background: #0c434d;
 	color: white;
 	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	font-family: "Montserrat", sans-serif;
-	font-size: 1rem;
+	padding: 0.7rem 1.8rem;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: 0.95rem;
+	font-weight: 500;
 	cursor: pointer;
-	width: max-content;
-	margin-bottom: -8px;
+	transition: all 0.2s ease;
+}
+
+.lower-element button:hover {
+	background: #09505d;
+	transform: translateY(-1px);
+}
+
+.lower-element button:active {
+	transform: translateY(0);
 }
 </style>

@@ -28,6 +28,11 @@ const activePopup = ref({
   index: null,
 });
 
+// Add these new refs for confirmation modals
+const showRemindConfirmation = ref(false);
+const showCancelConfirmation = ref(false);
+const selectedItem = ref(null);
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -49,34 +54,39 @@ const sendReminder = async (item) => {
       }
     );
     console.log(response.data);
+    // Show success message or notification
   } catch (error) {
     console.error("Error sending reminder:", error);
+  } finally {
+    showRemindConfirmation.value = false;
   }
 };
 
 const cancelSession = async (item) => {
   try {
-    const response = await axios
-      .post("http://localhost:8000/api/send/session/cancel/" + item.id, {
+    const response = await axios.post(
+      "http://localhost:8000/api/send/session/cancel/" + item.id,
+      {
         withCredentials: true,
         header: {
           "Content-Type": "application/json",
           Accept: "application/json",
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
-      })
-      .then((response) => {
-        console.log(response.data);
-        todaySchedule.value = todaySchedule.value.filter(
-          (session) => session.id !== item.id
-        );
-        upcommingSchedule.value = upcommingSchedule.value.filter(
-          (session) => session.id !== item.id
-        );
-        alert("Session cancelled successfully!");
-      });
+      }
+    );
+    console.log(response.data);
+    todaySchedule.value = todaySchedule.value.filter(
+      (session) => session.id !== item.id
+    );
+    upcommingSchedule.value = upcommingSchedule.value.filter(
+      (session) => session.id !== item.id
+    );
+    // Show success message or notification
   } catch (error) {
     console.error("Error cancelling session:", error);
+  } finally {
+    showCancelConfirmation.value = false;
   }
 };
 
@@ -91,17 +101,17 @@ const togglePopup = (type, index, event) => {
 
 const handleOptionClick = (option, item, event) => {
   event.stopPropagation();
+  selectedItem.value = item;
+  
   switch (option) {
     case "remind":
-      alert(`Set reminder for ${item.subject}`);
-      sendReminder(item);
+      showRemindConfirmation.value = true;
       break;
     case "reschedule":
       selectedSessionID.value = item.id;
       break;
     case "cancel":
-      alert(`Cancel ${item.subject}`);
-      cancelSession(item);
+      showCancelConfirmation.value = true;
       break;
   }
   activePopup.value = { type: null, index: null };
@@ -135,10 +145,15 @@ onUnmounted(() => {
 
 <template>
   <div class="session-wrapper">
-    <div class="top-element">
-      <font-awesome-icon icon="fa-calendar" size="3x" color="#fff" />
-      <h1>SESSION SCHEDULE</h1>
+    <!-- Header Section - Updated Design -->
+    <div class="table-header">
+      <h2 class="table-title">
+        <i class="fas fa-calendar header-icon"></i>
+        Session Schedule
+      </h2>
     </div>
+    
+    <!-- Main Content Section - Updated Design -->
     <div class="lower-element">
       <div class="session-grid">
         <!-- Today Schedule -->
@@ -362,41 +377,184 @@ onUnmounted(() => {
         <Message @close="handleMessageClose" />
       </div>
     </Transition>
-  </div>
 
-  <div v-if="reschedIsOpen" class="message-pop-up">
-    <RescheduleDialog
-      :id="selectedSessionID"
-      @close="reschedIsOpen = false"
-      @reschedule="reschedule"
-    />
+    <!-- Remind Confirmation Modal -->
+    <Transition name="fade" mode="out-in">
+      <div v-if="showRemindConfirmation" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Send Reminder</h3>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to send a reminder for <strong>{{ selectedItem?.subject }}</strong> to <strong>{{ selectedItem?.learner.user.name }}</strong>?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button cancel" @click="showRemindConfirmation = false">
+              Cancel
+            </button>
+            <button class="modal-button confirm" @click="sendReminder(selectedItem)">
+              Send Reminder
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Cancel Confirmation Modal -->
+    <Transition name="fade" mode="out-in">
+      <div v-if="showCancelConfirmation" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Cancel Session</h3>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to cancel <strong>{{ selectedItem?.subject }}</strong> with <strong>{{ selectedItem?.learner.user.name }}</strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button cancel" @click="showCancelConfirmation = false">
+              No, Keep It
+            </button>
+            <button class="modal-button confirm danger" @click="cancelSession(selectedItem)">
+              Yes, Cancel Session
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <div v-if="reschedIsOpen" class="message-pop-up">
+      <RescheduleDialog
+        :id="selectedSessionID"
+        @close="reschedIsOpen = false"
+        @reschedule="reschedule"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.session-wrapper {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  overflow: hidden;
+/* Base Styles */
+:root {
+  --primary: #3b9aa9;
+  --primary-light: #6dd1e3;
+  --primary-dark: #0b3e8a;
+  --secondary: #ffc107;
+  --danger: #f44336;
+  --success: #4caf50;
+  --warning: #ffa000;
+  --text-dark: #0b2548;
+  --text-light: #f5f7fa;
+  --bg-light: #ffffff;
+  --border: #e1e4e8;
 }
 
-.top-element {
+.session-wrapper {
+  background: var(--bg-light);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
+  overflow: hidden;
+  width: 90%;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Header Styles */
+.table-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #0b2548;
+}
+
+.table-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  font-size: 1.2rem;
+}
+
+/* Main Content Styles */
+.lower-element {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  gap: 17px;
-  background-color: #0c434d;
-  padding: 18px 30px;
-  border-radius: 20px 20px 0 0;
+  gap: 10px;
+  background-color: #fff;
+  overflow: hidden;
+  height: 542px;
+  padding: 1rem;
 }
 
-.top-element h1 {
-  color: #fff;
-  font-size: 1.8rem;
-  font-weight: 600;
+.session-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 50px;
+  width: 100%;
+  height: 100%;
+}
+
+.session-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 0 20px 0;
+}
+
+.session-card h1 {
+  color: var(--primary-dark);
+  font-size: 1.2rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.today-card,
+.upcomming-card {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+  border-left: 4px solid var(--primary);
+}
+
+.today-card:hover,
+.upcomming-card:hover {
+  background-color: rgba(59, 154, 169, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.today-card:nth-of-type(4n + 1) {
+  border-left: 4px solid #ff3131;
+}
+
+.today-card:nth-of-type(4n + 2) {
+  border-left: 4px solid #ff66c4;
+}
+
+.today-card:nth-of-type(4n + 3) {
+  border-left: 4px solid #ffe063;
+}
+
+.today-card:nth-of-type(4n) {
+  border-left: 4px solid #ff914d;
+}
+
+.upcomming-card {
+  border-left: 4px solid #006981;
 }
 
 .card-header {
@@ -404,6 +562,13 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+}
+
+.card-header h1 {
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .ellipsis-container {
@@ -418,7 +583,7 @@ onUnmounted(() => {
   right: 0;
   min-width: 160px;
   background-color: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -449,70 +614,8 @@ onUnmounted(() => {
   flex-grow: 1;
   text-align: left;
   white-space: nowrap;
-}
-
-.lower-element {
-  background-color: #fff;
-  border: 3px solid #0c434d;
-  padding: 10px 30px;
-  flex: 1;
-  overflow-y: auto;
-  border-radius: 0 0 20px 20px;
-}
-
-.session-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
-  margin-top: 20px;
-  height: 502.5px;
-}
-
-.session-card {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 0 0 20px 0;
-}
-
-.session-card h1 {
-  color: #066678;
-}
-
-.today-card,
-.upcomming-card {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 20px;
-  background-color: #f0f0f0;
-}
-
-.today-card:nth-of-type(4n + 1) {
-  border-left: 10px solid #ff3131;
-}
-
-.today-card:nth-of-type(4n + 2) {
-  border-left: 10px solid #ff66c4;
-}
-
-.today-card:nth-of-type(4n + 3) {
-  border-left: 10px solid #ffe063;
-}
-
-.today-card:nth-of-type(4n) {
-  border-left: 10px solid #ff914d;
-}
-
-.upcomming-card {
-  border-left: 10px solid #006981;
-}
-
-.today-card div:nth-of-type(1) h1,
-.upcomming-card div:nth-of-type(1) h1 {
-  color: #0c434d;
-  font-size: 1.3rem;
-  font-weight: 600;
-  text-decoration: underline;
+  color: var(--text-dark);
+  font-size: 0.9rem;
 }
 
 .info {
@@ -520,16 +623,17 @@ onUnmounted(() => {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  margin: 5px 0;
 }
 
 .info h2 {
-  color: #0c434d;
+  color: var(--text-dark);
   font-size: 1rem;
   font-weight: 600;
 }
 
 .info p {
-  color: #0c434d;
+  color: var(--text-dark);
   font-size: 0.9rem;
 }
 
@@ -542,6 +646,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  margin-top: 10px;
 }
 
 .last div:first-of-type {
@@ -554,11 +659,16 @@ onUnmounted(() => {
   width: 25px !important;
   cursor: pointer;
   position: relative;
+  transition: transform 0.2s;
+}
+
+.envelope:hover {
+  transform: scale(1.1);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
@@ -566,15 +676,150 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-}
-
 .message-pop-up {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px;
+  background-color: var(--primary);
+  color: white;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+  color: var(--text-dark);
+}
+
+.warning-text {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-top: 1px solid var(--border);
+}
+
+.modal-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.modal-button.cancel {
+  background-color: #f0f0f0;
+  color: var(--text-dark);
+  border: 1px solid #ddd;
+}
+
+.modal-button.cancel:hover {
+  background-color: #e0e0e0;
+}
+
+.modal-button.confirm {
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--primary-dark);
+}
+
+.modal-button.confirm:hover {
+  background-color: var(--primary-dark);
+}
+
+.modal-button.confirm.danger {
+  background-color: var(--danger);
+  border-color: #c62828;
+}
+
+.modal-button.confirm.danger:hover {
+  background-color: #c62828;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .session-grid {
+    grid-template-columns: 1fr;
+    grid-gap: 20px;
+  }
+  
+  .lower-element {
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+  .session-wrapper {
+    width: 95%;
+  }
+  
+  .card-header h1 {
+    font-size: 1rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-button {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 </style>

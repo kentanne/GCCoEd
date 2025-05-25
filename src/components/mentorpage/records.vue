@@ -89,32 +89,41 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="records-wrapper">
-    <div class="top-element">
-      <font-awesome-icon icon="fa-book" size="3x" color="#fff" />
-      <h1>Session Records</h1>
+  <div class="table-container">
+    <div class="table-header">
+      <h2 class="table-title">
+        <i class="fas fa-book header-icon"></i>
+        Session Records
+      </h2>
+
+      <div class="search-container">
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            type="text"
+            placeholder="Search records..."
+            class="search-input"
+          />
+        </div>
+      </div>
     </div>
-    <div class="lower-element">
-      <table>
+
+    <div class="table-scroll-container">
+      <table class="data-table">
         <thead>
           <tr>
-            <!-- <th>DATE / TIME</th> -->
             <th>COURSE</th>
             <th>LEARNER'S NAME</th>
             <th>YEAR</th>
-            <!-- <th>STATUS</th> -->
             <th>RATING</th>
             <th>ACTIONS</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Create a row for each record -->
           <tr v-for="record in records" :key="record.id">
-            <!-- <td>{{ record.date }}</td> -->
             <td>{{ record.reviewer.course }}</td>
             <td>{{ record.reviewer.user.name }}</td>
             <td>{{ record.reviewer.year }}</td>
-            <!-- <td>{{ record.status || 'blank'}}</td> -->
             <td>
               <div class="stars">
                 <span v-for="i in 5" :key="i" class="star">
@@ -124,44 +133,98 @@ onMounted(() => {
               </div>
             </td>
             <td>
-              <button @click="viewFeedback(record)" class="view-feedback-btn">
-                View Feedback
+              <button @click="viewFeedback(record)" class="details-btn">
+                <i class="fas fa-eye"></i> <span>View Feedback</span>
               </button>
             </td>
+          </tr>
+          <tr v-if="records.length === 0">
+            <td colspan="5" class="no-users">No records to display</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <transition name="fade" mode="out-in">
-      <div v-if="isFeedback" class="feedback-pop-up">
-        <div class="feedback-upper">
-          <img
-            :src="
-              'http://localhost:8000/api/image/' + recordView.reviewer.image ||
-              'https://placehold.co/600x400' ||
-              'https://placehold.co/600x400'
-            "
-            alt="profile-pic"
-          />
-          <h1>{{ recordView.reviewer.name }}</h1>
-          <h2>{{ recordView.reviewer.course }}</h2>
+      <div v-if="isFeedback" class="modal-overlay" @click.self="closeFeedback">
+        <div class="user-modal">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <div class="header-content">
+              <i class="fas fa-comment-dots modal-title-icon"></i>
+              <h3 class="modal-title">Feedback Details</h3>
+            </div>
+            <button class="close-btn" @click="closeFeedback">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
 
-          <font-awesome-icon
-            @click="closeFeedback"
-            icon="fa-xmark"
-            size="2x"
-            color="#fff"
-            style="cursor: pointer"
-            class="exit-feedback"
-          />
-        </div>
-        <div class="feedback-lower">
-          <h1>FEEDBACK</h1>
-          <div class="feedback-content">
-            <p>
-              {{ recordView.feedback }}
-            </p>
+          <!-- Modal Body -->
+          <div class="modal-body">
+            <!-- User Profile Section -->
+            <div class="user-profile">
+              <div class="profile-image-container">
+                <img
+                  :src="'http://localhost:8000/api/image/' + recordView.reviewer.image || 'https://placehold.co/600x400'"
+                  :alt="`Portrait of ${recordView.reviewer.name}`"
+                  class="profile-image"
+                />
+              </div>
+
+              <div class="profile-info">
+                <h4 class="user-name">{{ recordView.reviewer.name }}</h4>
+                <hr class="divider" />
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label"
+                      ><i class="fas fa-graduation-cap"></i> Course</span
+                    >
+                    <span class="info-value">{{ recordView.reviewer.course }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"
+                      ><i class="fas fa-calendar-alt"></i> Year Level</span
+                    >
+                    <span class="info-value">{{ recordView.reviewer.year }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"
+                      ><i class="fas fa-star"></i> Rating</span
+                    >
+                    <span class="info-value">
+                      <span v-for="i in 5" :key="i" class="star">
+                        <span v-if="i <= recordView.rating" class="filled">★</span>
+                        <span v-else>☆</span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="details-section">
+              <div class="bio-card">
+                <h4 class="section-title">
+                  <i class="fas fa-comment"></i> Feedback
+                </h4>
+                <hr class="divider2" />
+                <div class="bio-content">
+                  <div class="detail-item2">
+                    <span class="detail-value2">{{ recordView.feedback || "No feedback provided" }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <div class="footer-actions">
+              <button class="footer-btn back" @click="closeFeedback">
+                <i class="fas fa-arrow-left"></i> Back to Records
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -170,89 +233,125 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.records-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: hidden;
+/* Base Styles */
+:root {
+  --primary: #3b9aa9;
+  --primary-light: #6dd1e3;
+  --primary-dark: #0b3e8a;
+  --secondary: #ffc107;
+  --danger: #f44336;
+  --success: #4caf50;
+  --warning: #ffa000;
+  --text-dark: #0b2548;
+  --text-light: #f5f7fa;
+  --bg-light: #ffffff;
+  --border: #e1e4e8;
 }
 
-.top-element {
+.table-container {
+  background: var(--bg-light);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
+  overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
+  padding: 0 1rem 0 1rem;
+  text-align: center;
+  max-height: 465px;
+  height: 460px;
+  overflow-y: auto;
+  margin-top: 2rem;
+}
+
+.table-header {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  gap: 17px;
-  background-color: #0c434d;
-  padding: 18px 30px;
-  border-radius: 20px 20px 0 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #0b2548;
 }
 
-.top-element h1 {
-  color: #fff;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.lower-element {
+.table-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: rgb(18, 44, 84);
   display: flex;
-  flex-direction: column; /* Ensure proper alignment */
-  justify-content: flex-start; /* Align content to the top */
-  align-items: stretch; /* Stretch content to fill the width */
-  background-color: #fff;
-  border-radius: 0 0 20px 20px;
-  overflow: hidden;
-  border: 3px solid #0c434d;
-  padding: 0; /* Remove padding to make the table snap */
-  height: auto; /* Adjust height dynamically based on content */
+  align-items: center;
+  gap: 0.75rem;
 }
 
-table {
-  width: 100%; /* Make the table take up the full width */
-  border-collapse: collapse; /* Remove gaps between table cells */
-  color: #066678;
-  margin: 0; /* Remove all margins */
+.header-icon {
+  font-size: 1.2rem;
 }
 
-thead {
+.search-container {
+  margin-left: auto;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--primary);
+}
+
+.search-input {
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid rgb(17, 17, 95);
+  border-radius: 8px;
+  width: 250px;
+  font-size: 0.8rem;
+  height: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 2px 8px rgba(54, 88, 141, 0.7);
+}
+
+.table-scroll-container {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.data-table th {
   position: sticky;
   top: 0;
-  z-index: 1;
-  background-color: white;
+  background-color: #e5e5e5;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.75rem;
+  border-bottom: 2px solid var(--primary);
 }
 
-th {
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  border-bottom: 2px solid #ddd;
-  background-color: #f5f5f5;
+.data-table td {
+  padding: 0.8rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
 }
 
-tbody {
-  display: block;
-  overflow-y: auto;
-  max-height: 400px; /* Adjust height to fit within the container */
-  width: 100%;
-}
-
-thead,
-tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-td {
-  text-align: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+.data-table tr:hover {
+  background-color: rgba(59, 154, 169, 0.05);
 }
 
 .stars {
   display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 0.2rem;
 }
 
 .star {
@@ -264,108 +363,335 @@ td {
   color: #ffd700;
 }
 
-td button {
-  background-color: transparent;
-  border: none;
+.details-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--primary-dark);
+  background-color: rgba(73, 152, 164, 0.103);
+  color: var(--primary-dark);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
   cursor: pointer;
-  text-decoration: underline;
-  color: #066678;
+  transition: all 0.3s ease;
 }
 
-/* pop-up */
+.details-btn:hover {
+  background-color: rgba(59, 154, 169, 0.2);
+}
 
-.feedback-pop-up {
+.no-users {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-dark);
+}
+
+/* Modal Styles */
+.modal-overlay {
   position: fixed;
-  top: 50%;
-  left: 55%;
-  transform: translate(-50%, -50%);
-  width: 375px;
-  height: 450px;
-  background-color: #006981;
-  padding: 15px 20px 30px 20px;
-  overflow: hidden;
-  z-index: 1000;
-  border-radius: 20px;
-}
-
-.feedback-upper,
-.feedback-lower {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
+}
+
+.user-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  position: relative;
 }
 
-.feedback-upper img {
-  width: 110px;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 50%;
+.modal-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
-.feedback-upper h1 {
-  color: #fff;
-  font-size: 1.4rem;
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
-.feedback-upper::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 3px;
-  background-color: #a6a6a6;
-}
-
-.feedback-upper h2 {
-  color: #fff;
+.modal-title-icon {
   font-size: 1.2rem;
-  font-weight: 400;
 }
 
-.feedback-lower {
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.user-profile {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
+.profile-image-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #e1e4e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.user-name {
+  margin: 0.6rem 0 1.5rem 0;
+  font-size: 1.6rem;
+  color: #0b2548;
+  font-weight: 700;
+  text-align: left;
+}
+
+.divider {
+  border: none;
+  border-top: 4px solid #8a8a8f;
+  margin-bottom: 1rem;
+  margin-top: -1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  text-align: left;
 }
 
-.feedback-lower h1 {
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 400;
+.info-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.feedback-content {
-  padding: 10px 20px;
-  background-color: #fff;
+.info-label i {
+  width: 16px;
+  text-align: center;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0b234a;
+  margin-left: 25px;
+}
+
+/* Details Section */
+.details-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.bio-card {
+  background: #f9fafb;
   border-radius: 10px;
-  width: 100%;
-  height: 160px;
-  max-height: 160px;
-  overflow-y: auto;
-  word-wrap: break-word;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
 }
 
-.feedback-content p {
-  color: #066678;
+.section-title {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
+  color: #0b3e8a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.section-title i {
+  font-size: 1rem;
+}
+
+.divider2 {
+  border: none;
+  border-top: 1px solid #8a8a8f;
+  margin-bottom: 1.5rem;
+  margin-top: -0.5rem;
+}
+
+.bio-content {
   font-size: 0.9rem;
-  font-weight: 400;
-  text-align: justify;
+  line-height: 1.6;
+  color: #4b5563;
+  text-align: left;
 }
 
-.feedback-content::-webkit-scrollbar {
-  width: 8px;
+.detail-item2 {
+  margin-bottom: 1.5rem;
 }
 
-.exit-feedback {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+.detail-value2 {
+  display: block;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 1.25rem 1.5rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.footer-btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footer-btn.back {
+  background-color: transparent;
+  color: #6b7280;
+}
+
+.footer-btn.back:hover {
+  background-color: #e5e7eb;
+}
+
+/* Transition Effects */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .search-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-value {
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .user-profile {
+    gap: 1.5rem;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
 }
 </style>
