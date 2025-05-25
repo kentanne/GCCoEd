@@ -22,6 +22,7 @@ const api = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
+    "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
   },
 });
 
