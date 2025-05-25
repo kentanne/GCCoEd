@@ -105,32 +105,35 @@ async function login() {
         password: password.value,
       };
 
-      const response = api.post("/api/login", loginData, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = api
+        .post("/api/login", loginData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("Login successful:", response.data);
 
-      console.log("Login successful:", response.data);
-
-      switch (response.data.user_role) {
-        case null:
-          router.push("/signup");
-          break;
-        case "learner":
-          router.push("/learner");
-          break;
-        case "mentor":
-          router.push("/mentor");
-          break;
-        case "admin":
-          router.push("/admin");
-          break;
-        default:
-          console.error("Unknown user role:", response.data.user_role);
-          break;
-      }
+          switch (response.data.user_role) {
+            case null:
+              router.push("/signup");
+              break;
+            case "learner":
+              router.push("/learner");
+              break;
+            case "mentor":
+              router.push("/mentor");
+              break;
+            case "admin":
+              router.push("/admin");
+              break;
+            default:
+              console.error("Unknown user role:", response.data.user_role);
+              break;
+          }
+          // return response;
+        });
     });
 
     // Debug cookie information
