@@ -172,7 +172,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import api from "@/api/api.js";
+import api from "@/axios.js";
 import axios from "axios";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
