@@ -625,10 +625,10 @@
 
 <script>
 import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
-import axios, { Axios } from "axios";
+import api, { Axios } from "axios";
 
-axios.default.withCredentials = true; // Enable sending cookies with requests
-axios.default.withXSRFToken = true; // Enable CSRF token handling
+// axios.default.withCredentials = true; // Enable sending cookies with requests
+// axios.default.withXSRFToken = true; // Enable CSRF token handling
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -798,8 +798,8 @@ export default {
 
   methods: {
     async csrf() {
-      await axios
-        .get("http://localhost:8000/sanctum/csrf-cookie")
+      await api
+        .get("/sanctum/csrf-cookie")
         .then((response) => {
           console.log("CSRF cookie set");
         })
@@ -1248,12 +1248,12 @@ export default {
           formData.append(`credentials[${index}]`, file);
         });
 
-        await axios
-          .post("http://localhost:8000/api/mentor/register", formData, {
+        await api
+          .post("/api/mentor/register", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
               accept: "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             },
           })
           .then((response) => {

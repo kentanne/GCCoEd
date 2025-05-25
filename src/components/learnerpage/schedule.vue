@@ -39,19 +39,23 @@ const selectedTime = ref("");
 const sessionType = ref("in-person");
 const notes = ref("");
 const meetingLocation = ref("");
-const selectedSubject = ref(""); // Add this with other refs
+const selectedSubject = ref("");
+const showConfirmationModal = ref(false); // Add this for modal control
 
 // Calendar variables
 const currentDate = ref(new Date());
 const days = ref([]);
 const showYearSelection = ref(false);
 
-const confirmSchedule = async () => {
+const prepareSchedule = () => {
   if (!selectedDate.value || !selectedTime.value || !selectedSubject.value) {
     alert("Please select date, time and subject");
     return;
   }
+  showConfirmationModal.value = true;
+};
 
+const confirmSchedule = async () => {
   // Format date to match required format MM/DD/YYYY
   const formattedDate = new Date(selectedDate.value).toLocaleDateString(
     "en-US",
@@ -80,7 +84,7 @@ const confirmSchedule = async () => {
     time: formattedTime,
     location:
       sessionType.value === "in-person" ? meetingLocation.value : "online",
-    subject: selectedSubject.value, // Add subject to the payload
+    subject: selectedSubject.value,
   };
 
   try {
@@ -97,7 +101,6 @@ const confirmSchedule = async () => {
       }
     );
 
-    // Debug logs
     console.log("Selected Subject:", selectedSubject.value);
     console.log("Schedule Data:", scheduleData);
 
@@ -105,6 +108,8 @@ const confirmSchedule = async () => {
     emit("close");
   } catch (error) {
     console.error("Error in schedule confirmation:", error);
+  } finally {
+    showConfirmationModal.value = false;
   }
 };
 
@@ -447,7 +452,6 @@ const isToday = (date) => {
           </div>
         </div>
 
-        <!-- Add this after the calendar div in the right side section -->
         <div class="subject-select">
           <h3 class="subject-header">Select Subject</h3>
           <select v-model="selectedSubject" class="subject-dropdown" required>
@@ -469,7 +473,7 @@ const isToday = (date) => {
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button @click="confirmSchedule" type="button" class="btn-proceed">
+      <button @click="prepareSchedule" type="button" class="btn-proceed">
         PROCEED
       </button>
     </div>
@@ -481,6 +485,10 @@ const isToday = (date) => {
   border-bottom-width: 4px;
   width: 1000px;
   max-width: 1000px;
+  margin-left: 10rem;
+  margin-right: -10rem;
+  top: 3rem;
+  max-height: 950px;
 }
 
 .header {
@@ -863,7 +871,81 @@ const isToday = (date) => {
 .subject-dropdown:focus {
   outline: none;
   border-color: #0b3b44;
-  /* ring: 2px;
-  ring-color: #0b3b44; */
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: -1.7rem;
+  left: 10rem;
+  right: -10rem;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  height: 109%;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+  color: #0b3b44;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.modal-details {
+  margin-bottom: 2rem;
+}
+
+.modal-details p {
+  margin: 0.75rem 0;
+  font-size: 1rem;
+}
+
+.modal-details strong {
+  color: #0b3b44;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-btn-cancel {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-btn-confirm {
+  background-color: #0b3b44;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-btn-confirm:hover {
+  background-color: #1f6d7e;
 }
 </style>

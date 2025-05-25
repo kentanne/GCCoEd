@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faBook, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -25,8 +25,24 @@ function getCookie(name) {
   return null;
 }
 
+const searchQuery = ref("");
+const records = ref([]);
+
+const filteredRecords = computed(() => {
+  if (!searchQuery.value) return records.value;
+  const query = searchQuery.value.toLowerCase();
+  return records.value.filter(record => {
+    return (
+      record.date.toLowerCase().includes(query) ||
+      (record.subject && record.subject.toLowerCase().includes(query)) ||
+      (record.mentor.user.name.toLowerCase().includes(query)) ||
+      (record.mentor.year.toLowerCase().includes(query)) ||
+      (record.mentor.course.toLowerCase().includes(query))
+    );
+  });
+});
+
 const sendFeedback = async (record) => {
-  console.log(record);
   try {
     const response = await api.post(
       "/api/learner/feedback/" + record.id,
@@ -45,367 +61,27 @@ const sendFeedback = async (record) => {
     );
     console.log("Feedback sent successfully:", response.data);
     closeFeedback();
-    // Refresh the records to show updated feedback
-    records.value = props.schedForReview;
+    const updatedRecord = {
+      ...record,
+      feedback: {
+        feedback: record.feedback?.feedback || "",
+        rating: tempRating.value,
+      },
+      has_feedback: true
+    };
+    
+    const index = records.value.findIndex(r => r.id === record.id);
+    if (index !== -1) {
+      records.value[index] = updatedRecord;
+    }
+    
+    if (recordView.value.id === record.id) {
+      recordView.value = updatedRecord;
+    }
   } catch (error) {
     console.error("Error sending feedback:", error);
   }
 };
-
-const records = ref([
-  // {
-  // 	id: 1,
-  // 	date: "2023-10-01",
-  // 	course: "1st Year / BSIT",
-  // 	name: "John Doe",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 2,
-  // 	date: "2023-10-02",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Jane Smith",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 3,
-  // 	date: "2023-10-03",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Alice Johnson",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 4,
-  // 	date: "2023-10-04",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Bob Lee",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 5,
-  // 	date: "2023-10-05",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Ella Cruz",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 6,
-  // 	date: "2023-10-06",
-  // 	course: "4th Year / BSIT",
-  // 	name: "Charlie Kim",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 7,
-  // 	date: "2023-10-07",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Diana Park",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 8,
-  // 	date: "2023-10-08",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Edward Blake",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 9,
-  // 	date: "2023-10-09",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Fiona Lane",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 10,
-  // 	date: "2023-10-10",
-  // 	course: "4th Year / BSIT",
-  // 	name: "George Finn",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 11,
-  // 	date: "2023-10-11",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Hannah Wells",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 12,
-  // 	date: "2023-10-12",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Isaac Nash",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 13,
-  // 	date: "2023-10-13",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Julia Kim",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 14,
-  // 	date: "2023-10-14",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Kevin Hart",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 15,
-  // 	date: "2023-10-15",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Lana Rhodes",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 16,
-  // 	date: "2023-10-16",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Mike Taylor",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 17,
-  // 	date: "2023-10-17",
-  // 	course: "4th Year / BSIT",
-  // 	name: "Nina Gold",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 18,
-  // 	date: "2023-10-18",
-  // 	course: "4th Year / BSIT",
-  // 	name: "Oscar Knight",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 19,
-  // 	date: "2023-10-19",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Paula Rivera",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 20,
-  // 	date: "2023-10-20",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Quentin Blaze",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 21,
-  // 	date: "2023-10-21",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Rachel Green",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 22,
-  // 	date: "2023-10-22",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Steve Jobs",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 23,
-  // 	date: "2023-10-23",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Tina Moon",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 24,
-  // 	date: "2023-10-24",
-  // 	course: "4th Year / BSIT",
-  // 	name: "Ulysses Grant",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 25,
-  // 	date: "2023-10-25",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Vera Stone",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 26,
-  // 	date: "2023-10-26",
-  // 	course: "4th Year / BSIT",
-  // 	name: "William Kent",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 27,
-  // 	date: "2023-10-27",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Xander Fox",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 28,
-  // 	date: "2023-10-28",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Yasmine Grey",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 29,
-  // 	date: "2023-10-29",
-  // 	course: "4th Year / BSIT",
-  // 	name: "Zane Carter",
-  // 	year: "4th Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 30,
-  // 	date: "2023-10-30",
-  // 	course: "3rd Year / BSIT",
-  // 	name: "Ava Morgan",
-  // 	year: "3rd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 31,
-  // 	date: "2023-10-31",
-  // 	course: "1st Year / BSIT",
-  // 	name: "Ben Oliver",
-  // 	year: "1st Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-  // {
-  // 	id: 32,
-  // 	date: "2023-11-01",
-  // 	course: "2nd Year / BSIT",
-  // 	name: "Cleo Davis",
-  // 	year: "2nd Year",
-  // 	status: "Completed",
-  // 	rating: 0,
-  // 	feedback: "",
-  // 	feedbackSent: false
-  // },
-]);
 
 const recordView = ref({
   id: 0,
@@ -450,140 +126,183 @@ const setRating = (rating) => {
   tempRating.value = rating;
 };
 
-const submitFeedback = () => {
-  const record = records.value.find((r) => r.id === recordView.value.id);
-  if (record) {
-    record.rating = tempRating.value;
-    record.feedback = recordView.value.feedback;
-    record.feedbackSent = true;
-  }
-  closeFeedback();
-};
-
 onMounted(async () => {
-  // Fetch records from API or props
-  // Example: records.value = await fetchRecords();
-  // For now, using static data
-  records.value = props.schedForReview;
+  records.value = props.schedForReview || [];
 });
 </script>
 
 <template>
-  <div class="records-wrapper">
-    <div class="top-element">
-      <FontAwesomeIcon :icon="['fas', 'book']" size="3x" color="#fff" />
-      <h1>Session Records</h1>
+  <div class="table-container">
+    <div class="table-header">
+      <h2 class="table-title">
+        <FontAwesomeIcon :icon="['fas', 'book']" class="header-icon" />
+        Session Records
+      </h2>
+
+      <div class="search-container">
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search records..."
+            class="search-input"
+          />
+        </div>
+      </div>
     </div>
-    <div class="lower-element">
-      <table>
-        <thead>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead class="table-head">
           <tr>
             <th>DATE / TIME</th>
             <th>COURSE</th>
-            <th>MENTORS'S NAME</th>
+            <th>MENTOR'S NAME</th>
             <th>YEAR</th>
             <th>PROGRAM</th>
-            <!-- <th>STATUS</th> -->
             <th>RATING</th>
             <th>ACTIONS</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="record in records" :key="record.id">
-            <td>{{ record.date }}</td>
-            <td>{{ record.subject }}</td>
-            <td>{{ record.mentor.user.name }}</td>
-            <td>{{ record.mentor.year }}</td>
-            <td>{{ record.mentor.course }}</td>
-            <!-- <td>{{ record.status }}</td> -->
+        <tbody class="table-body">
+          <tr v-for="record in filteredRecords" :key="record.id">
+            <td class="small-text">{{ record.date }}</td>
+            <td class="small-text">{{ record.subject }}</td>
+            <td class="small-text">{{ record.mentor.user.name }}</td>
+            <td class="small-text">{{ record.mentor.year }}</td>
+            <td class="small-text">{{ record.mentor.course.match(/\(([^)]+)\)/)?.[1] }}</td>
             <td>
               <div class="stars">
                 <span v-for="i in 5" :key="i" class="star">
-                  <span
-                    v-if="i <= (record.feedback?.rating || 0)"
-                    class="filled"
-                    >★</span
-                  >
+                  <span v-if="i <= (record.feedback?.rating || 0)" class="filled">★</span>
                   <span v-else>☆</span>
                 </span>
               </div>
             </td>
             <td>
-              <button
-                @click="viewFeedback(record)"
-                class="view-feedback-btn"
+              <button 
+                @click="viewFeedback(record)" 
+                class="details-btn small-text"
                 :class="{ sent: record.has_feedback }"
               >
                 {{ record.has_feedback ? "View Feedback" : "Give Feedback" }}
               </button>
             </td>
           </tr>
+          <tr v-if="filteredRecords.length === 0">
+            <td colspan="7" class="no-users small-text">No records to display</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <transition name="fade" mode="out-in">
-      <div v-if="isFeedback" class="feedback-pop-up">
-        <div class="feedback-upper">
-          <img
-            :src="
-              'http://localhost:8000/api/image/' + recordView.mentor.image ||
-              'https://placehold.co/600x400' ||
-              'https://placehold.co/600x400'
-            "
-            alt="profile-pic"
-          />
-          <h1>{{ recordView.mentor.user.name }}</h1>
-          <h2>{{ recordView.mentor.course }}</h2>
-
-          <FontAwesomeIcon
-            @click="closeFeedback"
-            :icon="['fas', 'xmark']"
-            size="2x"
-            color="#fff"
-            style="cursor: pointer"
-            class="exit-feedback"
-          />
-        </div>
-        <hr />
-        <div class="feedback-lower">
-          <h1>RATE THIS SESSION</h1>
-          <div class="rating-stars">
-            <span
-              v-for="i in 5"
-              :key="i"
-              @click="!recordView.has_feedback && setRating(i)"
-              @mouseover="!recordView.has_feedback && (hoverRating = i)"
-              @mouseleave="hoverRating = 0"
-              class="star"
-              :class="{
-                filled:
-                  i <=
-                  (hoverRating || recordView.feedback?.rating || tempRating),
-                disabled: recordView.has_feedback,
-              }"
-            >
-              ★
-            </span>
+      <div v-if="isFeedback" class="modal-overlay" @click.self="closeFeedback">
+        <div class="user-modal">
+          <div class="modal-header">
+            <div class="header-content">
+              <i class="fas fa-comment-dots modal-title-icon"></i>
+              <h3 class="modal-title small-text">Feedback Details</h3>
+            </div>
+            <button class="close-btn" @click="closeFeedback">
+              <FontAwesomeIcon :icon="['fas', 'xmark']" />
+            </button>
           </div>
 
-          <h1>FEEDBACK</h1>
-          <textarea
-            v-model="recordView.feedback.feedback"
-            :placeholder="
-              recordView.has_feedback ? '' : 'Enter your feedback here...'
-            "
-            class="feedback-input"
-            :disabled="recordView.has_feedback"
-          ></textarea>
+          <div class="modal-body">
+            <div class="user-profile">
+              <div class="profile-image-container">
+                <img
+                  :src="'http://localhost:8000/api/image/' + recordView.mentor.image || 'https://placehold.co/600x400'"
+                  :alt="`Portrait of ${recordView.mentor.user.name}`"
+                  class="profile-image"
+                />
+              </div>
 
-          <button
-            v-if="!recordView.has_feedback"
-            @click="sendFeedback(recordView)"
-            class="submit-btn"
-          >
-            Submit Feedback
-          </button>
+              <div class="profile-info">
+                <h4 class="user-name small-text">{{ recordView.mentor.user.name }}</h4>
+                <hr class="divider" />
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label small-text"
+                      ><i class="fas fa-graduation-cap"></i> Course</span
+                    >
+                    <span class="info-value small-text">{{ recordView.mentor.course.match(/\(([^)]+)\)/)?.[1] }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label small-text"
+                      ><i class="fas fa-calendar-alt"></i> Year Level</span
+                    >
+                    <span class="info-value small-text">{{ recordView.mentor.year }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label small-text"
+                      ><i class="fas fa-star"></i> Session Date</span
+                    >
+                    <span class="info-value small-text">{{ recordView.date }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-section">
+              <div class="bio-card">
+                <h4 class="section-title small-text">
+                  <i class="fas fa-star"></i> Rate This Session
+                </h4>
+                <hr class="divider2" />
+                <div class="rating-stars">
+                  <span
+                    v-for="i in 5"
+                    :key="i"
+                    @click="!recordView.has_feedback && setRating(i)"
+                    @mouseover="!recordView.has_feedback && (hoverRating = i)"
+                    @mouseleave="hoverRating = 0"
+                    class="star"
+                    :class="{
+                      filled: i <= (hoverRating || tempRating),
+                      disabled: recordView.has_feedback,
+                    }"
+                  >
+                    ★
+                  </span>
+                </div>
+                <div v-if="recordView.has_feedback" class="current-rating small-text">
+                  Your rating: {{ recordView.feedback.rating }} stars
+                </div>
+              </div>
+
+              <div class="bio-card">
+                <h4 class="section-title small-text">
+                  <i class="fas fa-comment"></i> Feedback
+                </h4>
+                <hr class="divider2" />
+                <textarea
+                  v-model="recordView.feedback.feedback"
+                  :placeholder="recordView.has_feedback ? '' : 'Enter your feedback here...'"
+                  class="feedback-input small-text"
+                  :disabled="recordView.has_feedback"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="footer-actions">
+              <button 
+                v-if="!recordView.has_feedback" 
+                @click="sendFeedback(recordView)" 
+                class="footer-btn submit small-text"
+                :disabled="tempRating === 0"
+              >
+                <i class="fas fa-paper-plane"></i> Submit Feedback
+              </button>
+              <button class="footer-btn back small-text" @click="closeFeedback">
+                <i class="fas fa-arrow-left"></i> Back to Records
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </transition>
@@ -591,94 +310,145 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.records-wrapper {
+:root {
+  --primary: #3b9aa9;
+  --primary-light: #6dd1e3;
+  --primary-dark: #0b3e8a;
+  --secondary: #ffc107;
+  --danger: #f44336;
+  --success: #4caf50;
+  --warning: #ffa000;
+  --text-dark: #0b2548;
+  --text-light: #f5f7fa;
+  --bg-light: #ffffff;
+  --border: #e1e4e8;
+}
+
+.small-text {
+  font-size: 0.8rem;
+}
+
+.table-container {
+  background: var(--bg-light);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
+  width: 90%;
+  margin-top: 2rem;
+  margin-left: 2.5rem;
+  padding: 0 1rem;
+  text-align: center;
+  margin-top: 2rem;
   display: flex;
-  justify-content: center;
   flex-direction: column;
-  width: 100%;
-  overflow: hidden;
+  height: 37.4rem;
+  max-height: 37.5rem;
+  overflow-y: scroll;
 }
 
-.top-element {
+.table-header {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  gap: 17px;
-  background-color: #0c434d;
-  padding: 18px 30px;
-  border-radius: 20px 20px 0 0;
-}
-
-.top-element h1 {
-  color: #fff;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.lower-element {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  background-color: #fff;
-  border-radius: 0 0 20px 20px;
-  overflow: hidden;
-  border: 3px solid #0c434d;
-  height: 542px;
-}
-
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  table-layout: fixed;
-  color: #066678;
-}
-
-thead {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #0b2548;
   position: sticky;
   top: 0;
-  z-index: 1;
-  background-color: white;
+  z-index: 20;
 }
 
-th {
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  border-bottom: 2px solid #ddd;
-  background-color: #f5f5f5;
+.table-title {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-tbody {
-  display: block;
+.header-icon {
+  font-size: 1.4rem;
+}
+
+.search-container {
+  margin-left: auto;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--primary);
+}
+
+.search-input {
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  border: 1px solid rgb(17, 17, 95);
+  border-radius: 8px;
+  width: 250px;
+  font-size: 0.7rem;
+  height: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 2px 8px rgba(54, 88, 141, 0.7);
+}
+
+.table-wrapper {
   overflow-y: auto;
-  max-height: 660px;
+  flex-grow: 1;
 }
 
-thead,
-tbody tr {
-  display: table;
+.data-table {
   width: 100%;
-  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: center;
 }
 
-td {
-  text-align: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+.table-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table th {
+  background-color: #e5e5e5;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.5rem;
+  border-bottom: 2px solid var(--primary);
+  font-size: 0.8rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table td {
+  padding: 0.5rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table tr:hover {
+  background-color: rgba(59, 154, 169, 0.05);
 }
 
 .stars {
   display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 0.2rem;
 }
 
 .star {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #ccc;
 }
 
@@ -686,122 +456,326 @@ td {
   color: #ffd700;
 }
 
-.view-feedback-btn {
-  background-color: transparent;
-  border: none;
+.details-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--primary-dark);
+  background-color: rgba(73, 152, 164, 0.103);
+  color: var(--primary-dark);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
-  text-decoration: underline;
-  color: #066678;
+  transition: all 0.3s ease;
 }
 
-.view-feedback-btn:disabled {
-  color: #ccc;
-  cursor: not-allowed;
-  text-decoration: none;
+.details-btn:hover {
+  background-color: rgba(59, 154, 169, 0.2);
 }
 
-.feedback-pop-up {
+.details-btn.sent {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.no-users {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-dark);
+}
+
+.modal-overlay {
   position: fixed;
-  top: 50%;
-  left: 60%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  height: 400px;
-  background-color: #006981;
-  padding: 10px 15px 20px 15px;
-  overflow: hidden;
-  z-index: 1000;
-  border-radius: 20px;
-}
-
-.feedback-upper,
-.feedback-lower {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
+}
+
+.user-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 30%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px;
-  position: relative;
+  transform: translateX(10%);
 }
 
-.feedback-upper img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
+.modal-header {
+  padding: 1rem;
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.feedback-upper h1 {
-  color: #fff;
-  font-size: 1.2rem;
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-title {
+  margin: 0;
   font-weight: 600;
 }
 
-.feedback-upper h2 {
-  color: #fff;
+.modal-title-icon {
   font-size: 1rem;
-  font-weight: 400;
 }
 
-.feedback-lower {
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.user-profile {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.profile-image-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e1e4e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.user-name {
+  margin: 0.3rem 0 1rem 0;
+  font-weight: 700;
+  text-align: left;
+}
+
+.divider {
+  border: none;
+  border-top: 3px solid #8a8a8f;
+  margin-bottom: 0.8rem;
+  margin-top: -0.5rem;
+}
+
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.info-item {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  text-align: left;
+  min-width: 120px;
+  flex: 1 0 auto;
 }
 
-.feedback-lower h1 {
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 400;
+.info-label {
+  color: #6b7280;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-label i {
+  width: 14px;
+  text-align: center;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #0b234a;
+  margin-left: 20px;
+}
+
+.details-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.bio-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  margin: 0 0 1rem 0;
+  color: #0b3e8a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.section-title i {
+  font-size: 0.9rem;
+}
+
+.divider2 {
+  border: none;
+  border-top: 1px solid #8a8a8f;
+  margin-bottom: 1rem;
+  margin-top: -0.3rem;
 }
 
 .rating-stars {
   display: flex;
   justify-content: center;
-  gap: 5px;
-  margin: 7px 0;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
 }
 
 .rating-stars .star {
-  font-size: 1.4rem;
-  color: #ccc;
+  font-size: 1.5rem;
+  color: #e0e0e0;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .rating-stars .star.filled {
   color: #ffd700;
 }
 
+.rating-stars .star.disabled {
+  cursor: default;
+}
+
+.current-rating {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: var(--primary-dark);
+  font-weight: 500;
+}
+
 .feedback-input {
-  width: 100%;
-  height: 80px;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  resize: none;
-  margin-bottom: 10px;
+  width: 90%;
+  min-height: 80px;
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.3s;
 }
 
-.submit-btn {
-  background-color: #0c434d;
-  color: white;
+.feedback-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.feedback-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.modal-footer {
+  padding: 1rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.footer-btn {
+  padding: 0.5rem 1rem;
   border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.submit-btn:hover {
-  background-color: #3f8f9d;
+.footer-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: space-between;
 }
 
-.exit-feedback {
-  position: fixed;
-  top: 15px;
-  right: 15px;
+.footer-btn.back {
+  background-color: transparent;
+  color: #6b7280;
+}
+
+.footer-btn.back:hover {
+  background-color: #e5e7eb;
+}
+
+.footer-btn.submit {
+  background-color: var(--primary-dark);
+  color: white;
+}
+
+.footer-btn.submit:hover {
+  background-color: var(--primary);
+}
+
+.footer-btn.submit:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .fade-enter-active,
@@ -812,5 +786,86 @@ td {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    height: auto;
+    max-height: 80vh;
+  }
+  
+  .table-header {
+    position: relative;
+    top: auto;
+  }
+  
+  .table-head {
+    position: relative;
+    top: auto;
+  }
+  
+  .table-wrapper {
+    overflow-y: visible;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .search-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-value {
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .modal-body {
+    padding: 0.8rem;
+  }
+
+  .user-profile {
+    gap: 1rem;
+  }
+
+  .profile-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .footer-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .footer-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

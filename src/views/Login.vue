@@ -55,16 +55,11 @@
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
 // import api from "../axios.js"; // Adjust the path as necessary
-import axios from "axios";
+import api from "@/axios";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
-axios.defaults.xsrfCookieName = "XSRF-TOKEN";
-axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN";
+// axios.defaults.withCredentials = true; // Enable sending cookies with requests
+// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
 
-// axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-
-// Updated getCookie function for better cookie parsing
 function getCookie(name) {
   try {
     const value = `; ${document.cookie}`;
@@ -93,22 +88,7 @@ export default {
   methods: {
     async csrf() {
       try {
-        await axios.get("http://localhost:8000/sanctum/csrf-cookie", {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        });
-
-        // Wait for a short time to ensure cookie is set
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const token = getCookie("XSRF-TOKEN");
-        if (!token) {
-          throw new Error("CSRF token not set after request");
-        }
-
+        await api.get("/sanctum/csrf-cookie");
         console.log("CSRF cookie set successfully");
         return true;
       } catch (error) {
@@ -140,18 +120,13 @@ export default {
           password: this.password,
         };
 
-        const response = await axios.post(
-          "http://localhost:8000/api/login",
-          loginData,
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-            },
-          }
-        );
+        const response = await api.post("/api/login", loginData, {
+          withCredentials: true, // Ensure cookies are sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          },
+        });
 
         console.log("Login successful:", response.data);
 

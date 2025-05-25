@@ -5,328 +5,266 @@
       <img @click="closeEditInformation" src="/exit.svg" alt="exit" />
     </div>
     <div class="lower-element">
-      <div class="lower-grid">
-        <div class="personal-information">
-          <h1>I. PERSONAL INFORMATION</h1>
-          <div class="input-wrapper">
+      <div class="personal-information">
+        <h1>PERSONAL INFORMATION</h1>
+        <div class="input-wrapper">
+          <div
+            v-for="(item, index) in inputFieldPersonalInformation"
+            :key="index"
+            class="input-fields"
+          >
+            <label>{{ item.field }}</label>
+
+            <!-- Text Input -->
+            <input
+              v-if="item.type === 'text'"
+              type="text"
+              v-model="personalData[toCamelCase(item.field)]"
+              :placeholder="getPlaceholder(item.field, 'personal')"
+              class="standard-input"
+            />
+
+            <!-- Select Dropdown -->
             <div
-              v-for="(item, index) in inputFieldPersonalInformation"
-              :key="index"
-              class="input-fields"
+              v-else-if="item.type === 'select'"
+              class="custom-dropdown"
             >
-              <label>{{ item.field }}</label>
-
-              <!-- Text Input -->
-              <input
-                v-if="item.type === 'text'"
-                type="text"
-                v-model="personalData[toCamelCase(item.field)]"
-                :placeholder="getPlaceholder(item.field, 'personal')"
-                class="standard-input"
-              />
-
-              <!-- Select Dropdown -->
               <div
-                v-else-if="item.type === 'select' && item.field !== 'Gender'"
-                class="custom-dropdown"
+                class="dropdown-container"
+                @click.stop="toggleDropdown(toCamelCase(item.field))"
+              >
+                <input
+                  type="text"
+                  :value="personalData[toCamelCase(item.field)]"
+                  :placeholder="
+                    personalData[toCamelCase(item.field)] ||
+                    `Select ${item.field.toLowerCase()}`
+                  "
+                  readonly
+                  class="standard-input"
+                />
+                <i
+                  class="dropdown-icon"
+                  :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
+                  >▼</i
+                >
+              </div>
+              <div
+                v-if="dropdownOpen[toCamelCase(item.field)]"
+                class="dropdown-options"
               >
                 <div
-                  class="dropdown-container"
-                  @click.stop="toggleDropdown(toCamelCase(item.field))"
+                  v-for="(option, i) in item.options"
+                  :key="i"
+                  class="dropdown-option"
+                  @click="
+                    selectOption(toCamelCase(item.field), option, 'personal')
+                  "
                 >
-                  <input
-                    type="text"
-                    :value="personalData[toCamelCase(item.field)]"
-                    :placeholder="
-                      personalData[toCamelCase(item.field)] ||
-                      `Select ${item.field.toLowerCase()}`
-                    "
-                    readonly
-                    class="standard-input"
-                  />
-                  <i
-                    class="dropdown-icon"
-                    :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
-                    >▼</i
-                  >
-                </div>
-                <div
-                  v-if="dropdownOpen[toCamelCase(item.field)]"
-                  class="dropdown-options"
-                >
-                  <div
-                    v-for="(option, i) in item.options"
-                    :key="i"
-                    class="dropdown-option"
-                    @click="
-                      selectOption(toCamelCase(item.field), option, 'personal')
-                    "
-                  >
-                    {{ option }}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Gender Dropdown Section -->
-              <div v-else-if="item.field === 'Gender'" class="gender-section">
-                <div class="gender-dropdown">
-                  <div
-                    class="dropdown-container"
-                    @click.stop="toggleDropdown('gender')"
-                  >
-                    <input
-                      type="text"
-                      v-model="personalData.gender"
-                      placeholder="Select your gender"
-                      class="standard-input"
-                      readonly
-                    />
-                    <i
-                      class="dropdown-icon"
-                      :class="{ open: dropdownOpen.gender }"
-                      >▼</i
-                    >
-                  </div>
-                  <div
-                    v-show="dropdownOpen.gender"
-                    class="dropdown-options gender-options"
-                  >
-                    <div
-                      class="dropdown-option"
-                      @click="selectGender('Female')"
-                    >
-                      Female
-                    </div>
-                    <div class="dropdown-option" @click="selectGender('Male')">
-                      Male
-                    </div>
-                    <div
-                      class="dropdown-option"
-                      @click="selectGender('Non-binary')"
-                    >
-                      Non-binary
-                    </div>
-                    <div class="dropdown-option" @click="selectGender('Other')">
-                      Other
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Other Gender Input -->
-                <div
-                  v-if="personalData.gender === 'Other'"
-                  class="other-gender-input"
-                >
-                  <label>Please specify: </label>
-                  <input
-                    type="text"
-                    v-model="personalData.otherGender"
-                    class="standard-input"
-                    placeholder="Specify your gender"
-                  />
+                  {{ option }}
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="profile-information">
-          <h1>II. PROFILE INFORMATION</h1>
-          <div class="input-wrapper">
+      <div class="profile-information">
+        <h1>PROFILE INFORMATION</h1>
+        <div class="input-wrapper">
+          <div
+            v-for="(item, index) in inputFieldProfileInformation"
+            :key="index"
+            class="input-fields"
+          >
+            <label>{{ item.field }}</label>
+
+            <!-- Text Input -->
+            <input
+              v-if="item.type === 'text'"
+              type="text"
+              v-model="profileData[toCamelCase(item.field)]"
+              :placeholder="`Enter ${item.field.toLowerCase()}`"
+              class="standard-input"
+            />
+
+            <!-- Select Dropdown -->
             <div
-              v-for="(item, index) in inputFieldProfileInformation"
-              :key="index"
-              class="input-fields"
+              v-else-if="
+                item.type === 'select' && item.field !== 'Subject of Interest'
+              "
+              class="custom-dropdown"
             >
-              <label>{{ item.field }}</label>
-
-              <!-- Text Input -->
-              <input
-                v-if="item.type === 'text'"
-                type="text"
-                v-model="profileData[toCamelCase(item.field)]"
-                :placeholder="`Enter ${item.field.toLowerCase()}`"
-                class="standard-input"
-              />
-
-              <!-- Select Dropdown -->
               <div
-                v-else-if="
-                  item.type === 'select' && item.field !== 'Subject of Interest'
-                "
-                class="custom-dropdown"
+                class="dropdown-container"
+                @click.stop="toggleDropdown(toCamelCase(item.field))"
+              >
+                <input
+                  type="text"
+                  :value="profileData[toCamelCase(item.field)]"
+                  :placeholder="
+                    profileData[toCamelCase(item.field)] ||
+                    `Select ${item.field.toLowerCase()}`
+                  "
+                  readonly
+                  class="standard-input"
+                />
+                <i
+                  class="dropdown-icon"
+                  :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
+                  >▼</i
+                >
+              </div>
+              <div
+                v-if="dropdownOpen[toCamelCase(item.field)]"
+                class="dropdown-options"
               >
                 <div
-                  class="dropdown-container"
-                  @click.stop="toggleDropdown(toCamelCase(item.field))"
+                  v-for="(option, i) in item.options"
+                  :key="i"
+                  class="dropdown-option"
+                  @click="selectOption(toCamelCase(item.field), option)"
                 >
-                  <input
-                    type="text"
-                    :value="profileData[toCamelCase(item.field)]"
-                    :placeholder="
-                      profileData[toCamelCase(item.field)] ||
-                      `Select ${item.field.toLowerCase()}`
-                    "
-                    readonly
-                    class="standard-input"
-                  />
-                  <i
-                    class="dropdown-icon"
-                    :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
-                    >▼</i
-                  >
-                </div>
-                <div
-                  v-if="dropdownOpen[toCamelCase(item.field)]"
-                  class="dropdown-options"
-                >
-                  <div
-                    v-for="(option, i) in item.options"
-                    :key="i"
-                    class="dropdown-option"
-                    @click="selectOption(toCamelCase(item.field), option)"
-                  >
-                    {{ option }}
-                  </div>
+                  {{ option }}
                 </div>
               </div>
+            </div>
 
-              <!-- Subject of Interest Checkbox Dropdown -->
+            <!-- Subject of Interest Checkbox Dropdown -->
+            <div
+              v-else-if="item.field === 'Subject of Interest'"
+              class="custom-dropdown"
+            >
               <div
-                v-else-if="item.field === 'Subject of Interest'"
-                class="custom-dropdown"
+                class="dropdown-container"
+                @click.stop="toggleDropdown(toCamelCase(item.field))"
+              >
+                <input
+                  type="text"
+                  :value="getCSubjectInterestDisplay()"
+                  :placeholder="
+                    getCSubjectInterestDisplay() || 'Select courses'
+                  "
+                  readonly
+                  class="standard-input"
+                />
+                <i
+                  class="dropdown-icon"
+                  :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
+                  >▼</i
+                >
+              </div>
+              <div
+                v-if="dropdownOpen[toCamelCase(item.field)]"
+                class="dropdown-options checkbox-options"
               >
                 <div
-                  class="dropdown-container"
-                  @click.stop="toggleDropdown(toCamelCase(item.field))"
+                  class="category-section"
+                  v-if="availableSubjects.coreSubjects.length > 0"
                 >
-                  <input
-                    type="text"
-                    :value="getCSubjectInterestDisplay()"
-                    :placeholder="
-                      getCSubjectInterestDisplay() || 'Select courses'
-                    "
-                    readonly
-                    class="standard-input"
-                  />
-                  <i
-                    class="dropdown-icon"
-                    :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
-                    >▼</i
-                  >
-                </div>
-                <div
-                  v-if="dropdownOpen[toCamelCase(item.field)]"
-                  class="dropdown-options checkbox-options"
-                >
+                  <h4>Core Subjects</h4>
                   <div
-                    class="category-section"
-                    v-if="availableSubjects.coreSubjects.length > 0"
-                  >
-                    <h4>Core Subjects</h4>
-                    <div
-                      v-for="(option, i) in availableSubjects.coreSubjects"
-                      :key="'core-' + i"
-                      class="checkbox-option"
-                      @click.stop
-                    >
-                      <input
-                        type="checkbox"
-                        :id="`core-${i}`"
-                        :value="option"
-                        v-model="profileData.courseOffered"
-                        @click.stop
-                      />
-                      <label :for="`core-${i}`">{{ option }}</label>
-                    </div>
-                  </div>
-
-                  <div
-                    class="category-section"
-                    v-if="availableSubjects.gecSubjects.length > 0"
-                  >
-                    <h4>GEC Subjects</h4>
-                    <div
-                      v-for="(option, i) in availableSubjects.gecSubjects"
-                      :key="'gec-' + i"
-                      class="checkbox-option"
-                      @click.stop
-                    >
-                      <input
-                        type="checkbox"
-                        :id="`gec-${i}`"
-                        :value="option"
-                        v-model="profileData.courseOffered"
-                        @click.stop
-                      />
-                      <label :for="`gec-${i}`">{{ option }}</label>
-                    </div>
-                  </div>
-
-                  <div
-                    class="category-section"
-                    v-if="availableSubjects.peNstpSubjects.length > 0"
-                  >
-                    <h4>NSTP & PE Subjects</h4>
-                    <div
-                      v-for="(option, i) in availableSubjects.peNstpSubjects"
-                      :key="'pe-' + i"
-                      class="checkbox-option"
-                      @click.stop
-                    >
-                      <input
-                        type="checkbox"
-                        :id="`pe-${i}`"
-                        :value="option"
-                        v-model="profileData.courseOffered"
-                        @click.stop
-                      />
-                      <label :for="`pe-${i}`">{{ option }}</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Other Checkbox Dropdown -->
-              <div v-else-if="item.type === 'checkbox'" class="custom-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click.stop="toggleDropdown(toCamelCase(item.field))"
-                >
-                  <input
-                    type="text"
-                    :value="getDisplayValue(toCamelCase(item.field))"
-                    readonly
-                    class="standard-input"
-                  />
-                  <i
-                    class="dropdown-icon"
-                    :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
-                    >▼</i
-                  >
-                </div>
-                <div
-                  v-if="dropdownOpen[toCamelCase(item.field)]"
-                  class="dropdown-options checkbox-options"
-                >
-                  <div
-                    v-for="(option, i) in item.options"
-                    :key="i"
+                    v-for="(option, i) in availableSubjects.coreSubjects"
+                    :key="'core-' + i"
                     class="checkbox-option"
                     @click.stop
                   >
                     <input
                       type="checkbox"
-                      :id="`${toCamelCase(item.field)}-${i}`"
-                      :value="option.value"
-                      v-model="profileData[toCamelCase(item.field)]"
-                      :checked="isOptionChecked(item.field, option.value)"
+                      :id="`core-${i}`"
+                      :value="option"
+                      v-model="profileData.courseOffered"
                       @click.stop
                     />
-                    <label :for="`${toCamelCase(item.field)}-${i}`">{{
-                      option.label
-                    }}</label>
+                    <label :for="`core-${i}`">{{ option }}</label>
                   </div>
+                </div>
+
+                <div
+                  class="category-section"
+                  v-if="availableSubjects.gecSubjects.length > 0"
+                >
+                  <h4>GEC Subjects</h4>
+                  <div
+                    v-for="(option, i) in availableSubjects.gecSubjects"
+                    :key="'gec-' + i"
+                    class="checkbox-option"
+                    @click.stop
+                  >
+                    <input
+                      type="checkbox"
+                      :id="`gec-${i}`"
+                      :value="option"
+                      v-model="profileData.courseOffered"
+                      @click.stop
+                    />
+                    <label :for="`gec-${i}`">{{ option }}</label>
+                  </div>
+                </div>
+
+                <div
+                  class="category-section"
+                  v-if="availableSubjects.peNstpSubjects.length > 0"
+                >
+                  <h4>NSTP & PE Subjects</h4>
+                  <div
+                    v-for="(option, i) in availableSubjects.peNstpSubjects"
+                    :key="'pe-' + i"
+                    class="checkbox-option"
+                    @click.stop
+                  >
+                    <input
+                      type="checkbox"
+                      :id="`pe-${i}`"
+                      :value="option"
+                      v-model="profileData.courseOffered"
+                      @click.stop
+                    />
+                    <label :for="`pe-${i}`">{{ option }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Other Checkbox Dropdown -->
+            <div v-else-if="item.type === 'checkbox'" class="custom-dropdown">
+              <div
+                class="dropdown-container"
+                @click.stop="toggleDropdown(toCamelCase(item.field))"
+              >
+                <input
+                  type="text"
+                  :value="getDisplayValue(toCamelCase(item.field))"
+                  readonly
+                  class="standard-input"
+                />
+                <i
+                  class="dropdown-icon"
+                  :class="{ open: dropdownOpen[toCamelCase(item.field)] }"
+                  >▼</i
+                >
+              </div>
+              <div
+                v-if="dropdownOpen[toCamelCase(item.field)]"
+                class="dropdown-options checkbox-options"
+              >
+                <div
+                  v-for="(option, i) in item.options"
+                  :key="i"
+                  class="checkbox-option"
+                  @click.stop
+                >
+                  <input
+                    type="checkbox"
+                    :id="`${toCamelCase(item.field)}-${i}`"
+                    :value="option.value"
+                    v-model="profileData[toCamelCase(item.field)]"
+                    :checked="isOptionChecked(item.field, option.value)"
+                    @click.stop
+                  />
+                  <label :for="`${toCamelCase(item.field)}-${i}`">{{
+                    option.label
+                  }}</label>
                 </div>
               </div>
             </div>
@@ -336,25 +274,20 @@
 
       <div class="bio-goals-wrapper">
         <div class="bio-goals-grid">
-          <div
-            v-for="(item, index) in bioAndgoalsFields"
-            :key="index"
-            class="input-fields"
-            :class="{
-              'column-1': item.column === 1,
-              'column-2': item.column === 2,
-            }"
-          >
-            <label>{{ item.field }}</label>
-            <!-- Replace the textarea element in bio-goals-grid -->
+          <div class="input-fields">
+            <label>Short Bio</label>
             <textarea
-              v-model="profileData[toCamelCase(item.field)]"
+              v-model="profileData.shortBio"
               class="fixed-textarea"
-              :placeholder="
-                item.field === 'Short Bio'
-                  ? 'Tell us about yourself'
-                  : 'Tell us your learning goals'
-              "
+              placeholder="Tell us about yourself"
+            ></textarea>
+          </div>
+          <div class="input-fields">
+            <label>Learning Goals</label>
+            <textarea
+              v-model="profileData.learningGoals"
+              class="fixed-textarea"
+              placeholder="Tell us your learning goals"
             ></textarea>
           </div>
         </div>
@@ -387,7 +320,6 @@ const props = defineProps({
         name: "",
       },
       learn: {
-        gender: "",
         phoneNum: "",
         address: "",
         course: "",
@@ -411,10 +343,7 @@ function getCookie(name) {
   return null;
 }
 
-const personalData = reactive({
-  gender: "",
-  otherGender: "",
-});
+const personalData = reactive({});
 const profileData = reactive({
   courseOffered: [],
   shortBio: props.userData?.learn?.bio || "",
@@ -444,7 +373,6 @@ const programOptions = ref([
   "Bachelor of Science in Computer Science (BSCS)",
   "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)",
 ]);
-const genderOptions = ref(["Male", "Female", "Non-binary", "Other"]);
 const learningModalityOptions = ref(["Online", "In-person", "Hybrid"]);
 const durationOptions = ref(["1 hour", "2 hours", "3 hours"]);
 
@@ -468,11 +396,9 @@ const learningStyleOptions = ref([
 ]);
 
 const inputFieldPersonalInformation = ref([
-  //   { field: "Full Name", type: "text" },
   { field: "Year Level", type: "select", options: yearLevelOptions },
   { field: "Program", type: "select", options: programOptions },
   { field: "Address", type: "text" },
-  { field: "Gender", type: "select", options: genderOptions },
   { field: "Contact Number", type: "text" },
 ]);
 
@@ -492,11 +418,6 @@ const inputFieldProfileInformation = ref([
   { field: "Subject of Interest", type: "select" },
 ]);
 
-const bioAndgoalsFields = ref([
-  { field: "Short Bio", column: 1 },
-  { field: "Learning Goals", column: 2 }, // Changed from "Tutoring goals" to "Learning Goals"
-]);
-
 inputFieldPersonalInformation.value.forEach((item) => {
   const fieldName = toCamelCase(item.field);
   personalData[fieldName] = "";
@@ -509,10 +430,6 @@ inputFieldProfileInformation.value.forEach((item) => {
   } else if (fieldName !== "courseOffered") {
     profileData[fieldName] = "";
   }
-});
-
-bioAndgoalsFields.value.forEach((item) => {
-  profileData[toCamelCase(item.field)] = "";
 });
 
 watch(
@@ -743,19 +660,9 @@ const selectOption = (field, value, section = "profile") => {
   }
 };
 
-const selectGender = (gender) => {
-  personalData.gender = gender;
-  dropdownOpen.gender = false;
-
-  if (gender !== "Other") {
-    personalData.otherGender = "";
-  }
-};
-
 const getDisplayValue = (field) => {
   if (Array.isArray(profileData[field])) {
     if (profileData[field].length === 0) {
-      // Return props data based on field
       if (field === "daysOfAvailability") {
         return props.userData.learn.availability?.join(", ") || "";
       }
@@ -781,20 +688,13 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
-
-  // Initialize subjects based on the course from props
   updateAvailableSubjects(props.userData.learn.course);
-
-  // Initialize other fields with props data
   profileData.daysOfAvailability = props.userData.learn.availability || [];
   profileData.learningStyle = props.userData.learn.learn_sty || [];
   profileData.learningModality = props.userData.learn.learn_modality || "";
   profileData.preferredSessionDuration = props.userData.learn.prefSessDur || "";
   profileData.shortBio = props.userData.learn.bio || "";
   profileData.learningGoals = props.userData.learn.goals || "";
-
-  // Initialize personal data
-  personalData.gender = props.userData.learn.gender || "";
   personalData.contactNumber = props.userData.learn.phoneNum || "";
   personalData.address = props.userData.learn.address || "";
   personalData.program = props.userData.learn.course || "";
@@ -809,7 +709,7 @@ const validationErrors = reactive({
   contactNumber: "",
   address: "",
   shortBio: "",
-  learningGoals: "", // Changed from tutoringExperience
+  learningGoals: "",
 });
 
 function validateField(field, value) {
@@ -866,15 +766,11 @@ const saveChanges = async () => {
   const learn = props.userData.learn || {};
 
   const combinedData = {
-    // Personal Information
-    gender: personalData.gender || learn.gender,
     phoneNum: personalData.contactNumber?.trim() || learn.phoneNum,
     address: personalData.address?.trim() || learn.address,
     course: personalData.program || learn.course,
     department: "College of Computer Studies",
     year: personalData.yearLevel || learn.year,
-
-    // Profile Information
     subjects: JSON.stringify(
       profileData.courseOffered?.length
         ? profileData.courseOffered
@@ -895,15 +791,8 @@ const saveChanges = async () => {
     ),
     prefSessDur: profileData.preferredSessionDuration || learn.prefSessDur,
     bio: profileData.shortBio?.trim() || learn.bio || "",
-    goals: profileData.learningGoals?.trim() || learn.goals || "", // Added fallback empty string
+    goals: profileData.learningGoals?.trim() || learn.goals || "",
   };
-
-  // Remove any undefined or null values
-  Object.keys(combinedData).forEach((key) => {
-    if (combinedData[key] === undefined || combinedData[key] === null) {
-      delete combinedData[key];
-    }
-  });
 
   try {
     const response = await api.patch("/api/learner/edit", combinedData, {
@@ -915,8 +804,6 @@ const saveChanges = async () => {
     });
 
     if (response.status === 200) {
-      console.log("Saving goals:", profileData.learningGoals);
-      console.log("Combined data:", combinedData);
       alert("Changes saved successfully!");
       emit("close");
     }
@@ -935,7 +822,6 @@ const getPlaceholder = (field, section = "personal") => {
       "Year Level": learn.year || "Select year level",
       Program: learn.course || "Select program",
       Address: learn.address || "Enter address",
-      Gender: learn.gender || "Select gender",
     },
     profile: {
       "Learning Modality": learn.learn_modality || "Select learning modality",
@@ -965,7 +851,7 @@ const isOptionChecked = (field, value) => {
 
 <style scoped>
 .edit-information {
-  width: 800px !important;
+  width: 500px !important;
   max-height: 700px;
   height: 700px;
   display: flex;
@@ -1012,12 +898,6 @@ const isOptionChecked = (field, value) => {
   margin-bottom: 20px;
 }
 
-.lower-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-
 .input-wrapper {
   display: flex;
   flex-direction: column;
@@ -1027,6 +907,7 @@ const isOptionChecked = (field, value) => {
 .input-fields {
   display: flex;
   flex-direction: column;
+  margin-bottom: 15px;
 }
 
 .input-fields label {
@@ -1049,21 +930,12 @@ const isOptionChecked = (field, value) => {
 
 .personal-information,
 .profile-information {
-  padding: 0 20px 0 20px;
-  border-radius: 20px;
+  padding: 0 0 20px 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
 }
 
 .custom-dropdown {
-  position: relative;
-  width: 100%;
-}
-
-.gender-section {
-  position: relative;
-  width: 100%;
-}
-
-.gender-dropdown {
   position: relative;
   width: 100%;
 }
@@ -1100,10 +972,6 @@ const isOptionChecked = (field, value) => {
   border-radius: 0 0 10px 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}
-
-.gender-options {
-  z-index: 1001;
 }
 
 .dropdown-option {
@@ -1156,36 +1024,14 @@ const isOptionChecked = (field, value) => {
   font-weight: bold;
 }
 
-.other-gender-input {
-  margin-top: 10px;
-  width: 50%;
-}
-
-.other-gender-input label {
-  display: block;
-  color: #116174;
-  margin-bottom: 5px;
-  font-size: 11px;
-}
-
 .bio-goals-wrapper {
   margin-top: 20px;
 }
 
 .bio-goals-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  padding: 0 20px;
-  margin-top: 13px;
-}
-
-.bio-goals-grid .column-1 {
-  grid-column: 1;
-}
-
-.bio-goals-grid .column-2 {
-  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .fixed-textarea {
@@ -1217,4 +1063,5 @@ const isOptionChecked = (field, value) => {
   cursor: pointer;
   font-size: 16px;
 }
+
 </style>

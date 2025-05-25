@@ -112,16 +112,138 @@ const rescheduleSession = async () => {
 </template>
 
 <style scoped>
-/* Centered popup wrapper */
 .wrapper {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 400px;
-  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  width: 450px;
+  padding: 0;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid #eaeaea;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  z-index: 1000;
+}
+
+.dp__menu {
+  z-index: 1001 !important;
+  position: fixed;
+  transform: translateY(5px);
+}
+
+.upper-element {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f5f5f5;
+  position: relative;
+}
+
+.upper-element h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 auto;
+}
+
+.close-icon {
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+}
+
+.close-icon:hover {
+  color: #333;
+}
+
+.lower-element {
+  padding: 24px;
+}
+
+.lower-element p {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.datepicker-wrapper {
+  margin: 24px 0;
+  position: relative;
+}
+
+.datepicker-wrapper label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.button-container button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.cancel-button {
+  background: transparent;
+  color: #666;
+}
+
+.cancel-button:hover {
+  background: #f7f7f7;
+}
+
+.confirm-button {
+  background: #2c3e50;
+  color: white;
+}
+
+.confirm-button:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.confirm-button:not(:disabled):hover {
+  background: #1a2634;
+}
+
+.dp__input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.dp__input:hover {
+  border-color: #ccc;
+}
+
+.dp__input:focus {
+  border-color: #2c3e50;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
 }
 </style>
+

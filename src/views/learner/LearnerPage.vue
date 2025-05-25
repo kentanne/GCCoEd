@@ -31,7 +31,6 @@ const getLearnerDets = async () => {
       .then((response) => {
         console.log("User details fetched successfully:", response.data);
         if (response.status === 200) {
-          // Store data in unified userData ref
           userData.value = {
             user: response.data.user,
             learn: {
@@ -91,6 +90,7 @@ const sessionForReview = async () => {
     return null;
   }
 };
+
 const mentorProfile = async () => {
   try {
     await api
@@ -369,7 +369,7 @@ onMounted(async () => {
   await sessionInfo();
   await mentorProfile();
   await sessionForReview();
-  await fetchMentFiles(); // Changed from mentFiles() to fetchMentFiles()
+  await fetchMentFiles();
   console.log("User data:", userData.value);
 });
 </script>
@@ -377,6 +377,11 @@ onMounted(async () => {
 <template>
   <!-- sidebar -->
   <div class="sidebar">
+    <div class="logo-container">
+      <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo">
+      <span class="logo-text">GCCoEd</span>
+    </div>
+    
     <div class="upper-element">
       <div>
         <h1>Hi, Learner!</h1>
@@ -390,43 +395,27 @@ onMounted(async () => {
       </div>
       <div>
         <h2>{{ userData.user.name }}</h2>
-        <i
-          ><p>{{ userData.learn.year }}</p></i
-        >
-        <i
-          ><p>{{ userData.learn.course }}</p></i
-        >
+        <i><p>{{ userData.learn.year }}</p></i>
+        <i><p>{{ userData.learn.course.match(/\(([^)]+)\)/)?.[1] }}</p></i>
       </div>
     </div>
-    <!--<div class="wave-curve"></div>-->
+    
     <div class="footer-element">
       <div class="bio-container">
         <h1>BIO</h1>
-        <div>
+        <div class="lines">
           <p style="white-space: normal; word-break: break-all">
             {{ userData.learn.bio }}
           </p>
         </div>
       </div>
-      <div class="goals-container">
-        <h1>LEARNING GOALS</h1>
-        <div>
-          <p>{{ userData.learn.goals }}</p>
-        </div>
-      </div>
+      
       <div class="availability">
         <h1>Availability</h1>
         <div class="lines">
           <h3>Days:</h3>
           <div>
-            <ul>
-              <li
-                v-for="(day, index) in userData.learn.availability"
-                :key="index"
-              >
-                {{ day }}
-              </li>
-            </ul>
+            <p>{{ userData.learn.availability.join(', ') }}</p>
           </div>
         </div>
         <div class="lines">
@@ -436,11 +425,12 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+      
       <div class="subject-interest">
         <h1>Subject of Interest</h1>
         <div class="course-grid">
           <div
-            v-for="(card, index) in userData.learn.subjects"
+            v-for="(card, index) in userData.learn.subjects.slice(0, 5)"
             :key="index"
             class="course-card"
           >
@@ -451,13 +441,13 @@ onMounted(async () => {
             </div>
           </div>
           <div
-            v-if="remainingCoursesCount > 0"
+            v-if="userData.learn.subjects.length > 5"
             class="course-card remaining-courses"
             @click="toggleShowAllCourses"
           >
             <div class="lines">
               <div>
-                <p>+{{ remainingCoursesCount }}</p>
+                <p>+{{ userData.learn.subjects.length - 5 }}</p>
               </div>
             </div>
           </div>
@@ -477,47 +467,63 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="edit-information">
-        <button @click="openEditInformation">
-          {{ isEdit ? "Save" : "Edit" }}
-        </button>
-      </div>
-      <div>
-        <button @click="registerMentorRole">Register as Mentor</button>
-        <button @click="switchRole">switch Account Role</button>
+      
+      <div class="account-actions">
+        <div class="account-dropdown">
+          <button class="account-dropbtn">
+            <img src="/person.svg" alt="Account" class="account-icon" />
+            Account
+          </button>
+          <div class="account-dropdown-content">
+            <a @click="openEditInformation">
+              <img src="/edit.svg" alt="Edit" /> Edit Information
+            </a>
+            <a @click="registerMentorRole">
+              <img src="/register.svg" alt="Register" /> Register as Mentor
+            </a>
+            <a @click="switchRole">
+              <img src="/switch.svg" alt="Switch" /> Switch Account Role
+            </a>
+            <a @click="openLogoutDialog">
+              <img src="/logout.svg" alt="Logout" /> Logout
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- topbar -->
+  <!-- updated topbar with icon beside text -->
   <div class="topbar">
     <div class="topbar-left">
-      <div @click="switchComponent('main')" class="topbar-options">
-        <img src="/main.svg" alt="main" />
-        <p>Main</p>
+      <div 
+        @click="switchComponent('main')" 
+        class="topbar-option"
+        :class="{ 'active': activeComponent === 'main' }"
+      >
+        <img src="/main.svg" alt="Main" class="nav-icon" />
+        <span class="nav-text">Main</span>
       </div>
-      <div @click="switchComponent('session')" class="topbar-options">
-        <img src="/calendar.svg" alt="calendar" />
-        <p>Sessions</p>
+      <div 
+        @click="switchComponent('session')" 
+        class="topbar-option"
+        :class="{ 'active': activeComponent === 'session' }"
+      >
+        <img src="/calendar.svg" alt="Session" class="nav-icon" />
+        <span class="nav-text">Sessions</span>
       </div>
-      <div @click="switchComponent('records')" class="topbar-options">
-        <img src="/records.svg" alt="record" />
-        <p>Records</p>
-      </div>
-      <div @click="openLogoutDialog" class="topbar-options">
-        <img src="/logout.svg" alt="logout" />
-        <p>Logout</p>
+      <div 
+        @click="switchComponent('records')" 
+        class="topbar-option"
+        :class="{ 'active': activeComponent === 'records' }"
+      >
+        <img src="/records.svg" alt="Records" class="nav-icon" />
+        <span class="nav-text">Records</span>
       </div>
     </div>
-    <div class="topbar-right">
-      <input
-        maxlength="32"
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search"
-      />
-      <img src="/search.svg" alt="search" />
-    </div>
+<div class="topbar-date">
+  {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+</div>
   </div>
 
   <!-- main content -->
@@ -544,15 +550,558 @@ onMounted(async () => {
       <logoutDialog @close="confirmLogout = false" @logout="handleLogout" />
     </div>
   </Transition>
-
-  <Transition name="fade" mode="out-in">
-    <div v-if="isHelp" class="help-popup">
-      <help @close="isHelp = false" />
-    </div>
-  </Transition>
 </template>
 
 <style scoped>
-@import "@/assets/learnerpage/learner.css";
-@import "@/assets/learnerpage/color.css";
+/* Sidebar Styling */
+.sidebar {
+  position: fixed;
+  height: 100vh;
+  width: 300px;
+  background-color: rgb(40, 70, 86);
+  color: white;
+  padding: 20px 15px;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  width: 45px;
+  height: 30px;
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Profile Section */
+.upper-element {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 13px;
+  text-align: center;
+}
+
+.upper-element h1 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 17px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.upper-element img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  margin-top: 1rem;
+}
+
+.upper-element h2 {
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.upper-element p {
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.stars {
+  color: #FFD700;
+  font-size: 18px;
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+/* Content Sections */
+.footer-element {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bio-container h1{
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  padding-top: 17px;
+  margin-top: -1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.5rem;
+}
+
+.goals-container h1,
+.availability h1,
+.subject-interest h1 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  padding-top: 17px;
+  margin-top: 0rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.5rem;
+}
+
+/* Information Items */
+.lines {
+  display: flex;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: rgba(255, 254, 254, 0.2);
+  align-items: center;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.lines h3 {
+  min-width: 90px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lines p,
+.lines div {
+  color: white;
+  font-size: 12px;
+  white-space: nowrap;    
+  overflow-x: auto;          
+  overflow-y: hidden;      
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;     
+  -ms-overflow-style: none;  
+}
+
+.lines p::-webkit-scrollbar,
+.lines div::-webkit-scrollbar {
+  display: none;            
+}
+.bio-container .lines {
+  white-space: normal;
+  word-break: break-word;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding: 8px;
+  position: relative;
+}
+
+.bio-container .lines p {
+  color: white;
+  font-size: 12px;
+  line-height: 1.2;
+  margin: 0;
+  white-space: normal;
+  word-break: break-word;
+  width: 100%;
+  padding-right: 12px;
+  max-height: 30px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+
+.bio-container .lines p::-webkit-scrollbar {
+  display: none; 
+}
+/* Subjects Grid */
+.subject-interest .course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.subject-interest .course-card {
+  background-color: #225d6f;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: default;
+  width: 100%;
+}
+
+.subject-interest .course-card .lines {
+  padding: 5px;
+  background-color: #cee1e6b6;
+  overflow: hidden; 
+  margin-bottom: 0;
+}
+
+.subject-interest .course-card .lines p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgb(32, 71, 92);
+  display: block;
+  width: 100%;        
+}
+
+.subject-interest .remaining-courses {
+  background-color: #225d6f;
+  cursor: pointer;
+}
+
+.subject-interest .remaining-courses .lines {
+  justify-content: center; 
+}
+
+.subject-interest .remaining-courses .lines p {
+  color: rgb(32, 71, 92);
+  font-weight: bold;
+  text-align: center;
+}
+
+.subject-interest .remaining-courses:hover {
+  background-color: #00819d;
+}
+
+.subject-interest .remaining-courses:hover .lines {
+  background-color: #00819d;
+}
+
+/* All Subjects Popup */
+.subject-interest .all-courses-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  margin-left: 23%;
+  margin-top: 28%;
+  max-height: 50%;
+  max-height: 200px;
+}
+
+.subject-interest .popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 400px;
+  margin-top: 10%;
+}
+
+.subject-interest .popup-content h3 {
+  color: #006981;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.subject-interest .popup-courses {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.subject-interest .popup-course {
+  background-color: #d9dcef;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-align: center;
+  color: #066678;
+  font-family: Montserrat;
+}
+
+/* Account Dropdown Styles */
+.account-actions {
+  margin-top: 0.4rem;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.account-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.account-dropbtn {
+  background-color: #d8e2e4;
+  color: rgb(27, 51, 85);
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.account-dropbtn:hover {
+  background-color: #00819d;
+}
+
+.account-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.account-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  bottom: 100%;
+  left: 6rem;
+  border-radius: 5px;
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.account-dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.account-dropdown-content a:hover {
+  background-color: #006981;
+  color: white;
+}
+
+.account-dropdown-content a img {
+  width: 16px;
+  height: 16px;
+}
+
+.account-dropdown:hover .account-dropdown-content {
+  display: block;
+}
+
+/* Main Content Area */
+.main-content {
+  display: flex;
+  padding-left: 370px;
+  padding-right: 20px;
+  padding-top: 100px;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+
+/* Updated Topbar Styles with Icon Beside Text */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 330px;
+  right: 0;
+  height: 70px;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  padding: 0 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.topbar-left {
+  display: flex;
+  gap: 30px;
+  height: 100%;
+}
+
+.topbar-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 100%;
+  padding: 0 20px;
+  position: relative;
+  transition: all 0.3s ease;
+  gap: 10px;
+}
+
+.topbar-option:hover {
+  background-color: #f5f5f5;
+}
+
+.topbar-option.active {
+  background-color: #e6f7ff;
+}
+
+.topbar-option.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #006981;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.topbar-option:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-text {
+  color: #066678;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.topbar-option:hover .nav-text {
+  color: #004d5a;
+}
+
+.topbar-option.active .nav-text {
+  color: #004d5a;
+  font-weight: 600;
+}
+
+.topbar-date {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+}
+
+/* Popup Styles */
+.edit-information-popup,
+.logout-popup,
+.help-popup {
+  position: fixed;
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+}
+
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+
+/* Scrollbar styling for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px;
+  }
+  
+  .main-content {
+    padding-left: 270px;
+  }
+  
+  .topbar {
+    left: 250px;
+    padding: 0 20px;
+  }
+  
+  .topbar-left {
+    gap: 15px;
+  }
+  
+  .topbar-option {
+    padding: 0 10px;
+    gap: 6px;
+  }
+  
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .nav-text {
+    font-size: 13px;
+  }
+  
+  .topbar-date {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .topbar {
+    left: 0;
+    padding-left: 270px;
+  }
+  
+  .topbar-date {
+    display: none;
+  }
+}
 </style>
