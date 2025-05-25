@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios.js";
 
 const router = useRouter();
 
@@ -63,9 +63,9 @@ const handleStep2 = async () => {
   error.value = "";
 
   try {
-    await axios
+    await api
       .post(
-        "http://localhost:8000/api/forgot-password",
+        "/api/forgot-password",
         verificationData.value,
         {
           withCredentials: true,

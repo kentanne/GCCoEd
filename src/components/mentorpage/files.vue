@@ -299,13 +299,20 @@ onMounted(() => {
   background: var(--bg-light);
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
-  overflow: hidden;
   width: 90%;
-  margin: 2rem auto;
+  margin-top: 2rem;
+  margin-left: 2.5rem;
+  padding: 0 1rem;
   text-align: center;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 37.4rem;
+  max-height: 37.4rem;
+  overflow-y: scroll;
 }
 
-/* Header Styles */
+
 .table-header {
   display: flex;
   align-items: center;
@@ -314,19 +321,22 @@ onMounted(() => {
   gap: 1rem;
   flex-wrap: wrap;
   color: #0b2548;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .table-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: var(--text-light);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.8rem;
 }
 
 .header-icon {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 /* Main Content Styles */

@@ -625,10 +625,7 @@
 
 <script>
 import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
-import api, { Axios } from "axios";
-
-// axios.default.withCredentials = true; // Enable sending cookies with requests
-// axios.default.withXSRFToken = true; // Enable CSRF token handling
+import api from "@/axios.js"; // <-- Use the exported api instance
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -959,7 +956,7 @@ export default {
         }
 
         if (file.size > 2000000) {
-          alert("File size should be less than 2MB");
+          alert("File size should less than 2MB");
           return;
         }
 

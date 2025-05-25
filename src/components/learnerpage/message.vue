@@ -50,6 +50,8 @@ const close = () => {
 	overflow: hidden;
 	font-family: 'Helvetica Neue', Arial, sans-serif;
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+	transform: translateX(-50%); /* Default center adjustment */
+	margin-left: 45rem; 
 }
 
 .upper-element {

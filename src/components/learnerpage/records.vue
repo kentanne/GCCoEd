@@ -509,7 +509,7 @@ onMounted(async () => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  transform: translateX(10%);
+  transform: translateX(30%);
 }
 
 .modal-header {
@@ -764,12 +764,12 @@ onMounted(async () => {
 }
 
 .footer-btn.submit {
-  background-color: var(--primary-dark);
-  color: white;
+    background: linear-gradient(135deg, #3b9aa9, #0b3e8a);
+  color: rgb(225, 232, 235);
 }
 
 .footer-btn.submit:hover {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
 }
 
 .footer-btn.submit:disabled {
