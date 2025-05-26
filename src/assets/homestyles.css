@@ -221,7 +221,7 @@ body > * {
 
 .content-box p {
   font-size: 1.2rem;
-  color: white;
+  color: rgb(73, 25, 25);
   text-align: justify;
 }
 
@@ -296,10 +296,10 @@ body > * {
 }
 
 .learn-more-btn:hover {
-  background-color: #012f41;
+  background-color: #15191b;
 }
 
-/*Join Section*/
+/* Join Section - Responsive */
 .join-section {
   position: relative;
   width: 100%;
@@ -309,8 +309,7 @@ body > * {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
-  padding: 80px 5%;
+  padding: 40px 5%;
 }
 
 .join-section::before {
@@ -325,88 +324,129 @@ body > * {
   z-index: 1;
 }
 
-
-.join-card {
-  width: 350px;
-  height: 480px;
-  margin-top: 6rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 30px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.get-started-card {
   position: relative;
   z-index: 2;
-  transition: transform 0.3s ease;
-}
-
-.learner-card {
-  background: #02475e;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
+  border-radius: 30px;
+  padding: 2.5rem;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   color: white;
+  text-align: center;
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 2rem 0;
+  top: 2rem;
 }
 
-.mentor-card {
-  background: white;
-  color: #02475e;
+.get-started-title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 1.5rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-.join-card h3 {
-  font-size: 1.5rem;
-  font-weight: normal;
-}
-
-.join-card h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.join-card ul {
+.benefits-list {
   list-style: none;
   padding: 0;
-  margin-top: 2.5rem;
-}
-
-.join-card ul li {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  margin: 0 auto 2rem;
+  max-width: 500px;
   text-align: left;
+  padding-left: 5rem;
 }
 
-.join-card ul li i {
-  margin-right: 25px;
-  margin-top: 3px;
-  flex-shrink: 0;
+.benefits-list li {
+  padding: 0.6rem 0;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
 }
 
-.join-btn {
-  display: center;
-  width: 60%;
-  padding: 10px;
+.benefits-list i {
+  margin-right: 10px;
+  color: #a5d6a7;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  min-width: 24px;
+}
+
+.signup-btn {
+  background-color: white;
+  color: #233e59;
   border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  margin-top: 1.5rem;
+  padding: clamp(0.8rem, 3vw, 1rem) clamp(1.5rem, 5vw, 2.25rem);
+  font-size: clamp(1rem, 3vw, 1.2rem);
   font-weight: bold;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-top: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 80%;
+  max-width: 250px;
 }
 
-.learner-card .join-btn {
-  background: white;
-  color: #02475e;
+.signup-btn:hover {
+  background-color: #f1f8fe;
+  transform: translateY(-3px);
+  font-weight: 600;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-.mentor-card .join-btn {
-  background: #02475e;
-  color: white;
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .join-section {
+    padding: 30px 5%;
+    min-height: 80vh;
+  }
+  
+  .get-started-card {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+    width: 95%;
+  }
+  
+  .benefits-list {
+    padding-left: 0;
+    text-align: center;
+  }
+  
+  .benefits-list li {
+    justify-content: center;
+    text-align: left;
+    max-width: 300px;
+    margin: 0 auto;
+  }
 }
 
-.join-btn:hover {
-  transform: scale(1.03);
-  opacity: 0.9;
+@media (max-width: 480px) {
+  .get-started-card {
+    padding: 1.5rem 1rem;
+    border-radius: 15px;
+  }
+  
+  .get-started-title {
+    margin-bottom: 1rem;
+  }
+  
+  .benefits-list li {
+    font-size: 0.85rem;
+    padding: 0.4rem 0;
+  }
+  
+  .benefits-list i {
+    font-size: 1rem;
+    margin-right: 8px;
+  }
+  
+  .signup-btn {
+    width: 90%;
+    padding: 0.7rem 1rem;
+  }
 }
 
 @media (max-width: 1200px) {

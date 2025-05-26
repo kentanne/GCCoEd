@@ -78,30 +78,20 @@
       </div>
       <button class="learn-more-btn" @click="goToLearnMore">LEARN MORE</button>
     </section>
-    <section class="join-section" id="get-started">
-      <div class="join-card learner-card">
-        <h3>Join as</h3>
-        <h2>LEARNER</h2>
-        <ul>
-          <li><i class="fas fa-check"></i> Find mentors for various subjects and skills.</li>
-          <li><i class="fas fa-check"></i> Schedule learning sessions at your convenience.</li>
-          <li><i class="fas fa-check"></i> Get guidance from experienced peers.</li>
-          <li><i class="fas fa-check"></i> Improve your knowledge with structured sessions.</li>
-        </ul>
-        <button class="join-btn" @click="goToSignup">REGISTER</button>
-      </div>
-      <div class="join-card mentor-card">
-        <h3>Join as</h3>
-        <h2>MENTOR</h2>
-        <ul>
-          <li><i class="fas fa-check"></i> Share your knowledge and expertise.</li>
-          <li><i class="fas fa-check"></i> Set your availability and manage sessions.</li>
-          <li><i class="fas fa-check"></i> Help fellow students enhance their learning.</li>
-          <li><i class="fas fa-check"></i> Build leadership and teaching experience.</li>
-        </ul>
-        <button class="join-btn" @click="goToSignup">REGISTER</button>
-      </div>
-    </section>
+<section class="join-section" id="get-started">
+  <div class="get-started-card">
+    <h2 class="get-started-title">Ready to Get Started?</h2>
+    <div class="get-started-content">
+      <ul class="benefits-list">
+        <li><i class="fas fa-check-circle"></i> Connect with mentors in various subjects</li>
+        <li><i class="fas fa-check-circle"></i> Share your knowledge as a mentor</li>
+        <li><i class="fas fa-check-circle"></i> Flexible scheduling for sessions</li>
+        <li><i class="fas fa-check-circle"></i> Join our supportive learning community</li>
+      </ul>
+      <button class="signup-btn" @click="goToSignup"> NOW</button>
+    </div>
+  </div>
+</section> 
   </div>
 </template>
 

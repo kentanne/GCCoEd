@@ -104,10 +104,6 @@ const handleStep2 = async () => {
 
 <template>
   <div class="forgot-password-container">
-    <div class="learning-element"></div>
-    <div class="learning-element"></div>
-    <div class="learning-element"></div>
-    <div class="learning-element"></div>
 
     <header class="brand-header">
       <img
@@ -115,7 +111,7 @@ const handleStep2 = async () => {
         alt="GCCoed Logo"
         class="logo-img"
       />
-      <span class="brand-name">GCCoed</span>
+      <span class="brand-name">GCCoEd</span>
     </header>
     <div class="form-wrapper">
       <!-- Step 1 -->
@@ -220,128 +216,37 @@ const handleStep2 = async () => {
 </template>
 
 <style scoped>
-html,
-body {
-  overflow: hidden;
-  height: 100%;
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  color: white;
 }
 
 .forgot-password-container {
-  background: linear-gradient(145deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+  background-image: url("@/assets/bg.png");
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between;
 }
 
-.learning-element {
-  position: absolute;
-  opacity: 0.8;
-  z-index: 0;
-  animation: float 20s infinite linear;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.learning-element:nth-child(1) {
-  width: 60px;
-  height: 45px;
-  background: #ff7043;
-  border-radius: 4px 8px 8px 4px;
-  top: 15%;
-  left: 10%;
-  animation-duration: 25s;
-}
-.learning-element:nth-child(1)::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #ff8a65;
-  border-radius: 4px 8px 8px 4px;
-  transform: translateX(4px);
-}
-
-.learning-element:nth-child(2) {
-  width: 90px;
-  height: 6px;
-  background: #ffd54f;
-  transform: rotate(45deg);
-  top: 30%;
-  right: 10%;
-  animation-duration: 20s;
-  animation-delay: -5s;
-}
-.learning-element:nth-child(2)::before {
-  content: "";
-  position: absolute;
-  width: 15px;
-  height: 6px;
-  background: #ffb74d;
-  right: -12px;
-  transform: rotate(-45deg);
-}
-
-.learning-element:nth-child(3) {
-  width: 75px;
-  height: 60px;
-  background: white;
-  border: 2px solid #64b5f6;
-  border-radius: 2px;
-  top: 60%;
-  left: 20%;
-  animation-duration: 30s;
-  animation-delay: -10s;
-}
-.learning-element:nth-child(3)::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 4px;
-  background: #64b5f6;
-  top: 15px;
-}
-
-.learning-element:nth-child(4) {
-  width: 50px;
-  height: 70px;
-  background: #e0e0e0;
-  border-radius: 5px;
-  bottom: 20%;
-  right: 20%;
-  animation-duration: 18s;
-  animation-delay: -7s;
-}
-.learning-element:nth-child(4)::before {
-  content: "";
-  position: absolute;
-  width: 45px;
-  height: 30px;
-  background: #f5f5f5;
-  top: 8px;
-  left: 4px;
-  border-radius: 3px;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate(40px, 40px) rotate(5deg);
-  }
-  50% {
-    transform: translate(80px, 0) rotate(0deg);
-  }
-  75% {
-    transform: translate(40px, -40px) rotate(-5deg);
-  }
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-}
 
 .logo-img {
   height: 50px;
@@ -366,11 +271,11 @@ body {
 .form-wrapper {
   background: white;
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(52, 158, 177, 0.15);
-  width: 320px;
+  box-shadow: 0 8px 24px rgba(52, 158, 177, 0.5);
+  width: 350px;
   padding: 2rem;
   border: 1px solid rgba(230, 240, 255, 0.6);
-  border-top: 9px solid rgb(88, 148, 251);
+  border-top: 9px solid rgb(42, 60, 92);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -381,7 +286,7 @@ body {
 
 .form-wrapper:hover {
   transform: translate(-50%, -50%) translateY(-1px);
-  box-shadow: 0 15px 30px rgba(235, 235, 235, 0.4);
+  box-shadow: 0 8px 24px rgba(52, 158, 177, 0.5);
 }
 
 .step-container {
@@ -502,7 +407,7 @@ select {
 button {
   width: 50%;
   padding: 0.9rem;
-  background: linear-gradient(to right, #349eb1, #3ab7cc);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   border: none;
   border-radius: 8px;
@@ -519,7 +424,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(to right, #2e8b9e, #349eb1);
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(52, 158, 177, 0.25);
 }
@@ -596,42 +501,114 @@ button:disabled {
   }
 }
 
-@media (max-width: 768px) {
-  .form-wrapper {
-    margin: 20px 10px;
-    padding: 14px;
+
+/* Ultra-Compact Mobile Responsiveness */
+@media (max-width: 480px) {
+  .forgot-password-container {
+    padding: 0.5rem;
+    justify-content: flex-start;
   }
+
+  .brand-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .logo-img {
+    height: 40px;
+    margin: 0.5rem;
+  }
+
   .brand-name {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
+    margin-top: 0.8rem;
   }
+
+  .form-wrapper {
+    width: 95%;
+    padding: 1rem;
+    border-radius: 15px;
+    border-top-width: 6px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.8rem;
+  }
+
+  input,
+  select {
+    height: 38px;
+    padding: 0.6rem 1.8rem 0.6rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 15px;
+  }
+
+  .input-icon {
+    font-size: 0.9rem;
+    right: 10px;
+  }
+
   button {
-    padding: 8px;
-    bottom: 1rem;
+    width: 70%;
+    padding: 0.7rem;
+    font-size: 0.85rem;
+    margin: 1rem auto 0;
+    bottom: -0.5rem;
+  }
+
+  small {
+    font-size: 0.65em;
+  }
+
+  .error-message,
+  .success-message {
+    padding: 0.6rem;
+    font-size: 0.75rem;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .form-wrapper {
+    padding: 0.8rem;
+  }
+  
+  input,
+  select {
+    height: 36px;
+    padding: 0.5rem 1.6rem 0.5rem 0.6rem;
+  }
+  
+  button {
+    width: 80%;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .forgot-password-container {
+    background-attachment: scroll;
+    background-position: 60% center;
   }
 }
 
 @media (max-width: 480px) {
-  .form-wrapper {
-    padding: 12px;
-    width: 80%;
+  .forgot-password-container {
+    background-position: 70% center;
   }
-  .input-with-icon input,
-  .input-with-icon select {
-    font-size: 0.85rem;
-    padding: 6px 28px 6px 8px;
-  }
-  .input-icon {
-    right: 6px;
-    font-size: 0.85rem;
-  }
-  button {
-    font-size: 0.85rem;
-    padding: 8px;
-    bottom: 1rem;
-  }
+}
 
-  .brand-name {
-    font-size: 1.7rem;
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .forgot-password-container {
   }
 }
 

@@ -375,6 +375,7 @@ button:hover {
   .main-content {
     max-width: 380px;
     padding: 1.5rem;
+    
   }
 }
 
@@ -383,16 +384,11 @@ button:hover {
   main {
     flex-direction: column;
     gap: 2rem;
-    margin-top: 7rem;
+    margin-top: 3em;
   }
 
   .main-image img {
-    position: absolute;
-    top: 5.2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-    width: 150px;
+display: none;
   }
 
   .main-content {
