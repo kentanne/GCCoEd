@@ -485,6 +485,9 @@ onMounted(() => {
   border-bottom: 2px solid var(--primary);
 }
 
+.data-table td{
+  font-size: 15px;
+}
 .sortable-header {
   cursor: pointer;
   transition: background-color 0.2s;
@@ -515,6 +518,17 @@ onMounted(() => {
   background-color: rgba(59, 154, 169, 0.05);
 }
 
+.data-table th:nth-child(1),  
+.data-table td:nth-child(1) { 
+  width: 290px; 
+  max-width: 290px;
+  min-width: 80px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
 .file-type-badge {
   display: inline-block;
   padding: 0.35rem 0.75rem;
@@ -571,12 +585,13 @@ onMounted(() => {
   max-width: 90%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  transform: translateX(120px);
 }
 
 .modal-header {
   padding: 1rem 1.5rem;
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  color: white;
+  color: rgb(45, 72, 107);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -593,7 +608,7 @@ onMounted(() => {
 .close-btn {
   background: none;
   border: none;
-  color: white;
+  color: rgb(47, 84, 104);
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem;
@@ -655,19 +670,24 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  align-items: stretch; /* Changed from center to stretch */
+  width: 100%; /* Ensure it takes full width */
 }
 
 .action-btn {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem; /* Changed from 6rem to 1rem */
   border: none;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
+  justify-content: center; /* Center the content horizontally */
   align-items: center;
   gap: 0.75rem;
   transition: all 0.2s;
   font-size: 0.95rem;
+  width: 100%; /* Make all buttons take full width */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .action-btn.view {

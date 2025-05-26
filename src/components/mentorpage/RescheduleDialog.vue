@@ -100,8 +100,8 @@ const rescheduleSession = async () => {
 .wrapper {
   position: fixed;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: -4rem;
+  transform: translateY(-50%);
   background: white;
   border-radius: 12px;
   width: 450px;

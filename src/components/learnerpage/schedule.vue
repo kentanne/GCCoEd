@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
+import api from "@/axios.js";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   info: {
@@ -87,15 +88,15 @@ const confirmSchedule = async () => {
   };
 
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/learner/scheduleCreate",
+    const response = await api.post(
+      "/api/learner/scheduleCreate",
       scheduleData,
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
@@ -126,25 +127,38 @@ const formatDateForInput = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+// Add these computed properties and helpers
+const availableDays = computed(() => {
+  try {
+    return JSON.parse(mentorAvailability || "[]").map((day) =>
+      day.toLowerCase()
+    );
+  } catch (e) {
+    console.error("Error parsing available days:", e);
+    return [];
+  }
+});
+
+const isDateAvailable = (date) => {
+  const dayName = date
+    .toLocaleDateString("en-US", { weekday: "long" })
+    .toLowerCase();
+  return availableDays.value.includes(dayName);
+};
+
 // Function to generate days of the current month with padding
 const generateDays = () => {
   const year = currentDate.value.getFullYear();
   const month = currentDate.value.getMonth();
 
-  // First day of the month
   const firstDay = new Date(year, month, 1);
-  // Last day of the month
   const lastDay = new Date(year, month + 1, 0);
-
-  // Days from previous month to show
   const prevMonthDays = firstDay.getDay();
-
-  // Days from next month to show
   const nextMonthDays = 6 - lastDay.getDay();
 
   days.value = [];
 
-  // Add previous month's days
+  // Previous month's days
   const prevMonthLastDay = new Date(year, month, 0).getDate();
   for (
     let i = prevMonthLastDay - prevMonthDays + 1;
@@ -157,10 +171,11 @@ const generateDays = () => {
       isCurrentMonth: false,
       isSelected: false,
       isToday: isToday(date),
+      isAvailable: isDateAvailable(date),
     });
   }
 
-  // Add current month's days
+  // Current month's days
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const date = new Date(year, month, i);
     const dateString = formatDateForInput(date);
@@ -169,10 +184,11 @@ const generateDays = () => {
       isCurrentMonth: true,
       isSelected: selectedDate.value === dateString,
       isToday: isToday(date),
+      isAvailable: isDateAvailable(date),
     });
   }
 
-  // Add next month's days
+  // Next month's days
   for (let i = 1; i <= nextMonthDays; i++) {
     const date = new Date(year, month + 1, i);
     days.value.push({
@@ -180,12 +196,15 @@ const generateDays = () => {
       isCurrentMonth: false,
       isSelected: false,
       isToday: isToday(date),
+      isAvailable: isDateAvailable(date),
     });
   }
 };
 
 // Function to handle date selection
 const selectDate = (day) => {
+  if (!day.isAvailable) return; // Prevent selecting unavailable days
+
   if (!day.isCurrentMonth) {
     // Change month if clicking on a day from another month
     const newDate = new Date(day.date);
@@ -197,19 +216,21 @@ const selectDate = (day) => {
   generateDays();
 };
 
-// Function to go to the previous month
+// Update the navigation functions
 const prevMonth = () => {
-  currentDate.value.setMonth(currentDate.value.getMonth() - 1);
+  const newDate = new Date(currentDate.value);
+  newDate.setMonth(newDate.getMonth() - 1);
+  currentDate.value = newDate;
   generateDays();
 };
 
-// Function to go to the next month
 const nextMonth = () => {
-  currentDate.value.setMonth(currentDate.value.getMonth() + 1);
+  const newDate = new Date(currentDate.value);
+  newDate.setMonth(newDate.getMonth() + 1);
+  currentDate.value = newDate;
   generateDays();
 };
 
-// Function to go to today
 const goToToday = () => {
   currentDate.value = new Date();
   selectedDate.value = formatDateForInput(currentDate.value);
@@ -217,27 +238,19 @@ const goToToday = () => {
 };
 
 const selectYear = (year) => {
-  currentDate.value.setFullYear(year);
+  const newDate = new Date(currentDate.value);
+  newDate.setFullYear(year);
+  currentDate.value = newDate;
   showYearSelection.value = false;
   generateDays();
 };
 
 const currentMonthYear = computed(() => {
-  return currentDate.value.toLocaleString("default", {
+  return new Date(currentDate.value).toLocaleDateString("default", {
     month: "long",
     year: "numeric",
   });
 });
-
-// Function to check if a date is today
-const isToday = (date) => {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
-};
 
 // Initialize the calendar
 onMounted(() => {
@@ -270,17 +283,15 @@ const subjectOptions = computed(() => {
   }
 });
 
-// Format the selected date for display
-const formattedSelectedDate = computed(() => {
-  if (!selectedDate.value) return "";
-  const date = new Date(selectedDate.value);
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-});
+// Add this helper function before generateDays
+const isToday = (date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
 </script>
 
 <template>
@@ -398,6 +409,18 @@ const formattedSelectedDate = computed(() => {
             </div>
           </div>
 
+          <!-- Available days legend -->
+          <div class="calendar-legend">
+            <div class="legend-item">
+              <span class="legend-dot available"></span>
+              <span>Available</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot unavailable"></span>
+              <span>Unavailable</span>
+            </div>
+          </div>
+
           <div class="weekdays">
             <div
               v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
@@ -406,11 +429,12 @@ const formattedSelectedDate = computed(() => {
               {{ day }}
             </div>
           </div>
+
           <div class="days">
             <div
               v-for="(day, index) in days"
               :key="index"
-              @click="selectDate(day)"
+              @click="day.isAvailable ? selectDate(day) : null"
               :class="[
                 'day',
                 {
@@ -418,6 +442,8 @@ const formattedSelectedDate = computed(() => {
                   selected: day.isSelected,
                   current: day.isCurrentMonth,
                   other: !day.isCurrentMonth,
+                  available: day.isAvailable,
+                  unavailable: !day.isAvailable,
                 },
               ]"
             >
@@ -452,29 +478,6 @@ const formattedSelectedDate = computed(() => {
         PROCEED
       </button>
     </div>
-
-    <!-- Confirmation Modal -->
-    <div v-if="showConfirmationModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>Confirm Session Booking</h3>
-        <div class="modal-details">
-          <p><strong>Mentor:</strong> {{ mentorName }}</p>
-          <p><strong>Date:</strong> {{ formattedSelectedDate }}</p>
-          <p><strong>Time:</strong> {{ selectedTime }}</p>
-          <p><strong>Mode:</strong> {{ sessionType === 'in-person' ? 'In Person' : 'Online' }}</p>
-          <p v-if="sessionType === 'in-person'"><strong>Location:</strong> {{ meetingLocation }}</p>
-          <p><strong>Subject:</strong> {{ selectedSubject }}</p>
-        </div>
-        <div class="modal-buttons">
-          <button @click="showConfirmationModal = false" class="modal-btn-cancel">
-            Cancel
-          </button>
-          <button @click="confirmSchedule" class="modal-btn-confirm">
-            Confirm Booking
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -493,7 +496,7 @@ const formattedSelectedDate = computed(() => {
 }
 
 .header {
-  background-color: #0b3b44;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   padding: 0.75rem 1.25rem;
   border-top-left-radius: 1.5rem;
@@ -511,8 +514,6 @@ const formattedSelectedDate = computed(() => {
   font-weight: 800;
   font-size: 1.125rem;
   user-select: none;
-  color: #fff;
-
 }
 .header button {
   font-size: 2rem;
@@ -743,6 +744,29 @@ const formattedSelectedDate = computed(() => {
   background-color: #0b3b44;
   color: white;
 }
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.75rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.legend-dot.available {
+  background-color: #0b3b44;
+}
+.legend-dot.unavailable {
+  background-color: #e5e7eb;
+}
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -786,6 +810,22 @@ const formattedSelectedDate = computed(() => {
   background-color: #0b3b44;
   color: white;
 }
+.day.available {
+  color: #000000;
+  cursor: pointer;
+}
+.day.unavailable {
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+.day.unavailable:hover {
+  background-color: #f3f4f6;
+}
+.day.selected.available {
+  background-color: #0b3b44;
+  color: white;
+}
 .footer {
   display: flex;
   justify-content: flex-end;
@@ -811,7 +851,7 @@ const formattedSelectedDate = computed(() => {
   background: none;
 }
 .btn-proceed {
-  background-color: #2b8a9e;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
@@ -822,7 +862,7 @@ const formattedSelectedDate = computed(() => {
   border: none;
 }
 .btn-proceed:hover {
-  background-color: #1f6d7e;
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
 }
 .subject-select {
   margin-top: 1.5rem;

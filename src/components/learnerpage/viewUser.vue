@@ -270,7 +270,7 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 150;
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
 }
 
 .sticky-footer {
@@ -536,7 +536,7 @@ onMounted(() => {
 }
 
 .action-button button {
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -552,7 +552,7 @@ onMounted(() => {
 }
 
 .action-button button:hover {
-  background: linear-gradient(135deg, #0a367e, #328c9a);
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(11, 62, 138, 0.3);
 }

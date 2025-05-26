@@ -358,7 +358,7 @@
 .drop-zone {
   border: 3px dashed #a6a6a6;
   width: 90%;
-  height: 65%;
+  height: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -379,8 +379,8 @@
 }
 
 .drop-zone p {
-  color: var(--text-dark);
-  font-size: 1.2rem;
+  color: gray;
+  font-size: 1rem;
   font-weight: 500;
   margin-top: 30px;
   user-select: none;
@@ -397,8 +397,8 @@
 }
 
 .custom-file-upload {
-  background-color: var(--primary-dark);
-  color: var(--text-light);
+  background-color: rgb(40, 70, 86);
+  color: white;
   width: 91%;
   height: 50px;
   display: flex;
@@ -415,7 +415,8 @@
 }
 
 .custom-file-upload:hover {
-  background-color: var(--primary);
+  background-color: rgb(54, 87, 105);
+;
 }
 
 /* Files Display Section Styles */
@@ -433,15 +434,19 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  border-bottom: 5px solid rgb(26, 71, 112);
+  padding-bottom: 1rem;
+
 }
 
 .files-header h3 {
-  color: var(--primary-dark);
+  color: rgb(40, 70, 86);;
   font-size: 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+;
 }
 
 .file-count {
@@ -567,15 +572,15 @@
 /* Upload Button Styles */
 .upload-button {
   display: flex;
-  justify-content: center;
-  padding: 1.5rem;
+  justify-content: flex-end;
+  padding: 1rem;
   background-color: #f5f7fa;
   border-top: 1px solid var(--border);
 }
 
 .upload-btn {
-  background-color: var(--primary-dark);
-  color: var(--text-light);
+  background-color: rgb(209, 207, 207);
+  color:  rgb(40, 70, 86);
   padding: 0.75rem 2rem;
   font-size: 1rem;
   font-weight: 600;
@@ -591,7 +596,7 @@
 .upload-btn:hover {
   background-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 154, 169, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 154, 169, 0.5);
 }
 
 /* Responsive Design */

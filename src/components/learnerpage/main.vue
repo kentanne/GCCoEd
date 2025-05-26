@@ -145,7 +145,7 @@ const filteredUsers = computed(() => {
 }
 
 .search-button {
-  background: #349eb1;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   border: none;
   border-radius: 50%;
@@ -263,7 +263,7 @@ const filteredUsers = computed(() => {
 }
 
 .lower-element button {
-  background: #349eb1;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   border: none;
   padding: 0.5rem 1.25rem;
@@ -278,7 +278,7 @@ const filteredUsers = computed(() => {
 }
 
 .lower-element button:hover {
-  background: #2d8a9d;
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -300,7 +300,7 @@ const filteredUsers = computed(() => {
 
 .filledStar {
   font-size: 1.5rem;
-  bottom: -0.5;}
+}
 
 .fade-enter-active,
 .fade-leave-active {

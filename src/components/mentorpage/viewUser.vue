@@ -239,6 +239,7 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
+  
 }
 
 .sticky-header {
@@ -492,6 +493,7 @@ onMounted(() => {
   justify-content: flex-end;
   padding: 1.25rem 0;
   margin-top: 1rem;
+  
 }
 
 .action-button button {

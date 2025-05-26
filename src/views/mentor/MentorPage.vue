@@ -377,12 +377,7 @@ onMounted(async () => {
             <p>{{ userData.ment.year }}</p>
           </div>
         </div>
-        <div class="lines">
-          <h3>Department:</h3>
-          <div>
-            <p>{{ department }}</p>
-          </div>
-        </div>
+      
         <div class="lines">
           <h3>Program:</h3>
           <div>
@@ -519,26 +514,16 @@ onMounted(async () => {
         <span class="nav-text">File Manager</span>
       </div>
     </div>
-    <div class="topbar-right">
-      <input
-        maxlength="32"
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search"
-      />
-      <img src="/search.svg" alt="search" />
-    </div>
-    <div class="date-display">
-      <div class="date-day">{{ currentDay }}</div>
-      <div class="date-full">{{ currentDate }}</div>
+    <div class="topbar-date">
+  {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
     </div>
   </div>
 
   <!-- main content -->
   <div class="main-content">
     <component
-      :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
+      :userInformation="users"
       :schedule="todaySchedule"
       :upcomingSchedule="upcommingSchedule"
       :feedbacks="feedbacks"
@@ -565,7 +550,7 @@ onMounted(async () => {
   position: fixed;
   height: 100vh;
   width: 300px;
-  background-color: rgb(40, 70, 86);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   padding: 20px 15px;
   box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
@@ -652,13 +637,21 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.user-information h1,
+.user-information h1{
+    color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  padding-top: 17px;
+  margin-top: -1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.5rem;
+
+}
 .availability h1,
 .course-offered h1 {
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   padding-top: 17px;
-  margin-top: 0rem;
+  margin-top: -0.4rem;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   margin-bottom: 0.5rem;
 }
@@ -893,7 +886,7 @@ onMounted(async () => {
   width: 100%;
 }
 
-/* Updated Topbar Styles with Icon Beside Text */
+/* Updated Topbar Styles */
 .topbar {
   position: fixed;
   top: 0;
@@ -971,63 +964,13 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-.topbar-right {
-  display: flex;
-  position: relative;
-  margin-right: 120px;
-}
-
-.topbar-right input {
-  background-color: #006981;
-  border: none;
-  color: white;
-  outline: none;
-  padding: 15px 50px 15px 15px;
-  width: 250px;
-  text-align: initial;
-  border-radius: 10px;
-  transition: border 0.3s ease;
-}
-
-.topbar-right img {
-  position: absolute;
-  width: 25px;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-  cursor: pointer;
-}
-
-.topbar-right input:focus {
-  border: 1px solid green !important;
-}
-
-input::placeholder {
-  color: white;
-  opacity: 0.8;
-}
-
-.date-display {
-  position: absolute;
-  right: 20px;
-  background-color: #f5f5f5;
+.topbar-date {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
   padding: 8px 15px;
   border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.date-day {
-  color: #006981;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.date-full {
-  color: #666;
-  font-size: 12px;
+  background-color: #f5f5f5;
 }
 
 /* Popup Styles */
@@ -1108,16 +1051,9 @@ input::placeholder {
     font-size: 13px;
   }
   
-  .topbar-right {
-    margin-right: 80px;
-  }
-  
-  .topbar-right input {
-    width: 180px;
-  }
-  
-  .date-display {
-    display: none;
+  .topbar-date {
+    font-size: 12px;
+    padding: 5px 10px;
   }
 }
 
@@ -1127,7 +1063,7 @@ input::placeholder {
     padding-left: 270px;
   }
   
-  .topbar-right {
+  .topbar-date {
     display: none;
   }
 }

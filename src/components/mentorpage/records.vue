@@ -112,8 +112,8 @@ onMounted(() => {
       <table class="data-table">
         <thead>
           <tr>
-            <th>COURSE</th>
             <th>LEARNER'S NAME</th>
+            <th>COURSE</th>
             <th>YEAR</th>
             <th>RATING</th>
             <th>ACTIONS</th>
@@ -121,9 +121,9 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-for="record in records" :key="record.id">
-            <td>{{ record.reviewer.course }}</td>
             <td>{{ record.reviewer.user.name }}</td>
-            <td>{{ record.reviewer.year }}</td>
+            <td>{{ record.reviewer.course.match(/\(([^)]+)\)/)?.[1] }}</td>
+           <td>{{ record.reviewer.year }}</td>
             <td>
               <div class="stars">
                 <span v-for="i in 5" :key="i" class="star">
@@ -179,7 +179,7 @@ onMounted(() => {
                     <span class="info-label"
                       ><i class="fas fa-graduation-cap"></i> Course</span
                     >
-                    <span class="info-value">{{ recordView.reviewer.course }}</span>
+                    <span class="info-value">{{ recordView.reviewer.course.match(/\(([^)]+)\)/)?.[1] }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label"
@@ -353,6 +353,18 @@ onMounted(() => {
   background-color: rgba(59, 154, 169, 0.05);
 }
 
+.data-table th:nth-child(1),  
+.data-table td:nth-child(1) { 
+  width: 270px; 
+  max-width: 300px;
+  min-width: 80px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .stars {
   display: flex;
   justify-content: center;
@@ -411,23 +423,27 @@ onMounted(() => {
   background: white;
   border-radius: 12px;
   max-width: 700px;
-  width: 90%;
+  width: 30%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  transform: translateX(30%);
 }
 
 .modal-header {
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  padding: 1rem;
+  background: linear-gradient(135deg, #0c434d, #3b9aa9);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .header-content {

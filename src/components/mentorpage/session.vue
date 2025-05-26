@@ -534,12 +534,12 @@ onUnmounted(() => {
 .upcomming-card {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0.8rem;
+  padding: 0.5rem 0.9rem;
   background-color: #e4f3f5;
   border-radius: 8px;
   margin-bottom: 0.8rem;
   transition: all 0.3s ease;
-  border-left: 3px solid var(--primary);
+  border-left: 5px solid var(--primary);
   max-width: 100%;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
   transform: translateY(0);
@@ -663,6 +663,35 @@ onUnmounted(() => {
   align-items: center;
   width: 100%;
   margin-top: 0.5rem;
+  gap: 0.5rem;
+}
+
+/* Location section - takes available space */
+.last > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0; /* Crucial for text truncation */
+  overflow: hidden;
+}
+
+/* Location text with truncation */
+.last > div:first-child p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+  margin: 0; /* Remove default margins */
+}
+
+/* Message icon container - fixed width */
+.last > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  width: 40px; /* Fixed width for icon */
 }
 
 .location-container {
@@ -688,15 +717,18 @@ onUnmounted(() => {
 }
 
 .envelope {
-  width: 18px !important;
+  width: 30px !important;
+  height: 30px !important;
   cursor: pointer;
-  position: relative;
   transition: transform 0.2s;
+  flex-shrink: 0;
+  color: rgb(51, 76, 103);
 }
 
 .envelope:hover {
   transform: scale(1.1);
 }
+
 
 .fade-enter-active,
 .fade-leave-active {
@@ -833,21 +865,22 @@ onUnmounted(() => {
 }
 
 .modal-button.confirm {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, #0c434d, #3b9aa9);
   color: white;
   border-color: var(--primary-dark);
 }
 
 .modal-button.confirm:hover {
-  background-color: var(--primary-dark);
+  background: linear-gradient(135deg, #3b9aa9, #0c434d);
 }
 
 .modal-button.confirm.danger {
-  background-color: red;
+  background-color: var(--danger);
+  color: white;
 }
 
 .modal-button.confirm.danger:hover {
-  background-color: #f55050;
+  background-color: #d32f2f;
 }
 
 @media (max-width: 1024px) {

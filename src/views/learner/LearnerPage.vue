@@ -562,7 +562,7 @@ onMounted(async () => {
   position: fixed;
   height: 100vh;
   width: 300px;
-  background-color: rgb(40, 70, 86);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   padding: 20px 15px;
   box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
