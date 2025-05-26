@@ -4,6 +4,8 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -63,7 +65,24 @@ const rescheduleSession = async () => {
         }
       )
       .then((response) => {
-        console.log("Reschedule response:", response.data);
+        createToast("Session rescheduled successfully!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+      })
+      .catch((error) => {
+        // console.error("Error rescheduling session:", error);
+        createToast("Failed to reschedule session", {
+          position: "bottom-right",
+          type: "error",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+        });
       });
     // return response.data
   } catch (error) {
@@ -245,5 +264,14 @@ const rescheduleSession = async () => {
   border-color: #2c3e50;
   outline: none;
   box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

@@ -1,13 +1,16 @@
 <script setup>
 import axios from "axios";
-import api from "@/axios.js"; // Adjust the path as necessary
+import api from "@/axios.js";
 import { onMounted, ref } from "vue";
-import Offer from "./offer.vue"; // Add this import
-
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+import Offer from "./offer.vue";
+// Import loading overlay
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const baseURL = api.defaults.baseURL;
+
+// Add loading state
+const isLoading = ref(true);
 
 const props = defineProps({
   userId: {
@@ -33,66 +36,81 @@ function getCookie(name) {
 }
 
 const userInfo = async (id) => {
-  console.log(id);
   try {
-    const userDeets = await api
-      .get(`/api/mentor/users/${id}`, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      })
-      .then((response) => {
-        console.log("user details:", response.data);
-        name.value = response.data.user.name;
-        year.value = response.data.user_info.year;
-        course.value = response.data.user_info.course;
-        gender.value = response.data.user_info.gender;
-        contact.value = response.data.user_info.phoneNum;
-        email.value = response.data.user.email;
-        address.value = response.data.user_info.address;
-        bio.value = response.data.user_info.bio;
-        subjects.value = response.data.user_info.subjects;
-        modality.value = response.data.user_info.learn_modality;
-        learnStyle.value = response.data.user_info.learn_sty;
-        availability.value = response.data.user_info.availability;
-        sessionDur.value = response.data.user_info.prefSessDur;
-        goal.value = response.data.user_info.goals;
-        profilePic.value = response.data.user_info.image;
-        userSchoolId.value = response.data.user.id;
+    isLoading.value = true;
 
-        // Prepare data for offer component
-        userDeetsForOffer.value = [
-          userSchoolId.value, // userSchoolId
-          userId.value, // userId
-          name.value, // userName
-          year.value, // userYear
-          course.value, // userCourse
-          sessionDur.value, // userSessionDur
-          modality.value, // userModality
-          learnStyle.value, // userLearnStyle
-          availability.value, // userAvailability
-          modality.value, // userLearnModality
-          profilePic.value, // userProfilePic
-          subjects.value, // userSubjects
-        ];
-      });
+    const response = await api.get(`/api/mentor/users/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    // console.log("user details:", response.data);
+    name.value = response.data.user.name;
+    year.value = response.data.user_info.year;
+    course.value = response.data.user_info.course;
+    gender.value = response.data.user_info.gender;
+    contact.value = response.data.user_info.phoneNum;
+    email.value = response.data.user.email;
+    address.value = response.data.user_info.address;
+    bio.value = response.data.user_info.bio;
+    subjects.value = response.data.user_info.subjects;
+    modality.value = response.data.user_info.learn_modality;
+    learnStyle.value = response.data.user_info.learn_sty;
+    availability.value = response.data.user_info.availability;
+    sessionDur.value = response.data.user_info.prefSessDur;
+    goal.value = response.data.user_info.goals;
+    profilePic.value = response.data.user_info.image;
+    userSchoolId.value = response.data.user.id;
+
+    // Prepare data for offer component
+    userDeetsForOffer.value = [
+      userSchoolId.value, // userSchoolId
+      userId.value, // userId
+      name.value, // userName
+      year.value, // userYear
+      course.value, // userCourse
+      sessionDur.value, // userSessionDur
+      modality.value, // userModality
+      learnStyle.value, // userLearnStyle
+      availability.value, // userAvailability
+      modality.value, // userLearnModality
+      profilePic.value, // userProfilePic
+      subjects.value, // userSubjects
+    ];
   } catch (error) {
     console.error("Error fetching user details:", error);
     return null;
+  } finally {
+    isLoading.value = false; // Stop loading
+    // console.log("Loading completed, isLoading:", isLoading.value);
   }
 };
 
 // Add this function to handle offer confirmation
 const confirmSendOffer = () => {
-  showConfirmationModal.value = false;
-  // Here you would add your actual offer sending logic
-  console.log("Offer sent to", name.value);
-  // You might want to add a success notification here
+  showConfirmationModal.value = false; // Hide confirmation modal
+  showOffer.value = true; // Show offer modal
+  console.log("Opening offer modal for", name.value);
 };
 
+const capitalizeFirstLetter = (str) => {
+  if (!str) return "Not specified";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+const parseArrayString = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed.join(", ") : str;
+  } catch (e) {
+    return str || "Not specified";
+  }
+};
+
+const userSchoolId = ref(); // Add this to store the user school ID
 const name = ref();
 const year = ref();
 const course = ref();
@@ -141,7 +159,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="wrapper">
+  <div class="wrapper" :class="{ 'no-scroll': isLoading }">
+    <!-- Only render loading overlay when loading -->
+    <template v-if="isLoading">
+      <loading
+        v-model:active="isLoading"
+        :can-cancel="false"
+        :is-full-page="false"
+        :opacity="1"
+        :color="'#006981'"
+        loader="spinner"
+        background-color="#ffffff"
+      />
+    </template>
+
     <!-- Sticky Modal Header -->
     <div class="upper-element sticky-header">
       <div class="header-content">
@@ -176,7 +207,9 @@ onMounted(() => {
               <span class="info-label"
                 ><i class="fas fa-venus-mars"></i> Sex at Birth</span
               >
-              <span class="info-value">{{ gender || "N/A" }}</span>
+              <span class="info-value">{{
+                capitalizeFirstLetter(gender) || "N/A"
+              }}</span>
             </div>
             <div class="info-item">
               <span class="info-label"
@@ -224,7 +257,7 @@ onMounted(() => {
               <div class="detail-item">
                 <span class="detail-label">Subjects of Interest:</span>
                 <span class="detail-value right-align wrap-text">{{
-                  subjects || "N/A"
+                  parseArrayString(subjects) || "N/A"
                 }}</span>
               </div>
               <div class="detail-item">
@@ -236,13 +269,13 @@ onMounted(() => {
               <div class="detail-item">
                 <span class="detail-label">Learning Style:</span>
                 <span class="detail-value right-align">{{
-                  learnStyle || "N/A"
+                  parseArrayString(learnStyle) || "N/A"
                 }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Availability:</span>
                 <span class="detail-value availability-text right-align">{{
-                  availability || "N/A"
+                  parseArrayString(availability) || "N/A"
                 }}</span>
               </div>
               <div class="detail-item">
@@ -317,12 +350,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Add this class to disable scrolling when loading */
+.no-scroll {
+  overflow: hidden !important;
+}
+
+/* Update your existing wrapper style */
 .wrapper {
   background: white;
   border-radius: 12px;
   width: 800px;
   max-height: 80vh;
-  overflow-y: auto;
+  overflow-y: auto; /* This will be disabled when .no-scroll is applied */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -330,7 +369,10 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
-  
+}
+
+.no-scroll {
+  overflow: hidden;
 }
 
 .sticky-header {
@@ -584,7 +626,6 @@ onMounted(() => {
   justify-content: flex-end;
   padding: 1.25rem 0;
   margin-top: 1rem;
-  
 }
 
 .action-button button {
@@ -686,6 +727,29 @@ onMounted(() => {
   background: linear-gradient(135deg, #0a3b44, #328c9a);
 }
 
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000; /* Higher than confirmation modal */
+}
+
+/* Add to your component styles if needed */
+.popup-overlay .offer-component {
+  background: white;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
 /* Responsive Design */
 @media (max-width: 850px) {
   .wrapper {
@@ -738,5 +802,34 @@ onMounted(() => {
     width: 100px;
     height: 100px;
   }
+}
+
+.loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+}
+
+.vl-overlay {
+  z-index: 1000 !important;
+  pointer-events: auto !important; /* Only capture events when visible */
+}
+
+.vl-backdrop {
+  pointer-events: auto !important;
+  /* Rest of your styles */
+}
+
+/* When loading is complete, ensure no events are captured */
+.vl-hidden {
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 </style>

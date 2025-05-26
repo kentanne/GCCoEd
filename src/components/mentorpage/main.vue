@@ -42,9 +42,9 @@ const props = defineProps({
 // Computed property to filter users based on search query
 const filteredUsers = computed(() => {
   if (!searchQuery.value) return props.userInformation;
-  
+
   const query = searchQuery.value.toLowerCase();
-  return props.userInformation.filter(user => {
+  return props.userInformation.filter((user) => {
     return (
       user.userName.toLowerCase().includes(query) ||
       user.course.toLowerCase().includes(query) ||
@@ -56,6 +56,30 @@ const filteredUsers = computed(() => {
 
 <template>
   <div class="main-wrapper">
+    <div class="search-container">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by name, course, or year..."
+        class="search-input"
+      />
+      <button class="search-button">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+    </div>
     <div class="user-grid">
       <div
         v-for="user in props.userInformation"
@@ -173,15 +197,15 @@ const filteredUsers = computed(() => {
 }
 
 .user-card:hover::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: linear-gradient(
-    135deg, 
-    rgba(138, 43, 226, 0.2) 0%, 
+    135deg,
+    rgba(138, 43, 226, 0.2) 0%,
     rgba(75, 0, 130, 0.3) 100%
   );
   z-index: -1;

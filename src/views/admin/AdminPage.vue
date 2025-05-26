@@ -1,7 +1,38 @@
 <template>
   <div class="profile-page">
+    <!-- Loading Overlay -->
+    <loading
+      v-model:active="isLoading"
+      :can-cancel="false"
+      :is-full-page="true"
+      :opacity="1"
+      :color="'#006981'"
+      loader="spinner"
+      background-color="#ffffff"
+    />
+
+    <!-- Mobile Sidebar Toggle Button (only visible on mobile) -->
+    <button v-if="isMobileView" class="sidebar-toggle" @click="toggleSidebar">
+      <svg class="toggle-icon" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
+        />
+      </svg>
+    </button>
+
+    <!-- Overlay to close sidebar on mobile -->
+    <div
+      v-if="isMobileView && isSidebarVisible"
+      class="sidebar-overlay"
+      @click="toggleSidebar"
+    ></div>
+
     <!-- App Header -->
-    <header class="app-header">
+    <header
+      class="app-header"
+      :class="{ 'header-expanded': isMobileView && !isSidebarVisible }"
+    >
       <div class="profile-section">
         <div class="avatar-container">
           <img
@@ -25,8 +56,14 @@
 
     <!-- Main Content -->
     <div class="main-container">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar">
+      <!-- Sidebar Navigation with responsive classes -->
+      <aside
+        class="sidebar"
+        :class="{
+          'sidebar-mobile-visible': isSidebarVisible,
+          'sidebar-mobile': isMobileView,
+        }"
+      >
         <nav class="app-navigation">
           <button
             class="nav-btn"
@@ -83,8 +120,11 @@
         </nav>
       </aside>
 
-      <!-- Content Area -->
-      <main class="content-area">
+      <!-- Content Area with responsive class -->
+      <main
+        class="content-area"
+        :class="{ 'content-expanded': isMobileView && !isSidebarVisible }"
+      >
         <!-- Dashboard shown by default -->
         <dashboard v-if="activeTab === 'dashboard'" :stats="stats" />
 
@@ -130,19 +170,24 @@ import users from "@/components/adminpage/users.vue";
 import axios from "axios";
 import api from "@/axios.js";
 import { useRouter } from "vue-router";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
+// Import loading overlay
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
+
 const Router = useRouter();
 
-// Set axios defaults
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+// Add loading state
+const isLoading = ref(false);
 
-// Cookie helper function
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
+const startLoading = () => {
+  isLoading.value = true;
+};
+
+const stopLoading = () => {
+  isLoading.value = false;
+};
 
 // Reactive refs
 const activeTab = ref("dashboard");
@@ -166,11 +211,29 @@ const currentDate = ref(
   })
 );
 
+// Add these variables after your existing ref declarations
+const isSidebarVisible = ref(false); // For mobile devices only
+const isMobileView = ref(false);
+
 // Methods
 const handleLogout = () => {
   alert("Logout clicked");
   logout();
   Router.push("/login");
+};
+
+// Function to toggle sidebar on mobile
+const toggleSidebar = () => {
+  isSidebarVisible.value = !isSidebarVisible.value;
+};
+
+// Check if we're on mobile view on mount and window resize
+const checkMobileView = () => {
+  isMobileView.value = window.innerWidth <= 768;
+  // On larger screens, always show sidebar
+  if (!isMobileView.value) {
+    isSidebarVisible.value = true;
+  }
 };
 
 // Update the fetch functions to store the data
@@ -227,18 +290,40 @@ const fetchApplicants = async () => {
 
 const logout = async () => {
   try {
-    const response = await api.post(
-      "/api/logout/web",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api
+      .post(
+        "/api/logout/web",
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Logout successful!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+          Router.push("/login");
+        } else {
+          createToast("Logout failed!", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      });
     console.log("Logout response:", response.data);
   } catch (error) {
     console.error("Error during logout:", error);
@@ -247,8 +332,30 @@ const logout = async () => {
 
 // Lifecycle hook
 onMounted(async () => {
-  await fetchAll();
-  await fetchApplicants();
+  try {
+    // Start loading before any fetch operations
+    startLoading();
+
+    // Check initial screen size
+    checkMobileView();
+    window.addEventListener("resize", checkMobileView);
+
+    // Use Promise.all to wait for all fetch operations to complete
+    await Promise.all([fetchAll(), fetchApplicants()]);
+
+    console.log("All data loaded successfully");
+  } catch (error) {
+    console.error("Error loading data:", error);
+    createToast("Error loading data. Please refresh the page.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+  } finally {
+    stopLoading();
+  }
 });
 </script>
 
@@ -440,5 +547,149 @@ onMounted(async () => {
   padding: 2rem;
   overflow-y: auto;
   margin: 1.5rem 1.5rem 1.5rem 0;
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
+
+/* Add loading overlay styles */
+.vl-overlay {
+  z-index: 9999 !important;
+}
+
+.vl-icon {
+  border-top-color: #006981 !important;
+  border-left-color: #006981 !important;
+}
+
+.vl-backdrop {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* Add these new style rules */
+
+/* Mobile Sidebar Toggle Button */
+.sidebar-toggle {
+  display: none;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1002;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.toggle-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Overlay for closing sidebar on mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  /* Show mobile toggle button */
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  /* Show overlay when sidebar is visible */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Default state for sidebar on mobile */
+  .sidebar-mobile {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 1000;
+  }
+
+  /* State when sidebar is toggled visible */
+  .sidebar-mobile-visible {
+    transform: translateX(0);
+  }
+
+  /* Adjust header when sidebar is hidden */
+  .header-expanded {
+    padding-left: 70px;
+  }
+
+  /* Adjust content when sidebar is hidden */
+  .content-expanded {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* Update main container layout */
+  .main-container {
+    flex-direction: column;
+  }
+
+  /* Adjust content area on mobile */
+  .content-area {
+    margin-left: 0;
+    width: 100%;
+    transition: margin-left 0.3s ease;
+  }
+}
+
+/* Ensure date doesn't break layout on small screens */
+@media (max-width: 576px) {
+  .current-date {
+    display: none;
+  }
+
+  .app-header {
+    padding: 0.8rem;
+  }
+
+  .profile-meta {
+    font-size: 0.9rem;
+  }
+
+  .avatar-container {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Make sure sidebar mobile styles override defaults */
+.sidebar-mobile-visible {
+  transform: translateX(0) !important;
 }
 </style>

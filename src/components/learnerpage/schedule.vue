@@ -2,9 +2,9 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import api from "@/axios.js";
-
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+// Add this import for toast notifications
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 const baseURL = api.defaults.baseURL;
 
@@ -54,42 +54,73 @@ const prepareSchedule = () => {
     alert("Please select date, time and subject");
     return;
   }
-  showConfirmationModal.value = true;
+  // confirmSchedule;
+  // showConfirmationModal.value = true;
 };
 
 const confirmSchedule = async () => {
-  // Format date to match required format MM/DD/YYYY
-  const formattedDate = new Date(selectedDate.value).toLocaleDateString(
-    "en-US",
-    {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    }
-  );
+  // Validate required fields first
+  if (!selectedDate.value || !selectedTime.value || !selectedSubject.value) {
+    createToast("Please select date, time and subject", {
+      position: "bottom-right",
+      type: "warning",
+      transition: "slide",
+      timeout: 3000,
+      showIcon: true,
+    });
+    return;
+  }
 
-  // Extract hour and format time HH:MM
-  const timeMatch = selectedTime.value.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  let hours = parseInt(timeMatch[1]);
-  const minutes = timeMatch[2];
-  const period = timeMatch[3].toUpperCase();
-
-  if (period === "PM" && hours < 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-
-  const formattedTime = `${String(hours).padStart(2, "0")}:${minutes}`;
-
-  // Create the JSON structure with subject included
-  const scheduleData = {
-    participant_id: mentorNo,
-    date: formattedDate,
-    time: formattedTime,
-    location:
-      sessionType.value === "in-person" ? meetingLocation.value : "online",
-    subject: selectedSubject.value,
-  };
+  // Location validation for in-person sessions
+  if (sessionType.value === "in-person" && !meetingLocation.value) {
+    createToast("Please enter a meeting location", {
+      position: "bottom-right",
+      type: "warning",
+      transition: "slide",
+      timeout: 3000,
+      showIcon: true,
+    });
+    return;
+  }
 
   try {
+    // Format date to match required format MM/DD/YYYY
+    const formattedDate = new Date(selectedDate.value).toLocaleDateString(
+      "en-US",
+      {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      }
+    );
+
+    // Extract hour and format time HH:MM
+    const timeMatch = selectedTime.value.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!timeMatch) {
+      throw new Error("Invalid time format");
+    }
+
+    let hours = parseInt(timeMatch[1]);
+    const minutes = timeMatch[2];
+    const period = timeMatch[3].toUpperCase();
+
+    if (period === "PM" && hours < 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+
+    const formattedTime = `${String(hours).padStart(2, "0")}:${minutes}`;
+
+    // Create the JSON structure with subject included
+    const scheduleData = {
+      participant_id: mentorNo,
+      date: formattedDate,
+      time: formattedTime,
+      location:
+        sessionType.value === "in-person" ? meetingLocation.value : "online",
+      subject: selectedSubject.value,
+    };
+
+    console.log("Sending schedule data:", scheduleData);
+
     const response = await api.post(
       "/api/learner/scheduleCreate",
       scheduleData,
@@ -98,20 +129,33 @@ const confirmSchedule = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
 
-    console.log("Selected Subject:", selectedSubject.value);
-    console.log("Schedule Data:", scheduleData);
+    console.log("Schedule response:", response);
 
+    createToast("Schedule created successfully", {
+      position: "bottom-right",
+      type: "success", // Changed from "danger" to "success"
+      transition: "slide",
+      timeout: 3000,
+      showIcon: true,
+      toastBackgroundColor: "#319cb0", // Changed to a more appropriate color
+    });
+
+    // Emit events to parent component
     emit("confirm", scheduleData);
     emit("close");
   } catch (error) {
     console.error("Error in schedule confirmation:", error);
-  } finally {
-    showConfirmationModal.value = false;
+    createToast("Failed to create schedule. Please try again.", {
+      position: "bottom-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 3000,
+      showIcon: true,
+    });
   }
 };
 
@@ -476,7 +520,7 @@ const isToday = (date) => {
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button @click="prepareSchedule" type="button" class="btn-proceed">
+      <button @click="confirmSchedule" type="button" class="btn-proceed">
         PROCEED
       </button>
     </div>
@@ -1023,5 +1067,13 @@ const isToday = (date) => {
 
 .modal-btn-confirm:hover {
   background-color: #1f6d7e;
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

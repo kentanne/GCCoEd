@@ -43,9 +43,9 @@
           </div>
           <button type="submit">Login</button>
         </form>
-        <p class="switch-link">
+        <!-- <p class="switch-link">
           Don't have an account? <router-link to="/signup">Sign up</router-link>
-        </p>
+        </p> -->
       </div>
     </main>
   </div>
@@ -57,6 +57,8 @@ import { useRouter } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
 import api from "@/axios";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 const router = useRouter();
 const email = ref("");
@@ -115,6 +117,15 @@ async function login() {
       .then((response) => {
         console.log("Login successful:", response.data);
 
+        createToast("Login successful!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+
         switch (response.data.user_role) {
           case null:
             router.push("/signup");
@@ -133,6 +144,17 @@ async function login() {
             break;
         }
         // return response;
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        createToast("Login failed. Please try again.", {
+          position: "bottom-right",
+          type: "error",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#e74c3c",
+        });
       });
   } catch (error) {
     console.error("Login failed:", error);
@@ -412,5 +434,14 @@ display: none;
     max-width: 450px;
     padding: 2.5rem;
   }
+}
+/* Add this after your existing styles */
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

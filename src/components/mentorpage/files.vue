@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import { useDropZone } from "@vueuse/core";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -30,6 +32,14 @@ const uploadFiles = async () => {
       })
       .then((response) => {
         console.log("File upload response:", response.data);
+        createToast("File uploaded successfully!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
         files.value = []; // Clear the files after upload
       });
   } catch (error) {
@@ -431,7 +441,6 @@ onMounted(() => {
 
 .custom-file-upload:hover {
   background-color: rgb(54, 87, 105);
-;
 }
 
 /* Files Display Section Styles */
@@ -451,17 +460,15 @@ onMounted(() => {
   margin-bottom: 1rem;
   border-bottom: 5px solid rgb(26, 71, 112);
   padding-bottom: 1rem;
-
 }
 
 .files-header h3 {
-  color: rgb(40, 70, 86);;
+  color: rgb(40, 70, 86);
   font-size: 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin: 0;
-;
 }
 
 .file-count {
@@ -595,7 +602,7 @@ onMounted(() => {
 
 .upload-btn {
   background-color: rgb(209, 207, 207);
-  color:  rgb(40, 70, 86);
+  color: rgb(40, 70, 86);
   padding: 0.75rem 2rem;
   font-size: 1rem;
   font-weight: 600;
@@ -657,5 +664,13 @@ onMounted(() => {
   .file-name {
     max-width: 180px;
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

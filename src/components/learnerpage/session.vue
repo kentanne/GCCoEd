@@ -4,6 +4,8 @@ import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -751,7 +753,7 @@ const downloadFile = async (fileId, fileName) => {
   align-items: center;
   gap: 0.6rem;
   flex: 1;
-  min-width: 0; 
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -760,7 +762,7 @@ const downloadFile = async (fileId, fileName) => {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.85rem;
-  margin: 0; 
+  margin: 0;
 }
 
 .last > div:last-child {
@@ -847,7 +849,7 @@ const downloadFile = async (fileId, fileName) => {
   border: 2px solid #e0e0e0;
   transform: translateX(170px);
   height: 35rem;
-    overflow-y: auto;
+  overflow-y: auto;
   max-height: calc(70vh - 60px);
   padding: 0;
 }
@@ -908,19 +910,19 @@ const downloadFile = async (fileId, fileName) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(0,0,0,0.1);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
   color: rgb(36, 56, 92);
 }
 
 .close-button {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: rgb(30, 50, 73);
   font-size: 1.2rem;
@@ -935,7 +937,7 @@ const downloadFile = async (fileId, fileName) => {
 }
 
 .close-button:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .modal-body {
@@ -1056,7 +1058,7 @@ const downloadFile = async (fileId, fileName) => {
 }
 
 .file-actions .modal-button.preview {
-  background-color: #2196F3;
+  background-color: #2196f3;
   color: white;
 }
 
@@ -1065,7 +1067,7 @@ const downloadFile = async (fileId, fileName) => {
 }
 
 .file-actions .modal-button.download {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 

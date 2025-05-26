@@ -124,9 +124,9 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-for="record in records" :key="record.id">
-            <td>{{ record.reviewer.user.name }}</td>
+            <td>{{ record.reviewer.name }}</td>
             <td>{{ record.reviewer.course.match(/\(([^)]+)\)/)?.[1] }}</td>
-           <td>{{ record.reviewer.year }}</td>
+            <td>{{ record.reviewer.year }}</td>
             <td>
               <div class="stars">
                 <span v-for="i in 5" :key="i" class="star">
@@ -185,7 +185,9 @@ onMounted(() => {
                     <span class="info-label"
                       ><i class="fas fa-graduation-cap"></i> Course</span
                     >
-                    <span class="info-value">{{ recordView.reviewer.course.match(/\(([^)]+)\)/)?.[1] }}</span>
+                    <span class="info-value">{{
+                      recordView.reviewer.course.match(/\(([^)]+)\)/)?.[1]
+                    }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label"
@@ -365,11 +367,11 @@ onMounted(() => {
   background-color: rgba(59, 154, 169, 0.05);
 }
 
-.data-table th:nth-child(1),  
-.data-table td:nth-child(1) { 
-  width: 270px; 
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  width: 270px;
   max-width: 300px;
-  min-width: 80px; 
+  min-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

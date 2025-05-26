@@ -5,13 +5,25 @@ import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
 import api from "@/axios.js";
 import axios from "axios";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const baseURL = api.defaults.baseURL;
 
 const router = useRouter();
 
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+// Add loading state
+const isLoading = ref(false);
+
+const startLoading = () => {
+  isLoading.value = true;
+};
+
+const stopLoading = () => {
+  isLoading.value = false;
+};
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -144,8 +156,30 @@ const switchRole = async () => {
         },
       })
       .then((response) => {
+        createToast("Role switched!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
         console.log("Role switched:", response.data);
         router.push("/login");
+      })
+      .catch((error) => {
+        // console.error("Error switching role:", error);
+        createToast(
+          "Failed to switch role. Please try again or Register as Mentor.",
+          {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#e74c3c",
+          }
+        );
       });
   } catch (error) {
     console.error("Error switching role:", error);
@@ -362,20 +396,92 @@ const fetchUserInformation = () => {
   ];
 };
 
+const isSidebarVisible = ref(false); // For mobile devices only
+const isMobileView = ref(false);
+
+// Function to toggle sidebar on mobile
+const toggleSidebar = () => {
+  isSidebarVisible.value = !isSidebarVisible.value;
+};
+
+// Check if we're on mobile view on mount and window resize
+const checkMobileView = () => {
+  isMobileView.value = window.innerWidth <= 768;
+  // On larger screens, always show sidebar
+  if (!isMobileView.value) {
+    isSidebarVisible.value = true;
+  }
+};
+
+// Update onMounted to include mobile view check
 onMounted(async () => {
-  users.value = fetchUserInformation();
-  await getLearnerDets();
-  await sessionInfo();
-  await mentorProfile();
-  await sessionForReview();
-  await fetchMentFiles();
-  console.log("User data:", userData.value);
+  try {
+    // Start loading before any fetch operations
+    startLoading();
+
+    // Check initial screen size
+    checkMobileView();
+    window.addEventListener("resize", checkMobileView);
+
+    // Use Promise.all to wait for all fetch operations to complete
+    await Promise.all([
+      getLearnerDets(),
+      sessionInfo(),
+      mentorProfile(),
+      sessionForReview(),
+      fetchMentFiles(),
+    ]);
+
+    console.log("All data loaded successfully");
+  } catch (error) {
+    console.error("Error loading data:", error);
+    createToast("Error loading data. Please refresh the page.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+  } finally {
+    // Hide loading overlay when all operations are complete or if there's an error
+    stopLoading();
+  }
 });
 </script>
 
 <template>
-  <!-- sidebar -->
-  <div class="sidebar">
+  <!-- Loading Overlay -->
+  <loading
+    v-model:active="isLoading"
+    :can-cancel="false"
+    :is-full-page="true"
+    :opacity="1"
+    :color="'#006981'"
+    loader="spinner"
+    background-color="#ffffff"
+  />
+
+  <!-- Mobile Sidebar Toggle Button (only visible on mobile) -->
+  <button v-if="isMobileView" class="sidebar-toggle" @click="toggleSidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay to close sidebar on mobile -->
+  <div
+    v-if="isMobileView && isSidebarVisible"
+    class="sidebar-overlay"
+    @click="toggleSidebar"
+  ></div>
+
+  <!-- sidebar with conditional classes -->
+  <div
+    class="sidebar"
+    :class="{
+      'sidebar-mobile-visible': isSidebarVisible,
+      'sidebar-mobile': isMobileView,
+    }"
+  >
+    <!-- Existing sidebar content -->
     <div class="logo-container">
       <img src="/src/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo" />
       <span class="logo-text">GCCoEd</span>
@@ -496,8 +602,11 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- updated topbar with icon beside text -->
-  <div class="topbar">
+  <!-- updated topbar with responsive classes -->
+  <div
+    class="topbar"
+    :class="{ 'topbar-expanded': isMobileView && !isSidebarVisible }"
+  >
     <div class="topbar-left">
       <div
         @click="switchComponent('main')"
@@ -536,8 +645,11 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- main content -->
-  <div class="main-content">
+  <!-- main content with responsive class -->
+  <div
+    class="main-content"
+    :class="{ 'content-expanded': isMobileView && !isSidebarVisible }"
+  >
     <component
       :userInformation="filteredUsers"
       :is="componentMap[activeComponent] || mainView"
@@ -1065,6 +1177,21 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* Add loading overlay styles */
+.vl-overlay {
+  z-index: 9999 !important;
+}
+
+.vl-icon {
+  border-top-color: #006981 !important;
+  border-left-color: #006981 !important;
+}
+
+.vl-backdrop {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(2px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .sidebar {
@@ -1113,5 +1240,134 @@ onMounted(async () => {
   .topbar-date {
     display: none;
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
+
+/* Add these new style rules */
+
+/* Mobile Sidebar Toggle Button */
+.sidebar-toggle {
+  display: none;
+  background: #006981;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1002;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00819d;
+}
+
+/* Overlay for closing sidebar on mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  /* Show mobile toggle button */
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  /* Show overlay when sidebar is visible */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Default state for sidebar on mobile */
+  .sidebar-mobile {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  /* State when sidebar is toggled visible */
+  .sidebar-mobile-visible {
+    transform: translateX(0);
+  }
+
+  /* Adjust topbar when sidebar is hidden */
+  .topbar-expanded {
+    left: 0;
+    padding-left: 70px;
+  }
+
+  /* Adjust main content when sidebar is hidden */
+  .content-expanded {
+    padding-left: 20px;
+  }
+
+  /* Update main content area */
+  .main-content {
+    padding-left: 20px;
+    transition: padding-left 0.3s ease;
+  }
+
+  /* Update topbar */
+  .topbar {
+    transition: left 0.3s ease, padding-left 0.3s ease;
+  }
+
+  /* Make topbar scrollable horizontally */
+  .topbar {
+    left: 0 !important;
+    padding-left: 70px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    white-space: nowrap;
+  }
+
+  .topbar-left {
+    display: flex;
+    min-width: max-content; /* Ensure content doesn't wrap */
+  }
+
+  /* Hide scrollbar while maintaining functionality */
+  .topbar::-webkit-scrollbar {
+    height: 0;
+    display: none;
+  }
+
+  .topbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
+/* Make sure other conflicting style rules are overridden */
+.sidebar-mobile-visible {
+  transform: translateX(0) !important;
+}
+
+/* Add styles for scrollable topbar */
+.topbar-option {
+  flex-shrink: 0; /* Prevent options from shrinking */
 }
 </style>

@@ -98,13 +98,36 @@ const resetUserPass = async () => {
       password_confirmation: password_confirmation.value,
     };
 
-    const response = await api.patch("/api/reset-password", newPass, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
+    const response = await api
+      .patch("/api/reset-password", newPass, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Password reset response:", response.data);
+        createToast("Password reset successfully", {
+          position: "top-right",
+          type: "danger",
+          transition: "slide",
+          timeout: 3000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+      })
+      .catch((error) => {
+        console.error("Error resetting password:", error);
+        createToast("Failed to reset password", {
+          position: "top-right",
+          type: "danger",
+          transition: "slide",
+          timeout: 3000,
+          showIcon: true,
+          toastBackgroundColor: "#e53e3e",
+        });
+      });
 
     if (response.status === 200) {
       success.value = "Password reset successfully! Redirecting to login...";
@@ -411,5 +434,13 @@ button:disabled {
   .brand-name {
     font-size: 1.7rem;
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

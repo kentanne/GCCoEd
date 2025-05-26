@@ -4,6 +4,8 @@ import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -43,15 +45,36 @@ function getCookie(name) {
 
 const sendReminder = async (item) => {
   try {
-    const response = await api.post("/api/send/session/reminder/" + item.id, {
-      withCredentials: true,
-      header: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    });
-    console.log(response.data);
+    const response = await api
+      .post("/api/send/session/reminder/" + item.id, {
+        withCredentials: true,
+        header: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Reminder sent successfully!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+        } else {
+          createToast("Failed to send reminder.", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      });
+    // console.log(response.data);
     // Show success message or notification
   } catch (error) {
     console.error("Error sending reminder:", error);
@@ -62,14 +85,35 @@ const sendReminder = async (item) => {
 
 const cancelSession = async (item) => {
   try {
-    const response = await api.post("/api/send/session/cancel/" + item.id, {
-      withCredentials: true,
-      header: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    });
+    const response = await api
+      .post("/api/send/session/cancel/" + item.id, {
+        withCredentials: true,
+        header: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Session cancelled successfully!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+        } else {
+          createToast("Failed to cancel session.", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      });
     console.log(response.data);
     todaySchedule.value = todaySchedule.value.filter(
       (session) => session.id !== item.id
@@ -746,7 +790,6 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -977,5 +1020,14 @@ onUnmounted(() => {
   .envelope {
     width: 16px !important;
   }
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>
