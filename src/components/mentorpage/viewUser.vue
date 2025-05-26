@@ -174,7 +174,7 @@ onMounted(() => {
           <div class="info-grid">
             <div class="info-item">
               <span class="info-label"
-                ><i class="fas fa-venus-mars"></i> Gender</span
+                ><i class="fas fa-venus-mars"></i> Sex at Birth</span
               >
               <span class="info-value">{{ gender || "N/A" }}</span>
             </div>

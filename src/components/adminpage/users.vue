@@ -177,7 +177,7 @@
                 </div>
                 <div class="info-item">
                   <span class="info-label"
-                    ><i class="fas fa-venus-mars"></i> Gender</span
+                    ><i class="fas fa-venus-mars"></i> Sex at Birth</span
                   >
                   <span class="info-value">{{
                     capitalizeFirstLetter(currentUser.gender)
@@ -610,7 +610,7 @@ const exportUserToPDF = async (user) => {
             <td>${user.department || "College of Computer Studies"}</td>
           </tr>
           <tr>
-            <td class="info-label">Gender</td>
+            <td class="info-label">Sex at Birth</td>
             <td>${user.gender || "Not specified"}</td>
           </tr>
           <tr>

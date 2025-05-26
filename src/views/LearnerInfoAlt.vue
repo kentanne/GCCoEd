@@ -66,46 +66,32 @@
         </div>
 
         <div class="personal-field">
-          <label class="personal-label required" for="gender">GENDER</label>
+          <label class="personal-label required" for="gender">SEX AT BIRTH</label>
           <div class="gender-dropdown">
             <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
                 type="text"
                 v-model="gender"
-                placeholder="Select your gender"
+                placeholder="Select your sex"
                 class="personal-input"
                 readonly
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
-            <div v-if="dropdownOpen.gender" class="dropdown-options">
+             <div v-if="dropdownOpen.gender" class="dropdown-options">
               <div class="dropdown-option" @click="selectGender('Female')">
                 Female
               </div>
               <div class="dropdown-option" @click="selectGender('Male')">
                 Male
               </div>
-              <div class="dropdown-option" @click="selectGender('Non-binary')">
-                Non-binary
-              </div>
-              <div class="dropdown-option" @click="selectGender('Other')">
-                Other
-              </div>
-            </div>
-          </div>
-          <div v-if="gender === 'Other'" class="other-gender-input">
-            <label class="personal-label">Please specify: </label>
-            <input
-              type="text"
-              v-model="otherGender"
-              class="gender-specify"
-              placeholder="Specify your gender"
-            />
           </div>
           <span v-if="validationErrors.gender" class="validation-message">
             {{ validationErrors.gender }}
           </span>
         </div>
+        </div>
+
 
         <div class="personal-field">
           <label class="personal-label" for="year-level">YEAR LEVEL </label>
