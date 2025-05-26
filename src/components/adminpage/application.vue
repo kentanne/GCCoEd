@@ -12,7 +12,6 @@
           :class="{ active: activeFilter === 'all' }"
           @click="activeFilter = 'all'"
         >
-        
           All
         </button>
         <button
@@ -185,8 +184,9 @@
                 class="profile-image"
               />
               <div
-                v-if="currentApp.status !== 'resubmission'"
+                v-if="currentApp.status"
                 class="status-badge"
+                :class="currentApp.status.toLowerCase()"
               >
                 {{ currentApp.status }}
               </div>
@@ -362,10 +362,12 @@
 <script setup>
 import { ref, computed, onMounted, capitalize } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 // import { get } from "core-js/core/dict";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+const baseURL = api.defaults.baseURL;
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -375,15 +377,15 @@ const getCookie = (name) => {
 
 const approve = async (id) => {
   try {
-    const response = await axios.patch(
-      `http://localhost:8000/api/admin/mentor/approve/${id}`,
+    const response = await api.patch(
+      `/api/admin/mentor/approve/${id}`,
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
+          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
@@ -401,15 +403,15 @@ const approve = async (id) => {
 
 const reject = async (id) => {
   try {
-    const response = await axios.patch(
-      `http://localhost:8000/api/admin/mentor/reject/${id}`,
+    const response = await api.patch(
+      `/api/admin/mentor/reject/${id}`,
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
+          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
@@ -427,14 +429,11 @@ const reject = async (id) => {
 
 const getApplicantDetails = async (applicantId) => {
   try {
-    const response = await axios.get(
-      `http://localhost:8000/api/admin/${applicantId}`,
-      {
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.get(`/api/admin/${applicantId}`, {
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    });
 
     if (response.status === 200) {
       console.log("User details fetched successfully:", response.data);
@@ -449,17 +448,14 @@ const getApplicantDetails = async (applicantId) => {
 
 const getApplicantCreds = async (applicationId) => {
   try {
-    const response = await axios.get(
-      "http://localhost:8000/api/admin/cred/" + applicationId,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-      }
-    );
+    const response = await api.get("/api/admin/cred/" + applicationId, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    });
 
     if (response.status === 200) {
       console.log("Applicant credentials fetched successfully:", response.data);
@@ -664,14 +660,28 @@ const confirmAction = async () => {
       console.log("Application rejected successfully");
     }
 
-    // Refresh the applications list or update local state
-    const appIndex = props.applicantsList.applicants.findIndex(
-      (app) => app.user_id === currentAppId.value
-    );
+    // Get the array based on status
+    const status = actionToConfirm.value.toLowerCase();
+    const mentorsList = props.applicantsList.mentors;
 
-    if (appIndex !== -1) {
-      props.applicantsList.applicants[appIndex].status =
-        actionToConfirm.value.toLowerCase();
+    if (mentorsList) {
+      // Find the application in the pending array
+      const pendingIndex = mentorsList.pending.findIndex(
+        (app) => app.user_id === currentAppId.value
+      );
+
+      if (pendingIndex !== -1) {
+        // Remove from pending
+        const updatedApp = mentorsList.pending.splice(pendingIndex, 1)[0];
+        // Update status
+        updatedApp.status = status;
+        // Add to appropriate array
+        if (status === "approved") {
+          mentorsList.approved.push(updatedApp);
+        } else if (status === "rejected") {
+          mentorsList.rejected.push(updatedApp);
+        }
+      }
     }
 
     // Close the confirmation modal
@@ -698,11 +708,12 @@ const showCredentials = async (app) => {
       // ... existing user details ...
       applicant: data.user.name || "N/A",
       image: data.info.image
-        ? "http://localhost:8000/api/image/" + data.info.image
+        ? `${baseURL}/api/image/` + data.info.image
         : "default-image-url",
-      status:
-        capitalizeFirstLetter(data.info.approval_status) ||
-        data.info.approval_status,
+      // Update status to show "Pending" as default
+      status: data.info.approval_status
+        ? capitalizeFirstLetter(data.info.approval_status)
+        : "Pending",
       gender: data.info.gender?.toUpperCase() || "N/A",
       year: data.info.year || "N/A",
       program: data.info.course || "N/A",
@@ -1237,7 +1248,12 @@ onMounted(async () => {
   color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transform: translateY(25%);
-  background-color: #ef6c00; /* Default color for pending */
+}
+
+/* Status-specific colors */
+.status-badge.pending,
+.status-badge.pending_approval {
+  background-color: #ef6c00;
 }
 
 .status-badge.approved {
@@ -1246,11 +1262,6 @@ onMounted(async () => {
 
 .status-badge.rejected {
   background-color: #c62828;
-}
-
-.status-badge.pending,
-.status-badge.pending_approval {
-  background-color: #ef6c00;
 }
 
 .profile-info {

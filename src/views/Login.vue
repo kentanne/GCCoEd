@@ -12,15 +12,15 @@
         <form @submit.prevent="login">
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
-              <div class="input-with-icon">
+            <div class="input-with-icon">
               <i class="fas fa-user"></i>
-            <input
-              type="text"
-              v-model="email"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+              <input
+                type="text"
+                v-model="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
@@ -37,9 +37,9 @@
                 required
               />
             </div>
-        <p class="switch-link">
-          <router-link to="/forgot-password">Forgot Password?</router-link>
-        </p>
+            <p class="switch-link">
+              <router-link to="/forgot-password">Forgot Password?</router-link>
+            </p>
           </div>
           <button type="submit">Login</button>
         </form>
@@ -51,97 +51,101 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
-// import api from "../axios.js"; // Adjust the path as necessary
 import api from "@/axios";
 
-// axios.defaults.withCredentials = true; // Enable sending cookies with requests
-// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
+const router = useRouter();
+const email = ref("");
+const password = ref("");
+const passwordVisible = ref(false);
 
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
+  try {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return decodeURIComponent(parts.pop().split(";").shift());
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting cookie:", error);
+    return null;
+  }
 }
 
-export default {
-  name: "LoginComponent",
-  components: { Navbar },
-  data() {
-    return {
-      logo,
-      email: "",
-      password: "",
-      passwordVisible: false,
+async function csrf() {
+  try {
+    await api.get("/sanctum/csrf-cookie");
+    console.log("CSRF cookie set successfully");
+    return true;
+  } catch (error) {
+    console.error("Error setting CSRF cookie:", error);
+    return false;
+  }
+}
+
+async function login() {
+  try {
+    // await csrf().then((success) => {
+    //   if (!success) {
+    //     console.error("Failed to set CSRF cookie");
+    //     return;
+    //   }
+
+    console.log("All cookies:", document.cookie);
+    const token = getCookie("XSRF-TOKEN");
+    console.log("Retrieved XSRF-TOKEN:", token);
+
+    const loginData = {
+      login: email.value,
+      password: password.value,
     };
-  },
-  methods: {
-    async csrf() {
-      try {
-        await api.get("/sanctum/csrf-cookie");
-        console.log("CSRF cookie set successfully");
-        return true;
-      } catch (error) {
-        console.error("Error setting CSRF cookie:", error);
-        return false;
-      }
-    },
-    async login() {
-      try {
-        // Set CSRF token before login attempt
-        const csrfSet = await this.csrf();
-        if (!csrfSet) {
-          console.error("Failed to set CSRF token");
-          return;
-        }
 
-        const loginData = {
-          login: this.email,
-          password: this.password,
-        };
-
-        const response = await api.post(
-          "/api/login",
-          loginData,
-          {
-            withCredentials: true, // Ensure cookies are sent with the request
-            headers: {
-              "Content-Type": "application/json",
-              "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-            },
-          }
-        );
-
+    const response = api
+      .post("/api/login", loginData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
         console.log("Login successful:", response.data);
 
         switch (response.data.user_role) {
           case null:
-            this.$router.push("/signup");
+            router.push("/signup");
             break;
           case "learner":
-            this.$router.push("/learner");
+            router.push("/learner");
             break;
           case "mentor":
-            this.$router.push("/mentor");
+            router.push("/mentor");
             break;
           case "admin":
-            this.$router.push("/admin");
+            router.push("/admin");
             break;
           default:
             console.error("Unknown user role:", response.data.user_role);
+            break;
         }
-      } catch (error) {
-        console.error("Login failed:", error);
-      }
-    },
-    togglePasswordVisibility() {
-      this.passwordVisible = !this.passwordVisible;
-    },
-  },
-};
+        // return response;
+      });
+  } catch (error) {
+    console.error("Login failed:", error);
+  }
+}
+
+function togglePasswordVisibility() {
+  passwordVisible.value = !passwordVisible.value;
+}
+
+onMounted(async () => {
+  await csrf();
+});
 </script>
 
 <style scoped>
@@ -254,7 +258,7 @@ form {
 }
 
 .input-with-icon input {
-  padding: 0.8rem 2.5rem 0.8rem 1rem; 
+  padding: 0.8rem 2.5rem 0.8rem 1rem;
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
@@ -413,5 +417,4 @@ button:hover {
     padding: 2.5rem;
   }
 }
-
 </style>

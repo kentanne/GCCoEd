@@ -23,7 +23,6 @@
       </div>
     </header>
 
-    
     <!-- Main Content -->
     <div class="main-container">
       <!-- Sidebar Navigation -->
@@ -129,12 +128,13 @@ import dashboard from "@/components/adminpage/dashboard.vue";
 import application from "@/components/adminpage/application.vue";
 import users from "@/components/adminpage/users.vue";
 import axios from "axios";
+import api from "@/axios.js";
 import { useRouter } from "vue-router";
 const Router = useRouter();
 
 // Set axios defaults
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 // Cookie helper function
 function getCookie(name) {
@@ -176,12 +176,12 @@ const handleLogout = () => {
 // Update the fetch functions to store the data
 const fetchAll = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/api/admin", {
+    const response = await api.get("/api/admin", {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     });
 
@@ -210,17 +210,14 @@ const fetchAll = async () => {
 
 const fetchApplicants = async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:8000/api/admin/applicants",
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.get("/api/admin/applicants", {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
     applicantsList.value = response.data; // Store the applicants data
     console.log("Applicants:", applicantsList.value);
   } catch (error) {
@@ -230,15 +227,15 @@ const fetchApplicants = async () => {
 
 const logout = async () => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/logout/web",
+    const response = await api.post(
+      "/api/logout/web",
       {},
       {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );

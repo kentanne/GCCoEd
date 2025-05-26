@@ -121,7 +121,7 @@
           <div class="user-profile">
             <div class="profile-image-container">
               <img
-                :src="'http://localhost:8000/api/image/' + currentUser.image"
+                :src="`${baseURL}/api/image/` + currentUser.image"
                 :alt="`Portrait of ${currentUser.name}`"
                 class="profile-image"
               />
@@ -213,11 +213,9 @@
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Days of Availability:</span>
-                    <span class="detail-value">{{
-                      Array.isArray(currentUser.availability)
-                        ? currentUser.availability.join(", ")
-                        : currentUser.availability || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.availability) }}
+                    </span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Proficiency Level:</span>
@@ -227,11 +225,9 @@
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Teaching Style:</span>
-                    <span class="detail-value">{{
-                      Array.isArray(currentUser.teach_sty)
-                        ? currentUser.teach_sty.join(", ")
-                        : currentUser.teach_sty || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.teach_sty) }}
+                    </span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label"
@@ -243,11 +239,9 @@
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Subjects:</span>
-                    <span class="detail-value">{{
-                      Array.isArray(currentUser.subjects)
-                        ? currentUser.subjects.join(", ")
-                        : currentUser.subjects || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.subjects) }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -285,34 +279,34 @@
                   <div class="detail-item">
                     <span class="detail-label">Learning Modality:</span>
                     <span class="detail-value">{{
-                      currentUser.learningModality || "Not specified"
+                      currentUser.learn_modality || "Not specified"
                     }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Days of Availability:</span>
-                    <span class="detail-value">{{
-                      currentUser.availability || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.availability) }}
+                    </span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Learning Style:</span>
-                    <span class="detail-value">{{
-                      currentUser.learningStyle || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.learn_sty) }}
+                    </span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label"
                       >Preferred Session Duration:</span
                     >
                     <span class="detail-value">{{
-                      currentUser.sessionDuration || "Not specified"
+                      currentUser.prefSessDur || "Not specified"
                     }}</span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Subject of Interest:</span>
-                    <span class="detail-value">{{
-                      currentUser.subjectsInterest || "Not specified"
-                    }}</span>
+                    <span class="detail-value">
+                      {{ parseArrayString(currentUser.subjects) }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -332,7 +326,7 @@
                   <div class="detail-item2">
                     <span class="detail-label">Learning Goals:</span>
                     <span class="detail-value2">{{
-                      currentUser.learningGoals || "No goals provided"
+                      currentUser.goals || "No goals provided"
                     }}</span>
                   </div>
                 </div>
@@ -366,9 +360,12 @@ import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import logoGccoed from "@/assets/logo_gccoed.png";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const getCookies = () => {
   const cookies = document.cookie.split("; ");
@@ -731,6 +728,15 @@ const downloadFile = (file) => {
 const capitalizeFirstLetter = (str) => {
   if (!str) return "Not specified";
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+const parseArrayString = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed.join(", ") : str;
+  } catch (e) {
+    return str || "Not specified";
+  }
 };
 </script>
 

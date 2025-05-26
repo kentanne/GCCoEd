@@ -109,7 +109,11 @@ const handleStep2 = async () => {
     <div class="learning-element"></div>
 
     <header class="brand-header">
-      <img src="/src/assets/logo_gccoed.png" alt="GCCoed Logo" class="logo-img">
+      <img
+        src="/src/assets/logo_gccoed.png"
+        alt="GCCoed Logo"
+        class="logo-img"
+      />
       <span class="brand-name">GCCoed</span>
     </header>
     <div class="form-wrapper">
@@ -198,7 +202,7 @@ const handleStep2 = async () => {
                 </option>
               </select>
             </div>
-              <small style="">*If applicable</small>
+            <small style="">*If applicable</small>
           </div>
 
           <button type="submit" :disabled="loading">
@@ -215,9 +219,8 @@ const handleStep2 = async () => {
 </template>
 
 <style scoped>
-
-
-html, body {
+html,
+body {
   overflow: hidden;
   height: 100%;
   margin: 0;
@@ -238,7 +241,7 @@ html, body {
   opacity: 0.8;
   z-index: 0;
   animation: float 20s infinite linear;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .learning-element:nth-child(1) {
@@ -251,7 +254,7 @@ html, body {
   animation-duration: 25s;
 }
 .learning-element:nth-child(1)::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;
@@ -271,7 +274,7 @@ html, body {
   animation-delay: -5s;
 }
 .learning-element:nth-child(2)::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 15px;
   height: 6px;
@@ -292,7 +295,7 @@ html, body {
   animation-delay: -10s;
 }
 .learning-element:nth-child(3)::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 4px;
@@ -311,7 +314,7 @@ html, body {
   animation-delay: -7s;
 }
 .learning-element:nth-child(4)::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 45px;
   height: 30px;
@@ -342,7 +345,7 @@ html, body {
 .logo-img {
   height: 50px;
   width: auto;
-  margin: 1rem; 
+  margin: 1rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   display: inline-block;
   vertical-align: middle;
@@ -354,9 +357,9 @@ html, body {
   font-weight: 700;
   color: #2d3748;
   letter-spacing: 0.4px;
-  margin-top: 1.3rem; 
+  margin-top: 1.3rem;
   margin-left: 4px;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .form-wrapper {
@@ -472,9 +475,10 @@ small {
   font-size: 0.75em;
 }
 
-input, select {
+input,
+select {
   width: 100%;
-  padding: 0.8rem 2.5rem 0.8rem 0.8rem; 
+  padding: 0.8rem 2.5rem 0.8rem 0.8rem;
   border: 1.5px solid #d2d8e0;
   border-radius: 18px;
   font-size: 0.9rem;
@@ -525,7 +529,7 @@ button:active {
 }
 
 button::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -591,7 +595,6 @@ button:disabled {
   }
 }
 
-
 @media (max-width: 768px) {
   .form-wrapper {
     margin: 20px 10px;
@@ -600,7 +603,7 @@ button:disabled {
   .brand-name {
     font-size: 1.7rem;
   }
-    button {
+  button {
     padding: 8px;
     bottom: 1rem;
   }
@@ -626,9 +629,8 @@ button:disabled {
     bottom: 1rem;
   }
 
-  .brand-name{
+  .brand-name {
     font-size: 1.7rem;
   }
 }
-
 </style>

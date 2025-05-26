@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const props = defineProps({
   feedbacks: {
@@ -165,7 +168,10 @@ onMounted(() => {
             <div class="user-profile">
               <div class="profile-image-container">
                 <img
-                  :src="'http://localhost:8000/api/image/' + recordView.reviewer.image || 'https://placehold.co/600x400'"
+                  :src="
+                    `${baseURL}/api/image/` + recordView.reviewer.image ||
+                    'https://placehold.co/600x400'
+                  "
                   :alt="`Portrait of ${recordView.reviewer.name}`"
                   class="profile-image"
                 />
@@ -185,7 +191,9 @@ onMounted(() => {
                     <span class="info-label"
                       ><i class="fas fa-calendar-alt"></i> Year Level</span
                     >
-                    <span class="info-value">{{ recordView.reviewer.year }}</span>
+                    <span class="info-value">{{
+                      recordView.reviewer.year
+                    }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label"
@@ -193,7 +201,9 @@ onMounted(() => {
                     >
                     <span class="info-value">
                       <span v-for="i in 5" :key="i" class="star">
-                        <span v-if="i <= recordView.rating" class="filled">★</span>
+                        <span v-if="i <= recordView.rating" class="filled"
+                          >★</span
+                        >
                         <span v-else>☆</span>
                       </span>
                     </span>
@@ -211,7 +221,9 @@ onMounted(() => {
                 <hr class="divider2" />
                 <div class="bio-content">
                   <div class="detail-item2">
-                    <span class="detail-value2">{{ recordView.feedback || "No feedback provided" }}</span>
+                    <span class="detail-value2">{{
+                      recordView.feedback || "No feedback provided"
+                    }}</span>
                   </div>
                 </div>
               </div>

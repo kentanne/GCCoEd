@@ -3,9 +3,10 @@ import { ref, onMounted, onUnmounted, computed } from "vue";
 import Message from "./message.vue";
 import RescheduleDialog from "./RescheduleDialog.vue";
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   schedule: {
@@ -37,17 +38,14 @@ function getCookie(name) {
 
 const cancelSession = async (item) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/send/session/cancel/" + item.id,
-      {
-        withCredentials: true,
-        header: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api.post("/api/send/session/cancel/" + item.id, {
+      withCredentials: true,
+      header: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+      },
+    });
     console.log(response.data);
     todaySchedule.value = todaySchedule.value.filter(
       (session) => session.id !== item.id
@@ -124,7 +122,7 @@ const togglePopup = (type, index, event) => {
 const handleOptionClick = (option, item, event) => {
   event.stopPropagation();
   selectedItem.value = item;
-  
+
   switch (option) {
     case "reschedule":
       selectedSessionID.value = item.id;
@@ -161,13 +159,13 @@ onUnmounted(() => {
 });
 
 const previewFile = (fileId) => {
-  const response = axios
-    .get("http://localhost:8000/api/preview/file/" + fileId, {
+  const response = api
+    .get("/api/preview/file/" + fileId, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -180,14 +178,14 @@ const previewFile = (fileId) => {
 };
 
 const downloadFile = async (fileId, fileName) => {
-  axios
-    .get("http://localhost:8000/api/download/file/" + fileId, {
+  api
+    .get("/api/download/file/" + fileId, {
       responseType: "blob",
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -219,7 +217,7 @@ const downloadFile = async (fileId, fileName) => {
         Session Schedule
       </h2>
     </div>
-    
+
     <div class="lower-element">
       <div class="session-grid">
         <!-- Today Schedule -->
@@ -259,9 +257,7 @@ const downloadFile = async (fileId, fileName) => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">
-                        Reschedule
-                      </p>
+                      <p class="option-text">Reschedule</p>
                     </div>
                     <div
                       class="popup-option"
@@ -363,9 +359,7 @@ const downloadFile = async (fileId, fileName) => {
                         color="#066678"
                         class="option-icon"
                       />
-                      <p class="option-text">
-                        Reschedule
-                      </p>
+                      <p class="option-text">Reschedule</p>
                     </div>
                     <div
                       class="popup-option"
@@ -483,14 +477,25 @@ const downloadFile = async (fileId, fileName) => {
             <h3>Cancel Session</h3>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to cancel <strong>{{ selectedItem?.subject }}</strong> with <strong>{{ selectedItem?.mentor.user.name }}</strong>?</p>
+            <p>
+              Are you sure you want to cancel
+              <strong>{{ selectedItem?.subject }}</strong> with
+              <strong>{{ selectedItem?.mentor.user.name }}</strong
+              >?
+            </p>
             <p class="warning-text">This action cannot be undone.</p>
           </div>
           <div class="modal-footer">
-            <button class="modal-button cancel" @click="showCancelConfirmation = false">
+            <button
+              class="modal-button cancel"
+              @click="showCancelConfirmation = false"
+            >
               No, Keep It
             </button>
-            <button class="modal-button confirm danger" @click="cancelSession(selectedItem)">
+            <button
+              class="modal-button confirm danger"
+              @click="cancelSession(selectedItem)"
+            >
               Yes, Cancel Session
             </button>
           </div>
@@ -1081,12 +1086,12 @@ const downloadFile = async (fileId, fileName) => {
     grid-template-columns: 1fr;
     grid-gap: 1rem;
   }
-  
+
   .lower-element {
     height: auto;
     padding: 0.5rem;
   }
-  
+
   .session-card {
     padding: 0 0.3rem 0.5rem 0.3rem;
   }
@@ -1102,7 +1107,7 @@ const downloadFile = async (fileId, fileName) => {
   .table-header {
     padding: 1rem;
   }
-  
+
   .table-title {
     font-size: 1.1rem;
   }
@@ -1111,16 +1116,16 @@ const downloadFile = async (fileId, fileName) => {
     width: 95%;
     max-width: 400px;
   }
-  
+
   .today-card,
   .upcomming-card {
     padding: 0.7rem 0.9rem;
   }
-  
+
   .card-header h1 {
     font-size: 0.9rem;
   }
-  
+
   .info h2 {
     font-size: 0.85rem;
   }
@@ -1137,19 +1142,19 @@ const downloadFile = async (fileId, fileName) => {
     width: 100%;
     justify-content: center;
   }
-  
+
   .session-card h1 {
     font-size: 1rem;
   }
-  
+
   .info p {
     font-size: 0.8rem;
   }
-  
+
   .action-icons {
     gap: 0.6rem;
   }
-  
+
   .envelope,
   .file-icon {
     width: 16px !important;

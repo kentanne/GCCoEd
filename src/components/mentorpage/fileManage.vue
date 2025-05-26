@@ -101,7 +101,10 @@
             </td>
             <td>{{ file.file_size }} KB</td>
             <td>
-              <button @click="openFileActions(file, $event)" class="details-btn">
+              <button
+                @click="openFileActions(file, $event)"
+                class="details-btn"
+              >
                 <i class="fas fa-ellipsis-v"></i> <span>Actions</span>
               </button>
             </td>
@@ -114,7 +117,11 @@
     </div>
 
     <transition name="fade" mode="out-in">
-      <div v-if="showFileActions" class="modal-overlay" @click.self="closeFileActions">
+      <div
+        v-if="showFileActions"
+        class="modal-overlay"
+        @click.self="closeFileActions"
+      >
         <div class="file-modal">
           <div class="modal-header">
             <h3 class="modal-title">
@@ -124,7 +131,7 @@
               <i class="fas fa-times"></i>
             </button>
           </div>
-          
+
           <div class="modal-body">
             <div class="file-info">
               <div class="file-icon">
@@ -132,18 +139,27 @@
               </div>
               <div class="file-details">
                 <h4>{{ selectedFile.file_name }}</h4>
-                <p>{{ selectedFile.File_type }} • {{ selectedFile.file_size }} KB • {{ formatDate(selectedFile.created_at) }}</p>
+                <p>
+                  {{ selectedFile.File_type }} • {{ selectedFile.file_size }} KB
+                  • {{ formatDate(selectedFile.created_at) }}
+                </p>
               </div>
             </div>
-            
+
             <div class="action-buttons">
               <button @click="viewFile(selectedFile)" class="action-btn view">
                 <i class="fas fa-eye"></i> View
               </button>
-              <button @click="downloadFile(selectedFile)" class="action-btn download">
+              <button
+                @click="downloadFile(selectedFile)"
+                class="action-btn download"
+              >
                 <i class="fas fa-download"></i> Download
               </button>
-              <button @click="deleteFile(selectedFile)" class="action-btn delete">
+              <button
+                @click="deleteFile(selectedFile)"
+                class="action-btn delete"
+              >
                 <i class="fas fa-trash"></i> Delete
               </button>
             </div>
@@ -156,6 +172,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import api from "@/axios.js";
 import axios from "axios";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -163,8 +180,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faSearch);
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   files: {
@@ -196,26 +213,33 @@ const showTypeFilter = ref(false);
 
 const filteredFiles = computed(() => {
   let result = [...files.value];
-  
+
   // Apply type filter
   if (selectedFileType.value !== "all") {
-    result = result.filter(file => file.File_type === selectedFileType.value);
+    result = result.filter((file) => file.File_type === selectedFileType.value);
   }
-  
+
   // Apply search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter(file => 
-      file.file_name.toLowerCase().includes(query) || 
-      file.File_type.toLowerCase().includes(query)
+    result = result.filter(
+      (file) =>
+        file.file_name.toLowerCase().includes(query) ||
+        file.File_type.toLowerCase().includes(query)
     );
   }
-  
+
   // Apply sorting
   if (sortKey.value) {
     result.sort((a, b) => {
-      let compareA = sortKey.value === "file_size" ? Number(a[sortKey.value]) : a[sortKey.value];
-      let compareB = sortKey.value === "file_size" ? Number(b[sortKey.value]) : b[sortKey.value];
+      let compareA =
+        sortKey.value === "file_size"
+          ? Number(a[sortKey.value])
+          : a[sortKey.value];
+      let compareB =
+        sortKey.value === "file_size"
+          ? Number(b[sortKey.value])
+          : b[sortKey.value];
 
       if (sortKey.value === "created_at") {
         compareA = new Date(a[sortKey.value]);
@@ -227,12 +251,12 @@ const filteredFiles = computed(() => {
       return 0;
     });
   }
-  
+
   return result;
 });
 
 const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  const options = { year: "numeric", month: "short", day: "numeric" };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
@@ -253,13 +277,13 @@ const closeFileActions = () => {
 
 const viewFile = (file) => {
   console.log("Viewing file:", file);
-  axios
-    .get("http://localhost:8000/api/preview/file/" + file.id, {
+  api
+    .get("/api/preview/file/" + file.id, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -274,14 +298,14 @@ const viewFile = (file) => {
 
 const downloadFile = (file) => {
   console.log("Downloading file:", file.id);
-  axios
-    .get("http://localhost:8000/api/download/file/" + file.id, {
+  api
+    .get("/api/download/file/" + file.id, {
       responseType: "blob",
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -305,13 +329,13 @@ const downloadFile = (file) => {
 
 const deleteFile = (file) => {
   console.log("Deleting file:", file.id);
-  axios
-    .delete("http://localhost:8000/api/mentor/file/delete/" + file.id, {
+  api
+    .delete("/api/mentor/file/delete/" + file.id, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     })
     .then((response) => {
@@ -349,12 +373,12 @@ const toggleTypeFilter = (event) => {
 
 const getFileIcon = (fileType) => {
   const type = fileType.toLowerCase();
-  if (type.includes('pdf')) return 'fas fa-file-pdf';
-  if (type.includes('word')) return 'fas fa-file-word';
-  if (type.includes('excel')) return 'fas fa-file-excel';
-  if (type.includes('image')) return 'fas fa-file-image';
-  if (type.includes('video')) return 'fas fa-file-video';
-  return 'fas fa-file';
+  if (type.includes("pdf")) return "fas fa-file-pdf";
+  if (type.includes("word")) return "fas fa-file-word";
+  if (type.includes("excel")) return "fas fa-file-excel";
+  if (type.includes("image")) return "fas fa-file-image";
+  if (type.includes("video")) return "fas fa-file-video";
+  return "fas fa-file";
 };
 
 onMounted(() => {
@@ -405,7 +429,6 @@ onMounted(() => {
   max-height: 37.4rem;
   overflow-y: scroll;
 }
-
 
 .table-header {
   display: flex;

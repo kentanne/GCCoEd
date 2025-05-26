@@ -1,13 +1,20 @@
 <template>
   <div class="mentorinfo-container">
-
-        <button @click="scrollToGetStarted" class="back-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+    <button @click="scrollToGetStarted" class="back-btn">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z"
+          clip-rule="evenodd"
+        />
       </svg>
       Back
     </button>
-    
+
     <header class="page-header">
       <h1>MENTOR INFO</h1>
       <p>Complete your profile to start mentoring.</p>
@@ -17,310 +24,287 @@
       <!-- Step 1 Content -->
       <div v-if="currentStep === 1">
         <h2 class="title">I. PERSONAL INFORMATION</h2>
-       
-            <div class="personal-field">
-              <!-- For Address -->
-              <label class="personal-label required" for="address"
-                >ADDRESS</label
-              >
+
+        <div class="personal-field">
+          <!-- For Address -->
+          <label class="personal-label required" for="address">ADDRESS</label>
+          <input
+            type="text"
+            id="address"
+            v-model="address"
+            @input="validateField('address', address)"
+            @blur="validateField('address', address)"
+            placeholder="Enter your address"
+            class="personal-input"
+            :class="{ error: validationErrors.address }"
+          />
+          <span v-if="validationErrors.address" class="validation-message">
+            {{ validationErrors.address }}
+          </span>
+        </div>
+
+        <div class="personal-field">
+          <!-- For Contact Number -->
+          <label class="personal-label required" for="contact-number"
+            >CONTACT NUMBER</label
+          >
+          <input
+            type="text"
+            id="contact-number"
+            v-model="contactNumber"
+            @input="validateField('contactNumber', contactNumber)"
+            @blur="validateField('contactNumber', contactNumber)"
+            placeholder="Enter your contact number (11 digits)"
+            class="personal-input"
+            :class="{ error: validationErrors.contactNumber }"
+            maxlength="11"
+          />
+          <span
+            v-if="validationErrors.contactNumber"
+            class="validation-message"
+          >
+            {{ validationErrors.contactNumber }}
+          </span>
+        </div>
+
+        <div class="personal-field">
+          <!-- For Gender -->
+          <label class="personal-label required" for="gender">GENDER</label>
+          <div class="gender-dropdown">
+            <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
                 type="text"
-                id="address"
-                v-model="address"
-                @input="validateField('address', address)"
-                @blur="validateField('address', address)"
-                placeholder="Enter your address"
+                v-model="gender"
+                placeholder="Select your gender"
                 class="personal-input"
-                :class="{ error: validationErrors.address }"
+                readonly
               />
-              <span v-if="validationErrors.address" class="validation-message">
-                {{ validationErrors.address }}
-              </span>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
-
-            <div class="personal-field">
-              <!-- For Contact Number -->
-              <label class="personal-label required" for="contact-number"
-                >CONTACT NUMBER</label
-              >
-              <input
-                type="text"
-                id="contact-number"
-                v-model="contactNumber"
-                @input="validateField('contactNumber', contactNumber)"
-                @blur="validateField('contactNumber', contactNumber)"
-                placeholder="Enter your contact number (11 digits)"
-                class="personal-input"
-                :class="{ error: validationErrors.contactNumber }"
-                maxlength="11"
-              />
-              <span
-                v-if="validationErrors.contactNumber"
-                class="validation-message"
-              >
-                {{ validationErrors.contactNumber }}
-              </span>
-            </div>
-
-            <div class="personal-field">
-              <!-- For Gender -->
-              <label class="personal-label required" for="gender">GENDER</label>
-              <div class="gender-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('gender')"
-                >
-                  <input
-                    type="text"
-                    v-model="gender"
-                    placeholder="Select your gender"
-                    class="personal-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.gender" class="dropdown-options">
-                  <div class="dropdown-option" @click="selectGender('Female')">
-                    Female
-                  </div>
-                  <div class="dropdown-option" @click="selectGender('Male')">
-                    Male
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectGender('Non-binary')"
-                  >
-                    Non-binary
-                  </div>
-                  <div class="dropdown-option" @click="selectGender('Other')">
-                    Other
-                  </div>
-                </div>
+            <div v-if="dropdownOpen.gender" class="dropdown-options">
+              <div class="dropdown-option" @click="selectGender('Female')">
+                Female
               </div>
-              <div v-if="gender === 'Other'" class="other-gender-input">
-                <label class="personal-label">Please specify: </label>
-                <input
-                  type="text"
-                  v-model="otherGender"
-                  class="gender-specify"
-                  placeholder="Specify your gender"
-                />
+              <div class="dropdown-option" @click="selectGender('Male')">
+                Male
               </div>
-              <span v-if="validationErrors.gender" class="validation-message">
-                {{ validationErrors.gender }}
-              </span>
-            </div>
-
-            <div class="personal-field">
-              <label class="personal-label" for="year-level">YEAR LEVEL </label>
-              <div class="year-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('yearLevel')"
-                >
-                  <input
-                    type="text"
-                    v-model="yearLevel"
-                    placeholder="Select your year level"
-                    class="personal-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.yearLevel" class="dropdown-options">
-                  <div
-                    class="dropdown-option"
-                    @click="selectYearLevel('1st Year')"
-                  >
-                    1st Year
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectYearLevel('2nd Year')"
-                  >
-                    2nd Year
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectYearLevel('3rd Year')"
-                  >
-                    3rd Year
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectYearLevel('4th Year')"
-                  >
-                    4th Year
-                  </div>
-                </div>
+              <div class="dropdown-option" @click="selectGender('Non-binary')">
+                Non-binary
               </div>
-            </div>
-            <div class="personal-field">
-              <label class="personal-label" for="program">PROGRAM </label>
-              <div class="program-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('program')"
-                >
-                  <input
-                    type="text"
-                    v-model="program"
-                    placeholder="Select your program"
-                    class="personal-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.program" class="dropdown-options">
-                  <div
-                    class="dropdown-option"
-                    @click="
-                      selectProgram(
-                        'Bachelor of Science in Information Technology (BSIT)'
-                      )
-                    "
-                  >
-                    Bachelor of Science in Information Technology (BSIT)
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="
-                      selectProgram(
-                        'Bachelor of Science in Computer Science (BSCS)'
-                      )
-                    "
-                  >
-                    Bachelor of Science in Computer Science (BSCS)
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="
-                      selectProgram(
-                        'Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)'
-                      )
-                    "
-                  >
-                    Bachelor of Science in Entertainment and Multimedia
-                    Computing (BSEMC)
-                  </div>
-                </div>
+              <div class="dropdown-option" @click="selectGender('Other')">
+                Other
               </div>
             </div>
           </div>
-          
+          <div v-if="gender === 'Other'" class="other-gender-input">
+            <label class="personal-label">Please specify: </label>
+            <input
+              type="text"
+              v-model="otherGender"
+              class="gender-specify"
+              placeholder="Specify your gender"
+            />
+          </div>
+          <span v-if="validationErrors.gender" class="validation-message">
+            {{ validationErrors.gender }}
+          </span>
+        </div>
+
+        <div class="personal-field">
+          <label class="personal-label" for="year-level">YEAR LEVEL </label>
+          <div class="year-dropdown">
+            <div
+              class="dropdown-container"
+              @click="toggleDropdown('yearLevel')"
+            >
+              <input
+                type="text"
+                v-model="yearLevel"
+                placeholder="Select your year level"
+                class="personal-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div v-if="dropdownOpen.yearLevel" class="dropdown-options">
+              <div class="dropdown-option" @click="selectYearLevel('1st Year')">
+                1st Year
+              </div>
+              <div class="dropdown-option" @click="selectYearLevel('2nd Year')">
+                2nd Year
+              </div>
+              <div class="dropdown-option" @click="selectYearLevel('3rd Year')">
+                3rd Year
+              </div>
+              <div class="dropdown-option" @click="selectYearLevel('4th Year')">
+                4th Year
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="personal-field">
+          <label class="personal-label" for="program">PROGRAM </label>
+          <div class="program-dropdown">
+            <div class="dropdown-container" @click="toggleDropdown('program')">
+              <input
+                type="text"
+                v-model="program"
+                placeholder="Select your program"
+                class="personal-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div v-if="dropdownOpen.program" class="dropdown-options">
+              <div
+                class="dropdown-option"
+                @click="
+                  selectProgram(
+                    'Bachelor of Science in Information Technology (BSIT)'
+                  )
+                "
+              >
+                Bachelor of Science in Information Technology (BSIT)
+              </div>
+              <div
+                class="dropdown-option"
+                @click="
+                  selectProgram(
+                    'Bachelor of Science in Computer Science (BSCS)'
+                  )
+                "
+              >
+                Bachelor of Science in Computer Science (BSCS)
+              </div>
+              <div
+                class="dropdown-option"
+                @click="
+                  selectProgram(
+                    'Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)'
+                  )
+                "
+              >
+                Bachelor of Science in Entertainment and Multimedia Computing
+                (BSEMC)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Step 2 Content -->
       <div v-if="currentStep === 2">
         <h2 class="title">II. PROFILE INFORMATION</h2>
 
-                  <!-- Profile Picture and Credentials Upload -->
-          <div class="upload-container">
-            <div class="profile-picture-upload">
-              <label class="profile-label">PROFILE PICTURE</label>
-              <div class="upload-controls" @click="uploadProfilePicture">
-                <div class="profile-preview-container">
-                  <img
-                    v-if="profileImage"
-                    :src="profileImage"
-                    alt="Profile Preview"
-                    class="profile-preview"
-                  />
-                  <i v-else class="fas fa-user-circle default-icon"></i>
+        <!-- Profile Picture and Credentials Upload -->
+        <div class="upload-container">
+          <div class="profile-picture-upload">
+            <label class="profile-label">PROFILE PICTURE</label>
+            <div class="upload-controls" @click="uploadProfilePicture">
+              <div class="profile-preview-container">
+                <img
+                  v-if="profileImage"
+                  :src="profileImage"
+                  alt="Profile Preview"
+                  class="profile-preview"
+                />
+                <i v-else class="fas fa-user-circle default-icon"></i>
+              </div>
+              <div class="upload-text">
+                <div class="choose-file-container">
+                  <i class="fas fa-upload"></i>
+                  <span>Choose File</span>
                 </div>
-                <div class="upload-text">
-                  <div class="choose-file-container">
-                    <i class="fas fa-upload"></i>
-                    <span>Choose File</span>
-                  </div>
-                  <input
-                    type="file"
-                    ref="profileInput"
-                    accept="image/*"
-                    style="display: none"
-                    @change="handleProfileUpload"
-                  />
-                  <span
-                    class="file-name"
-                    style="
-                      max-width: 150px;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                    "
-                    >{{ profilePictureName || "No file chosen" }}</span
-                  >
-                </div>
+                <input
+                  type="file"
+                  ref="profileInput"
+                  accept="image/*"
+                  style="display: none"
+                  @change="handleProfileUpload"
+                />
+                <span
+                  class="file-name"
+                  style="
+                    max-width: 150px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  "
+                  >{{ profilePictureName || "No file chosen" }}</span
+                >
               </div>
             </div>
+          </div>
 
-<div class="credentials-upload">
-  <label class="profile-label">CREDENTIALS</label>
-  <div class="upload-controls">
-    <i class="fas fa-file-upload upload-icon"></i>
-    <div class="choose-file-container" @click="uploadCredentials">
-      <span>Upload Credentials</span>
-    </div>
-    <input
-      type="file"
-      ref="credentialInput"
-      multiple
-      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-      style="display: none"
-      @change="handleCredentialUpload"
-    />
-    <a href="#" @click.prevent="toggleFileList" class="file-link"
-      >View Uploaded Files ({{ credentials.length }})</a
-    >
-  </div>
-</div>
- </div>
-
-                     <div class="divider"></div>
-
-                 <div class="profile-field">
-              <label class="profile-label" for="availability-days"
-                >DAYS OF AVAILABILITY</label
+          <div class="credentials-upload">
+            <label class="profile-label">CREDENTIALS</label>
+            <div class="upload-controls">
+              <i class="fas fa-file-upload upload-icon"></i>
+              <div class="choose-file-container" @click="uploadCredentials">
+                <span>Upload Credentials</span>
+              </div>
+              <input
+                type="file"
+                ref="credentialInput"
+                multiple
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                style="display: none"
+                @change="handleCredentialUpload"
+              />
+              <a href="#" @click.prevent="toggleFileList" class="file-link"
+                >View Uploaded Files ({{ credentials.length }})</a
               >
-              <div class="availability-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('availability')"
-                >
-                  <input
-                    type="text"
-                    id="availability-days"
-                    v-model="availabilityDaysDisplay"
-                    placeholder="Select available days"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div
-                  v-if="dropdownOpen.availability"
-                  class="dropdown-options availability-options"
-                >
-                  <div
-                    v-for="day in daysOfWeek"
-                    :key="day"
-                    class="dropdown-option availability-option"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'day-' + day"
-                      :value="day"
-                      v-model="selectedDays"
-                      @click.stop
-                    />
-                    <label :for="'day-' + day">{{ day }}</label>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="profile-field">
+          <label class="profile-label" for="availability-days"
+            >DAYS OF AVAILABILITY</label
+          >
+          <div class="availability-dropdown">
+            <div
+              class="dropdown-container"
+              @click="toggleDropdown('availability')"
+            >
+              <input
+                type="text"
+                id="availability-days"
+                v-model="availabilityDaysDisplay"
+                placeholder="Select available days"
+                class="profile-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div
+              v-if="dropdownOpen.availability"
+              class="dropdown-options availability-options"
+            >
+              <div
+                v-for="day in daysOfWeek"
+                :key="day"
+                class="dropdown-option availability-option"
+              >
+                <input
+                  type="checkbox"
+                  :id="'day-' + day"
+                  :value="day"
+                  v-model="selectedDays"
+                  @click.stop
+                />
+                <label :for="'day-' + day">{{ day }}</label>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div class="profile-field">
-              <!-- For Subjects Offered -->
-              <label class="profile-label required">SUBJECTS OFFERED</label>
-         <div class="dropdown-wrapper">
+        <div class="profile-field">
+          <!-- For Subjects Offered -->
+          <label class="profile-label required">SUBJECTS OFFERED</label>
+          <div class="dropdown-wrapper">
             <div class="dropdown-trigger" @click="toggleSubjectDropdown">
               <input
                 type="text"
@@ -384,232 +368,213 @@
           </span>
         </div>
 
-                   <div class="profile-field">
-              <label class="profile-label" for="teaching-style"
-                >TEACHING STYLE
-              </label>
-              <div class="teaching-style-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('learningStyle')"
-                >
-                  <input
-                    type="text"
-                    id="teaching-style"
-                    v-model="learningStyleDisplay"
-                    placeholder="Select teaching style(s)"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div
-                  v-if="dropdownOpen.learningStyle"
-                  class="dropdown-options teaching-style-options"
-                >
-                  <div
-                    v-for="style in sessionStyles"
-                    :key="style"
-                    class="dropdown-option teaching-style-option"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'style-' + style"
-                      :value="style"
-                      v-model="selectedsessionStyles"
-                      @click.stop
-                    />
-                    <label :for="'style-' + style">{{ style }}</label>
-                  </div>
-                </div>
-              </div>
+        <div class="profile-field">
+          <label class="profile-label" for="teaching-style"
+            >TEACHING STYLE
+          </label>
+          <div class="teaching-style-dropdown">
+            <div
+              class="dropdown-container"
+              @click="toggleDropdown('learningStyle')"
+            >
+              <input
+                type="text"
+                id="teaching-style"
+                v-model="learningStyleDisplay"
+                placeholder="Select teaching style(s)"
+                class="profile-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
-
-            <div class="profile-field">
-              <!-- For Teaching Modality -->
-              <label class="profile-label required" for="modality"
-                >TEACHING MODALITY</label
+            <div
+              v-if="dropdownOpen.learningStyle"
+              class="dropdown-options teaching-style-options"
+            >
+              <div
+                v-for="style in sessionStyles"
+                :key="style"
+                class="dropdown-option teaching-style-option"
               >
-              <div class="subjmodality-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('modality')"
-                >
-                  <input
-                    type="text"
-                    v-model="modality"
-                    placeholder="Select teaching modality"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.modality" class="dropdown-options">
-                  <div
-                    class="dropdown-option"
-                    @click="selectModality('Online')"
-                  >
-                    Online
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectModality('In-person')"
-                  >
-                    In-person
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectModality('Hybrid')"
-                  >
-                    Hybrid
-                  </div>
-                </div>
+                <input
+                  type="checkbox"
+                  :id="'style-' + style"
+                  :value="style"
+                  v-model="selectedsessionStyles"
+                  @click.stop
+                />
+                <label :for="'style-' + style">{{ style }}</label>
               </div>
             </div>
- 
-               <div class="profile-field">
-              <label class="profile-label" for="session-duration"
-                >PREFERRED SESSION DURATION
-              </label>
-              <div class="session-duration-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('sessionDuration')"
-                >
-                  <input
-                    type="text"
-                    v-model="sessionDuration"
-                    placeholder="Select duration"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div
-                  v-if="dropdownOpen.sessionDuration"
-                  class="dropdown-options"
-                >
-                  <div
-                    class="dropdown-option"
-                    @click="selectSessionDuration('1 hour')"
-                  >
-                    1 hour
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectSessionDuration('2 hours')"
-                  >
-                    2 hours
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectSessionDuration('3 hours')"
-                  >
-                    3 hours
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-                           <div class="profile-field">
-              <label class="profile-label" for="proficiency"
-                >PROFICIENCY LEVEL
-              </label>
-              <div class="proficiency-dropdown">
-                <div
-                  class="dropdown-container"
-                  @click="toggleDropdown('proficiency')"
-                >
-                  <input
-                    type="text"
-                    v-model="proficiency"
-                    placeholder="Select proficiency level"
-                    class="profile-input"
-                    readonly
-                  />
-                  <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div v-if="dropdownOpen.proficiency" class="dropdown-options">
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Beginner')"
-                  >
-                    Beginner
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Intermediate')"
-                  >
-                    Intermediate
-                  </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectProficiency('Advanced')"
-                  >
-                    Advanced
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-              <div class="profile-field">
-                <!-- For Bio -->
-                <label class="profile-label required" for="bio"
-                  >SHORT BIO</label
-                >
-                <textarea
-                  id="bio"
-                  v-model="bio"
-                  @input="validateField('bio', bio)"
-                  @blur="validateField('bio', bio)"
-                  placeholder="Tell us about yourself (50-500 characters)"
-                  rows="4"
-                  class="profile-textarea"
-                  :class="{ error: validationErrors.bio }"
-                ></textarea>
-                <span v-if="validationErrors.bio" class="validation-message">
-                  {{ validationErrors.bio }}
-                </span>
-              </div>
-
-                  <div class="profile-field">
-                <!-- For Experience -->
-                <label class="profile-label required" for="experience"
-                  >TUTORING EXPERIENCE</label
-                >
-                <textarea
-                  id="goals"
-                  v-model="experience"
-                  @input="validateField('experience', experience)"
-                  @blur="validateField('experience', experience)"
-                  placeholder="Describe your tutoring experience (50-500 characters)"
-                  rows="4"
-                  class="profile-textarea"
-                  :class="{ error: validationErrors.goals }"
-                ></textarea>
-                <span v-if="validationErrors.goals" class="validation-message">
-                  {{ validationErrors.goals }}
-                </span>
-              </div>
           </div>
-         </div>
-       </div>
-
-             <!-- Step Indicator -->
-      <div class="step-indicator-container">
-        <div class="step-indicator">
-          <div
-            v-for="step in totalSteps"
-            :key="step"
-            :class="[
-              'step',
-              { active: step === currentStep, completed: step < currentStep },
-            ]"
-            @click="goToStep(step)"
-          ></div>
         </div>
+
+        <div class="profile-field">
+          <!-- For Teaching Modality -->
+          <label class="profile-label required" for="modality"
+            >TEACHING MODALITY</label
+          >
+          <div class="subjmodality-dropdown">
+            <div class="dropdown-container" @click="toggleDropdown('modality')">
+              <input
+                type="text"
+                v-model="modality"
+                placeholder="Select teaching modality"
+                class="profile-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div v-if="dropdownOpen.modality" class="dropdown-options">
+              <div class="dropdown-option" @click="selectModality('Online')">
+                Online
+              </div>
+              <div class="dropdown-option" @click="selectModality('In-person')">
+                In-person
+              </div>
+              <div class="dropdown-option" @click="selectModality('Hybrid')">
+                Hybrid
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-field">
+          <label class="profile-label" for="session-duration"
+            >PREFERRED SESSION DURATION
+          </label>
+          <div class="session-duration-dropdown">
+            <div
+              class="dropdown-container"
+              @click="toggleDropdown('sessionDuration')"
+            >
+              <input
+                type="text"
+                v-model="sessionDuration"
+                placeholder="Select duration"
+                class="profile-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div v-if="dropdownOpen.sessionDuration" class="dropdown-options">
+              <div
+                class="dropdown-option"
+                @click="selectSessionDuration('1 hour')"
+              >
+                1 hour
+              </div>
+              <div
+                class="dropdown-option"
+                @click="selectSessionDuration('2 hours')"
+              >
+                2 hours
+              </div>
+              <div
+                class="dropdown-option"
+                @click="selectSessionDuration('3 hours')"
+              >
+                3 hours
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-field">
+          <label class="profile-label" for="proficiency"
+            >PROFICIENCY LEVEL
+          </label>
+          <div class="proficiency-dropdown">
+            <div
+              class="dropdown-container"
+              @click="toggleDropdown('proficiency')"
+            >
+              <input
+                type="text"
+                v-model="proficiency"
+                placeholder="Select proficiency level"
+                class="profile-input"
+                readonly
+              />
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            <div v-if="dropdownOpen.proficiency" class="dropdown-options">
+              <div
+                class="dropdown-option"
+                @click="selectProficiency('Beginner')"
+              >
+                Beginner
+              </div>
+              <div
+                class="dropdown-option"
+                @click="selectProficiency('Intermediate')"
+              >
+                Intermediate
+              </div>
+              <div
+                class="dropdown-option"
+                @click="selectProficiency('Advanced')"
+              >
+                Advanced
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-field">
+          <!-- For Bio -->
+          <label class="profile-label required" for="bio">SHORT BIO</label>
+          <textarea
+            id="bio"
+            v-model="bio"
+            @input="validateField('bio', bio)"
+            @blur="validateField('bio', bio)"
+            placeholder="Tell us about yourself (50-500 characters)"
+            rows="4"
+            class="profile-textarea"
+            :class="{ error: validationErrors.bio }"
+          ></textarea>
+          <span v-if="validationErrors.bio" class="validation-message">
+            {{ validationErrors.bio }}
+          </span>
+        </div>
+
+        <div class="profile-field">
+          <!-- For Experience -->
+          <label class="profile-label required" for="experience"
+            >TUTORING EXPERIENCE</label
+          >
+          <textarea
+            id="goals"
+            v-model="experience"
+            @input="validateField('experience', experience)"
+            @blur="validateField('experience', experience)"
+            placeholder="Describe your tutoring experience (50-500 characters)"
+            rows="4"
+            class="profile-textarea"
+            :class="{ error: validationErrors.goals }"
+          ></textarea>
+          <span v-if="validationErrors.goals" class="validation-message">
+            {{ validationErrors.goals }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator-container">
+    <div class="step-indicator">
+      <div
+        v-for="step in totalSteps"
+        :key="step"
+        :class="[
+          'step',
+          { active: step === currentStep, completed: step < currentStep },
+        ]"
+        @click="goToStep(step)"
+      ></div>
+    </div>
 
     <button class="next-button" @click="nextStep" :disabled="isSubmitted">
       {{
@@ -622,43 +587,40 @@
     </button>
   </div>
 
-
-
-      <!-- File List Modal -->
-      <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
-        <div class="Credmodal-content" @click.stop>
-          <h3>Uploaded Files</h3>
-          <ul class="file-list">
-            <li v-for="(file, index) in credentials" :key="index">
-              <span class="file-info">
-                <i class="fas fa-file-alt"></i>
-                {{ file.name }}
-              </span>
-              <button @click.stop="deleteCredential(index)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </li>
-          </ul>
-          <div style="display: flex; justify-content: center; width: 100%">
-            <button class="close-button" @click="closeFileList">Close</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Application Status Popup -->
-      <div v-if="showStatusPopup" class="status-popup-overlay">
-        <div class="status-popup-content">
-          <h3>APPLICATION STATUS</h3>
-          <p class="status-text">
-            Your mentor application is under review. You will receive an email
-            once it's approved. Thank you!
-          </p>
-          <button class="proceed-button" @click="proceedToHome">
-            PROCEED TO HOME
+  <!-- File List Modal -->
+  <div v-if="showFileList" class="Credmodal-overlay" @click="closeFileList">
+    <div class="Credmodal-content" @click.stop>
+      <h3>Uploaded Files</h3>
+      <ul class="file-list">
+        <li v-for="(file, index) in credentials" :key="index">
+          <span class="file-info">
+            <i class="fas fa-file-alt"></i>
+            {{ file.name }}
+          </span>
+          <button @click.stop="deleteCredential(index)">
+            <i class="fas fa-trash-alt"></i>
           </button>
-        </div>
+        </li>
+      </ul>
+      <div style="display: flex; justify-content: center; width: 100%">
+        <button class="close-button" @click="closeFileList">Close</button>
       </div>
+    </div>
+  </div>
 
+  <!-- Application Status Popup -->
+  <div v-if="showStatusPopup" class="status-popup-overlay">
+    <div class="status-popup-content">
+      <h3>APPLICATION STATUS</h3>
+      <p class="status-text">
+        Your mentor application is under review. You will receive an email once
+        it's approved. Thank you!
+      </p>
+      <button class="proceed-button" @click="proceedToHome">
+        PROCEED TO HOME
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -887,7 +849,7 @@ export default {
       const errors = [];
 
       if (this.currentStep === 1) {
-       // if (!this.fullName.trim()) errors.push("Full Name is required");
+        // if (!this.fullName.trim()) errors.push("Full Name is required");
         if (!this.gender) errors.push("Gender is required");
         if (this.gender === "Other" && !this.otherGender.trim())
           errors.push("Please specify your gender");
@@ -1516,7 +1478,7 @@ body {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin; 
+  scrollbar-width: thin;
   scrollbar-color: #02475e transparent;
 }
 
@@ -1531,9 +1493,12 @@ body {
 }
 
 .form-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, 
-              rgba(2, 71, 94, 0.6) 0%, 
-              rgba(6, 102, 120, 0.6) 100%);  border: 1px solid #02475e;
+  background: linear-gradient(
+    45deg,
+    rgba(2, 71, 94, 0.6) 0%,
+    rgba(6, 102, 120, 0.6) 100%
+  );
+  border: 1px solid #02475e;
   border-radius: 4px;
 }
 
@@ -1549,16 +1514,15 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #02475e; 
-  padding: 1.5rem 4rem 1rem; 
+  background: #02475e;
+  padding: 1.5rem 4rem 1rem;
   color: #ffffff;
   font-size: 1.6rem;
-  margin: 0 -1.5rem 1.5rem; 
+  margin: 0 -1.5rem 1.5rem;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
-
 
 .personal-field {
   display: flex;
@@ -1657,7 +1621,6 @@ body {
   align-items: center;
   gap: 13px;
 }
-
 
 .dropdown-option:hover {
   background-color: rgba(255, 253, 253, 0.243);
@@ -1839,16 +1802,15 @@ body {
   box-shadow: 0 0 0 2px rgba(2, 71, 94, 0.2);
 }
 
-
 /* Profile Picture and Credentials Upload */
 .upload-container {
-  display: flex; 
+  display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 2rem;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  text-align: left; 
+  text-align: left;
   flex-wrap: wrap;
 }
 
@@ -1859,7 +1821,6 @@ body {
   gap: 1rem;
   flex: 1;
   min-width: 250px;
-  
 }
 
 .profile-label {
@@ -1989,7 +1950,6 @@ body {
   text-decoration: underline;
 }
 
-
 /* File List Modal */
 .Credmodal-overlay {
   position: fixed;
@@ -2062,7 +2022,6 @@ body {
 .file-list button:hover {
   color: #ff4d4d;
 }
-
 
 .close-button {
   background-color: #155577;
@@ -2169,7 +2128,6 @@ body {
   user-select: none;
 }
 
-
 .next-button:hover {
   background-color: #032c58;
 }
@@ -2189,7 +2147,7 @@ body {
   left: 45%;
   top: 2.5rem;
   width: 350px;
-  max-width: 100vw; 
+  max-width: 100vw;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
@@ -2306,7 +2264,6 @@ body {
     position: relative;
   }
 
-
   .page-header h1 {
     font-size: 1.5rem;
   }
@@ -2344,7 +2301,7 @@ body {
   }
 
   .dropdown-menu.subjects {
-    position: absolute; 
+    position: absolute;
     width: 100%;
     left: 0 !important;
     top: 100% !important;
@@ -2354,8 +2311,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: none !important;
   }
-
-  
 
   .upload-container {
     padding: 0.5rem;
@@ -2371,7 +2326,6 @@ body {
     font-size: 0.8rem;
   }
 
-
   .next-button {
     position: relative;
     bottom: auto;
@@ -2380,7 +2334,6 @@ body {
     width: 30%;
     align-self: center;
   }
-
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -2408,7 +2361,7 @@ body {
   }
 }
 
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
   .form-container {
     margin: 10px;
     width: calc(100% - 20px);
@@ -2425,8 +2378,9 @@ body {
     width: 50%;
   }
 
-    .title {
-    font-size: 15px;  }
+  .title {
+    font-size: 15px;
+  }
 
   .profile-preview-container {
     width: 70px;
@@ -2436,8 +2390,8 @@ body {
   .default-icon {
     font-size: 2.5rem;
   }
-    .dropdown-menu.subjects {
-    position: absolute; 
+  .dropdown-menu.subjects {
+    position: absolute;
     width: 100%;
     left: 0 !important;
     top: 100% !important;
@@ -2447,7 +2401,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: none !important;
   }
-
 
   .next-button {
     position: relative;
@@ -2459,15 +2412,15 @@ body {
   }
 
   .divider {
-  height: 1px;
-  background: #929495;
-  margin-bottom: 35px;
-  margin-left: 7.5rem;
-  margin-top: -2rem;
-  width: 86%;
-  border: none;
-  border-radius: 2px;
-  transform: translateX(-100px);
-}
+    height: 1px;
+    background: #929495;
+    margin-bottom: 35px;
+    margin-left: 7.5rem;
+    margin-top: -2rem;
+    width: 86%;
+    border: none;
+    border-radius: 2px;
+    transform: translateX(-100px);
+  }
 }
 </style>

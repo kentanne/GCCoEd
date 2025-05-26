@@ -2,10 +2,11 @@
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
+import api from "@/axios.js"; // Adjust the path as necessary
 import axios from "axios";
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
 
 const props = defineProps({
   id: {
@@ -46,9 +47,9 @@ const rescheduleSession = async () => {
       hour12: false,
     }); // Format: HH:mm
 
-    const response = await axios
+    const response = await api
       .patch(
-        "http://localhost:8000/api/resched/" + props.id,
+        "/api/resched/" + props.id,
         {
           date: formattedDate,
           time: formattedTime,
@@ -57,7 +58,7 @@ const rescheduleSession = async () => {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
           },
         }
       )

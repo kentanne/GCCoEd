@@ -1,10 +1,14 @@
 <script setup>
 import { ref, computed } from "vue";
 import viewUser from "@/components/mentorpage/viewUser.vue";
+import api from "@/axios.js";
+import axios from "axios";
 
 const isView = ref(false);
 const selectedUserId = ref();
 const searchQuery = ref("");
+
+const baseURL = api.defaults.baseURL;
 
 const openView = (id) => {
   console.log("Selected user ID:", id);
@@ -19,16 +23,19 @@ const closeView = () => {
 const props = defineProps({
   userInformation: {
     type: Array,
-    required: false,
-    default: () => [],
+    required: true,
   },
   schedule: {
     type: Object,
-    required: false,
+    required: true,
   },
   upcomingSchedule: {
     type: Object,
-    required: false,
+    required: true,
+  },
+  mentorData: {
+    type: Object,
+    required: true,
   },
 });
 
@@ -49,48 +56,25 @@ const filteredUsers = computed(() => {
 
 <template>
   <div class="main-wrapper">
-    <div class="search-container">
-      <input 
-        v-model="searchQuery"
-        type="text" 
-        placeholder="Search by name, course, or year..."
-        class="search-input"
-      />
-      <button class="search-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </button>
-    </div>
-
     <div class="user-grid">
       <div
-        v-for="user in filteredUsers"
+        v-for="user in props.userInformation"
         :key="user.id"
         class="user-card"
       >
         <div class="upper-element">
           <img
-            :src="user.image_id ? `http://localhost:8000/api/image/${user.image_id}` : 'https://placehold.co/600x400'"
+            :src="
+              `${baseURL}/api/image/` + user.image_id ||
+              'https://placehold.co/600x400'
+            "
             alt="profile-pic"
           />
           <h1>{{ user.userName }}</h1>
-          <div class="stars" v-if="user.rating_ave !== undefined">
-            <span class="filledStar" v-for="i in 5" :key="i">
-              <span
-                v-if="i <= Math.round(user.rating_ave || 0)"
-                style="color: #ffd700"
-                >★</span
-              >
-              <span v-else style="color: #e0e0e0">☆</span>
-            </span>
-          </div>
         </div>
         <div class="lower-element">
           <p>{{ user.yearLevel }}</p>
           <p>{{ user.course.match(/\(([^)]+)\)/)?.[1] }}</p>
-          <p class="proficiency" v-if="user.proficiency">{{ user.proficiency }}</p>
           <button @click="openView(user.id)">See More</button>
         </div>
       </div>
@@ -98,7 +82,11 @@ const filteredUsers = computed(() => {
 
     <Transition name="fade" mode="out-in">
       <div v-if="isView" class="view-popup">
-        <viewUser :userId="selectedUserId" @close="closeView" />
+        <viewUser
+          :userId="selectedUserId"
+          :mentorData="props.mentorData"
+          @close="closeView"
+        />
       </div>
     </Transition>
   </div>
@@ -168,6 +156,7 @@ const filteredUsers = computed(() => {
 }
 
 .user-card {
+  background: #e3e6e7;
   background: #e3e6e7;
   border-radius: 10px;
   overflow: hidden;

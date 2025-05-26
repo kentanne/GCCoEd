@@ -1,13 +1,21 @@
 <script setup>
 import axios from "axios";
+import api from "@/axios.js"; // Adjust the path as necessary
 import { onMounted, ref } from "vue";
+import Offer from "./offer.vue"; // Add this import
 
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+// axios.defaults.withCredentials = true;
+// axios.defaults.withXSRFToken = true;
+
+const baseURL = api.defaults.baseURL;
 
 const props = defineProps({
   userId: {
     type: Number,
+    required: true,
+  },
+  mentorData: {
+    type: Object,
     required: true,
   },
 });
@@ -27,13 +35,13 @@ function getCookie(name) {
 const userInfo = async (id) => {
   console.log(id);
   try {
-    const userDeets = await axios
-      .get(`http://localhost:8000/api/mentor/users/${id}`, {
+    const userDeets = await api
+      .get(`/api/mentor/users/${id}`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -53,6 +61,23 @@ const userInfo = async (id) => {
         sessionDur.value = response.data.user_info.prefSessDur;
         goal.value = response.data.user_info.goals;
         profilePic.value = response.data.user_info.image;
+        userSchoolId.value = response.data.user.id;
+
+        // Prepare data for offer component
+        userDeetsForOffer.value = [
+          userSchoolId.value, // userSchoolId
+          userId.value, // userId
+          name.value, // userName
+          year.value, // userYear
+          course.value, // userCourse
+          sessionDur.value, // userSessionDur
+          modality.value, // userModality
+          learnStyle.value, // userLearnStyle
+          availability.value, // userAvailability
+          modality.value, // userLearnModality
+          profilePic.value, // userProfilePic
+          subjects.value, // userSubjects
+        ];
       });
   } catch (error) {
     console.error("Error fetching user details:", error);
@@ -83,6 +108,31 @@ const availability = ref();
 const sessionDur = ref();
 const goal = ref();
 const profilePic = ref();
+const showOfferModal = ref(false); // Add this with your other refs
+const showOffer = ref(false);
+const userDeetsForOffer = ref();
+
+// Add this function to handle opening/closing the offer modal
+const toggleOfferModal = () => {
+  showOfferModal.value = !showOfferModal.value;
+};
+
+// Add this function to handle opening the offer modal
+const openOffer = () => {
+  showOffer.value = true;
+};
+
+// Add the handleOfferConfirm function
+const handleOfferConfirm = async (offerData) => {
+  try {
+    console.log("Offer confirmed:", offerData);
+    // Here you can add any additional logic needed after offer confirmation
+    showOffer.value = false;
+    emit("close");
+  } catch (error) {
+    console.error("Error handling offer confirmation:", error);
+  }
+};
 
 onMounted(() => {
   console.log("test mount");
@@ -109,7 +159,10 @@ onMounted(() => {
       <div class="lower-upper">
         <div class="profile-image-container">
           <img
-            :src="'http://localhost:8000/api/image/' + profilePic || 'https://placehold.co/600x400'"
+            :src="
+              `${baseURL}/api/image/` + profilePic ||
+              'https://placehold.co/600x400'
+            "
             alt="Profile Image"
             class="profile-image"
           />
@@ -120,27 +173,39 @@ onMounted(() => {
           <hr class="divider" />
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
+              <span class="info-label"
+                ><i class="fas fa-venus-mars"></i> Gender</span
+              >
               <span class="info-value">{{ gender || "N/A" }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-calendar-alt"></i> Year</span>
+              <span class="info-label"
+                ><i class="fas fa-calendar-alt"></i> Year</span
+              >
               <span class="info-value">{{ year || "N/A" }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-graduation-cap"></i> Program</span>
+              <span class="info-label"
+                ><i class="fas fa-graduation-cap"></i> Program</span
+              >
               <span class="info-value">{{ course || "N/A" }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-phone"></i> Contact</span>
+              <span class="info-label"
+                ><i class="fas fa-phone"></i> Contact</span
+              >
               <span class="info-value">{{ contact || "N/A" }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
+              <span class="info-label"
+                ><i class="fas fa-envelope"></i> Email</span
+              >
               <span class="info-value">{{ email || "N/A" }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fas fa-map-marker-alt"></i> Address</span>
+              <span class="info-label"
+                ><i class="fas fa-map-marker-alt"></i> Address</span
+              >
               <span class="info-value">{{ address || "N/A" }}</span>
             </div>
           </div>
@@ -158,23 +223,33 @@ onMounted(() => {
             <div class="details-content">
               <div class="detail-item">
                 <span class="detail-label">Subjects of Interest:</span>
-                <span class="detail-value right-align wrap-text">{{ subjects || "N/A" }}</span>
+                <span class="detail-value right-align wrap-text">{{
+                  subjects || "N/A"
+                }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Learning Modality:</span>
-                <span class="detail-value right-align">{{ modality || "N/A" }}</span>
+                <span class="detail-value right-align">{{
+                  modality || "N/A"
+                }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Learning Style:</span>
-                <span class="detail-value right-align">{{ learnStyle || "N/A" }}</span>
+                <span class="detail-value right-align">{{
+                  learnStyle || "N/A"
+                }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Availability:</span>
-                <span class="detail-value availability-text right-align">{{ availability || "N/A" }}</span>
+                <span class="detail-value availability-text right-align">{{
+                  availability || "N/A"
+                }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Preferred Session Duration:</span>
-                <span class="detail-value right-align">{{ sessionDur || "N/A" }}</span>
+                <span class="detail-value right-align">{{
+                  sessionDur || "N/A"
+                }}</span>
               </div>
             </div>
           </div>
@@ -187,11 +262,15 @@ onMounted(() => {
             <div class="bio-content">
               <div class="detail-item2">
                 <span class="detail-label">Bio:</span>
-                <span class="detail-value2 wrap-text">{{ bio || "No bio provided" }}</span>
+                <span class="detail-value2 wrap-text">{{
+                  bio || "No bio provided"
+                }}</span>
               </div>
               <div class="detail-item2">
                 <span class="detail-label">Academic Goals:</span>
-                <span class="detail-value2 wrap-text">{{ goal || "No goals provided" }}</span>
+                <span class="detail-value2 wrap-text">{{
+                  goal || "No goals provided"
+                }}</span>
               </div>
             </div>
           </div>
@@ -213,7 +292,10 @@ onMounted(() => {
         <hr class="divider2" />
         <p>Are you sure you want to send a mentoring offer to {{ name }}?</p>
         <div class="modal-actions">
-          <button class="modal-btn cancel" @click="showConfirmationModal = false">
+          <button
+            class="modal-btn cancel"
+            @click="showConfirmationModal = false"
+          >
             Cancel
           </button>
           <button class="modal-btn confirm" @click="confirmSendOffer">
@@ -221,6 +303,15 @@ onMounted(() => {
           </button>
         </div>
       </div>
+    </div>
+    <!-- Offer Modal -->
+    <div v-if="showOffer" class="popup-overlay">
+      <Offer
+        :info="userDeetsForOffer"
+        :mentorId="props.mentorData.user.id"
+        @close="showOffer = false"
+        @confirm="handleOfferConfirm"
+      />
     </div>
   </div>
 </template>
@@ -534,7 +625,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   z-index: 2000;
-    left: 10rem;
+  left: 10rem;
   width: 100%;
 }
 
@@ -547,7 +638,6 @@ onMounted(() => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 2001;
   margin-left: 3rem;
-
 }
 
 .confirmation-modal h3 {
@@ -602,7 +692,7 @@ onMounted(() => {
     width: 95%;
     max-width: 95vw;
   }
-  
+
   .details-section {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -643,7 +733,7 @@ onMounted(() => {
   .bio-card {
     padding: 1rem;
   }
-  
+
   .profile-image {
     width: 100px;
     height: 100px;
