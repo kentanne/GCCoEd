@@ -791,4 +791,12 @@ onMounted(() => {
     height: 100px;
   }
 }
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
 </style>
