@@ -7,7 +7,7 @@
         alt="GCCoed Logo"
         class="logo-img"
       />
-      <span class="brand-name">GCCoed</span>
+      <span class="brand-name">GCCoEd</span>
     </header>
     <div class="form-wrapper">
       <h2>Reset Password</h2>
@@ -100,11 +100,11 @@ const resetUserPass = async () => {
 
     const response = await api
       .patch("/api/reset-password", newPass, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       })
       .then((response) => {
         console.log("Password reset response:", response.data);
@@ -127,7 +127,7 @@ const resetUserPass = async () => {
           showIcon: true,
           toastBackgroundColor: "#e53e3e",
         });
-      });
+    });
 
     if (response.status === 200) {
       success.value = "Password reset successfully! Redirecting to login...";
