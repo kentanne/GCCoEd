@@ -1,5 +1,16 @@
 <template>
   <div class="profile-page">
+    <!-- Loading Overlay -->
+    <loading
+      v-model:active="isLoading"
+      :can-cancel="false"
+      :is-full-page="true"
+      :opacity="1"
+      :color="'#006981'"
+      loader="spinner"
+      background-color="#ffffff"
+    />
+
     <!-- App Header -->
     <header class="app-header">
       <div class="profile-section">
@@ -130,19 +141,24 @@ import users from "@/components/adminpage/users.vue";
 import axios from "axios";
 import api from "@/axios.js";
 import { useRouter } from "vue-router";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
+// Import loading overlay
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
+
 const Router = useRouter();
 
-// Set axios defaults
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+// Add loading state
+const isLoading = ref(false);
 
-// Cookie helper function
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
+const startLoading = () => {
+  isLoading.value = true;
+};
+
+const stopLoading = () => {
+  isLoading.value = false;
+};
 
 // Reactive refs
 const activeTab = ref("dashboard");
@@ -227,18 +243,40 @@ const fetchApplicants = async () => {
 
 const logout = async () => {
   try {
-    const response = await api.post(
-      "/api/logout/web",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
+    const response = await api
+      .post(
+        "/api/logout/web",
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Logout successful!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+          Router.push("/login");
+        } else {
+          createToast("Logout failed!", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      });
     console.log("Logout response:", response.data);
   } catch (error) {
     console.error("Error during logout:", error);
@@ -247,8 +285,27 @@ const logout = async () => {
 
 // Lifecycle hook
 onMounted(async () => {
-  await fetchAll();
-  await fetchApplicants();
+  try {
+    // Start loading before any fetch operations
+    startLoading();
+
+    // Use Promise.all to wait for all fetch operations to complete
+    await Promise.all([fetchAll(), fetchApplicants()]);
+
+    console.log("All data loaded successfully");
+  } catch (error) {
+    console.error("Error loading data:", error);
+    createToast("Error loading data. Please refresh the page.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+  } finally {
+    // Hide loading overlay when all operations are complete or if there's an error
+    stopLoading();
+  }
 });
 </script>
 
@@ -440,5 +497,28 @@ onMounted(async () => {
   padding: 2rem;
   overflow-y: auto;
   margin: 1.5rem 1.5rem 1.5rem 0;
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
+
+/* Add loading overlay styles */
+.vl-overlay {
+  z-index: 9999 !important;
+}
+
+.vl-icon {
+  border-top-color: #006981 !important;
+  border-left-color: #006981 !important;
+}
+
+.vl-backdrop {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(2px);
 }
 </style>

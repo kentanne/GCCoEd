@@ -4,6 +4,8 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
 import api from "@/axios.js"; // Adjust the path as necessary
 import axios from "axios";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -64,6 +66,25 @@ const rescheduleSession = async () => {
       )
       .then((response) => {
         console.log("Reschedule response:", response.data);
+        createToast("Session rescheduled successfully!", {
+          position: "top-right",
+          type: "danger",
+          transition: "slide",
+          timeout: 3000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+      })
+      .catch((error) => {
+        console.error("Error rescheduling session:", error);
+        createToast("Failed to reschedule session.", {
+          position: "top-right",
+          type: "danger",
+          transition: "slide",
+          timeout: 3000,
+          showIcon: true,
+          toastBackgroundColor: "#e74c3c",
+        });
       });
     // return response.data
   } catch (error) {
@@ -124,7 +145,7 @@ const rescheduleSession = async () => {
   padding: 0;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
   border: 1px solid #eaeaea;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   z-index: 1000;
 }
 
@@ -246,5 +267,12 @@ const rescheduleSession = async () => {
   outline: none;
   box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
 }
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
 
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
 </style>

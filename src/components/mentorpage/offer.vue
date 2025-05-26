@@ -2,6 +2,8 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -127,21 +129,41 @@ const confirmSchedule = async () => {
   };
 
   try {
-    const response = await api.post("/api/mentor/send-offer", scheduleData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
-    });
+    const response = await api
+      .post("/api/mentor/send-offer", scheduleData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Tutoring offer sent successfully!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+          emit("confirm", scheduleData);
+          emit("close");
+        } else {
+          createToast("Failed to send tutoring offer", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      });
 
-    // Debug logs
-    console.log("Selected Subject:", selectedSubject.value);
-    console.log("Schedule Data:", scheduleData);
-
-    emit("confirm", scheduleData);
-    emit("close");
+    // // Debug logs
+    // console.log("Selected Subject:", selectedSubject.value);
+    // console.log("Schedule Data:", scheduleData);
   } catch (error) {
     console.error("Error in schedule confirmation:", error);
     alert(error.response?.data?.message || "Error sending tutoring offer");
@@ -912,5 +934,14 @@ const currentMonthYear = computed(() => {
   border-color: #0b3b44;
   /* ring: 2px;
   ring-color: #0b3b44; */
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

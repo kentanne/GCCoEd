@@ -362,8 +362,10 @@
 <script setup>
 import { ref, computed, onMounted, capitalize } from "vue";
 import axios from "axios";
-import api from "@/axios.js"; // Adjust the path as necessary
-// import { get } from "core-js/core/dict";
+import api from "@/axios.js";
+// Make sure to import the toast functionality
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
@@ -385,18 +387,38 @@ const approve = async (id) => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
 
     if (response.status === 200) {
       console.log("Application approved successfully:", response.data);
+
+      // Add success toast notification
+      createToast("Application approved successfully!", {
+        position: "top-right",
+        type: "success",
+        transition: "slide",
+        timeout: 3000,
+        showIcon: true,
+        backgroundColor: "#319cb0",
+      });
+
       return response.data;
     }
     throw new Error(`Failed to approve application: ${response.status}`);
   } catch (error) {
     console.error("Error approving application:", error);
+
+    // Add error toast notification
+    createToast("Failed to approve application. Please try again.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+
     throw error;
   }
 };
@@ -411,18 +433,38 @@ const reject = async (id) => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-CSRFToken": getCookie("csrftoken"),
         },
       }
     );
 
     if (response.status === 200) {
       console.log("Application rejected successfully:", response.data);
+
+      // Add success toast notification
+      createToast("Application rejected successfully.", {
+        position: "top-right",
+        type: "success",
+        transition: "slide",
+        timeout: 3000,
+        showIcon: true,
+        backgroundColor: "#319cb0",
+      });
+
       return response.data;
     }
     throw new Error(`Failed to reject application: ${response.status}`);
   } catch (error) {
     console.error("Error rejecting application:", error);
+
+    // Add error toast notification
+    createToast("Failed to reject application. Please try again.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+
     throw error;
   }
 };

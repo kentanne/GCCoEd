@@ -6,6 +6,10 @@ import { useRouter } from "vue-router";
 import api from "@/axios.js";
 import axios from "axios";
 import Offer from "@/components/mentorpage/offer.vue";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const baseURL = api.defaults.baseURL;
 
@@ -14,6 +18,16 @@ const router = useRouter();
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;
+
+const isLoading = ref(false);
+
+const startLoading = () => {
+  isLoading.value = true;
+};
+
+const stopLoading = () => {
+  isLoading.value = false;
+};
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -182,8 +196,28 @@ const switchRole = async () => {
         },
       })
       .then((response) => {
-        console.log("Role switched:", response.data);
+        createToast("Role switched successfully", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
         router.push("/login");
+      })
+      .catch((error) => {
+        createToast(
+          "Failed to switch role. Please try again or Register as Learner",
+          {
+            position: "bottom-right",
+            type: "danger",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#ff4d4d",
+          }
+        );
       });
   } catch (error) {
     console.error("Error switching role:", error);
@@ -341,16 +375,49 @@ const handleOfferConfirm = () => {
 };
 
 onMounted(async () => {
-  console.log("test kung namamount");
-  await loggedUserDets();
-  await learnersProfile();
-  await sessionInfo();
-  await getFeedbacks();
-  await getFiles();
+  try {
+    // Start loading before any fetch operations
+    startLoading();
+    // console.log("Starting to load data");
+
+    // Use Promise.all to wait for all fetch operations to complete
+    await Promise.all([
+      loggedUserDets(),
+      learnersProfile(),
+      sessionInfo(),
+      getFeedbacks(),
+      getFiles(),
+    ]);
+
+    // console.log("All data loaded successfully");
+  } catch (error) {
+    console.error("Error loading data:", error);
+    createToast("Error loading data. Please refresh the page.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+  } finally {
+    // Hide loading overlay when all operations are complete or if there's an error
+    stopLoading();
+  }
 });
 </script>
 
 <template>
+  <!-- Loading Overlay -->
+  <loading
+    v-model:active="isLoading"
+    :can-cancel="false"
+    :is-full-page="true"
+    :opacity="1"
+    :color="'#006981'"
+    loader="spinner"
+    background-color="#ffffff"
+  />
+
   <!-- sidebar -->
   <div class="sidebar">
     <div class="logo-container">
@@ -394,7 +461,7 @@ onMounted(async () => {
             <p>{{ userData.ment.year }}</p>
           </div>
         </div>
-      
+
         <div class="lines">
           <h3>Program:</h3>
           <div>
@@ -536,7 +603,14 @@ onMounted(async () => {
       </div>
     </div>
     <div class="topbar-date">
-  {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+      {{
+        new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      }}
     </div>
   </div>
 
@@ -669,14 +743,13 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.user-information h1{
-    color: rgba(255, 255, 255, 0.9);
+.user-information h1 {
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   padding-top: 17px;
   margin-top: -1.2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   margin-bottom: 0.5rem;
-
 }
 .availability h1,
 .course-offered h1 {
@@ -1082,7 +1155,7 @@ onMounted(async () => {
   .nav-text {
     font-size: 13px;
   }
-  
+
   .topbar-date {
     font-size: 12px;
     padding: 5px 10px;
@@ -1094,9 +1167,30 @@ onMounted(async () => {
     left: 0;
     padding-left: 270px;
   }
-  
+
   .topbar-date {
     display: none;
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
+.vl-overlay {
+  z-index: 9999 !important;
+}
+
+.vl-icon {
+  border-top-color: #006981 !important;
+  border-left-color: #006981 !important;
+}
+
+.vl-backdrop {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(2px);
 }
 </style>

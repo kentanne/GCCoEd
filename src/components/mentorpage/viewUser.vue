@@ -87,12 +87,12 @@ const userInfo = async (id) => {
 
 // Add this function to handle offer confirmation
 const confirmSendOffer = () => {
-  showConfirmationModal.value = false;
-  // Here you would add your actual offer sending logic
-  console.log("Offer sent to", name.value);
-  // You might want to add a success notification here
+  showConfirmationModal.value = false; // Hide confirmation modal
+  showOffer.value = true; // Show offer modal
+  console.log("Opening offer modal for", name.value);
 };
 
+const userSchoolId = ref(); // Add this to store the user school ID
 const name = ref();
 const year = ref();
 const course = ref();
@@ -330,7 +330,6 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
-  
 }
 
 .sticky-header {
@@ -584,7 +583,6 @@ onMounted(() => {
   justify-content: flex-end;
   padding: 1.25rem 0;
   margin-top: 1rem;
-  
 }
 
 .action-button button {
@@ -684,6 +682,29 @@ onMounted(() => {
 
 .modal-btn.confirm:hover {
   background: linear-gradient(135deg, #0a3b44, #328c9a);
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000; /* Higher than confirmation modal */
+}
+
+/* Add to your component styles if needed */
+.popup-overlay .offer-component {
+  background: white;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive Design */

@@ -3,6 +3,8 @@ import { ref } from "vue";
 import api from "@/axios.js"; // Adjust the path as necessary
 import axios from "axios";
 import router from "@/router";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -22,11 +24,27 @@ const logOut = async () => {
     })
     .then((response) => {
       if (response.status === 200) {
-        console.log("Logout successful");
+        createToast("Logout successful!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+
+        // console.log("Logout successful");
         emit("logout");
         router.push("/login");
       } else {
-        console.error("Logout failed");
+        // console.error("Logout failed");
+        createToast("Logout successful!", {
+          position: "bottom-right",
+          type: "error",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+        });
       }
     })
     .catch((error) => {

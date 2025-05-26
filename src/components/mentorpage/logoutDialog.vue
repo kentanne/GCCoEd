@@ -3,6 +3,8 @@ import { ref } from "vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
 import router from "@/router";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withCredentials = true;
@@ -26,11 +28,27 @@ const logOut = async () => {
     })
     .then((response) => {
       if (response.status === 200) {
-        console.log("Logout successful");
+        createToast("Logout successful!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
+
+        // console.log("Logout successful");
         emit("logout");
         router.push("/login");
       } else {
-        console.error("Logout failed");
+        // console.error("Logout failed");
+        createToast("Logout successful!", {
+          position: "bottom-right",
+          type: "error",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+        });
       }
     })
     .catch((error) => {
@@ -142,5 +160,14 @@ const close = () => {
   border: none;
   cursor: pointer;
   font-size: 1rem;
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.5rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

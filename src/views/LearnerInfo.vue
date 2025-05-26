@@ -509,6 +509,8 @@
 <script>
 import { registrationStore } from "@/stores/registrationStore";
 import api from "@/axios.js";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true; // Enable sending cookies with requests
 // axios.defaults.withXSRFToken = true; // Enable CSRF token handling
@@ -1096,10 +1098,25 @@ export default {
             },
           })
           .then((response) => {
-            console.log("Registration successful:", response);
+            // console.log("Registration successful:", response);
+            createToast("Registration successful!", {
+              position: "bottom-right",
+              type: "success",
+              transition: "slide",
+              timeout: 2000,
+              showIcon: true,
+              toastBackgroundColor: "#319cb0",
+            });
           })
           .catch((error) => {
             console.error("Registration error:", error);
+            createToast("Registration failed!", {
+              position: "bottom-right",
+              type: "danger",
+              transition: "slide",
+              timeout: 2000,
+              showIcon: true,
+            });
             throw error;
           });
       } catch (error) {
@@ -1202,4 +1219,13 @@ export default {
 
 <style scoped>
 @import "@/assets/learnerInfo.css";
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
+}
 </style>

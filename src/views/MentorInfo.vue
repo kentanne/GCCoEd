@@ -626,6 +626,8 @@
 <script>
 import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
 import api from "@/axios.js"; // <-- Use the exported api instance
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -1254,10 +1256,24 @@ export default {
             },
           })
           .then((response) => {
-            console.log("ge");
+            createToast("Registration successful!", {
+              position: "bottom-right",
+              type: "success",
+              transition: "slide",
+              timeout: 2000,
+              showIcon: true,
+              toastBackgroundColor: "#319cb0",
+            });
           })
           .catch((error) => {
             console.error(error);
+            createToast("Registration failed!", {
+              position: "bottom-right",
+              type: "danger",
+              transition: "slide",
+              timeout: 2000,
+              showIcon: true,
+            });
           });
 
         // console.log('Mentor application submitted:', formData);
@@ -1266,9 +1282,6 @@ export default {
         this.isSubmitted = true;
       } catch (error) {
         console.error("Application submission error:", error);
-        alert(
-          "An error occurred while submitting your application. Please try again."
-        );
       }
     },
 
@@ -2422,5 +2435,14 @@ body {
     border-radius: 2px;
     transform: translateX(-100px);
   }
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

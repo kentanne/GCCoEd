@@ -5,13 +5,25 @@ import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
 import api from "@/axios.js";
 import axios from "axios";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const baseURL = api.defaults.baseURL;
 
 const router = useRouter();
 
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+// Add loading state
+const isLoading = ref(false);
+
+const startLoading = () => {
+  isLoading.value = true;
+};
+
+const stopLoading = () => {
+  isLoading.value = false;
+};
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -144,8 +156,30 @@ const switchRole = async () => {
         },
       })
       .then((response) => {
+        createToast("Role switched!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
         console.log("Role switched:", response.data);
         router.push("/login");
+      })
+      .catch((error) => {
+        // console.error("Error switching role:", error);
+        createToast(
+          "Failed to switch role. Please try again or Register as Mentor.",
+          {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#e74c3c",
+          }
+        );
       });
   } catch (error) {
     console.error("Error switching role:", error);
@@ -192,25 +226,25 @@ const fetchMentFiles = async () => {
   }
 };
 
-const logout = async () => {
-  try {
-    const response = await api.post(
-      "/api/logout/web",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
-    console.log("Logout response:", response.data);
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
-};
+// const logout = async () => {
+//   try {
+//     const response = await api.post(
+//       "/api/logout/web",
+//       {},
+//       {
+//         withCredentials: true,
+//         headers: {
+//           "Content-Type": "application/json",
+//           Accept: "application/json",
+//           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
+//         },
+//       }
+//     );
+//     console.log("Logout response:", response.data);
+//   } catch (error) {
+//     console.error("Error during logout:", error);
+//   }
+// };
 
 const userData = ref({
   user: {
@@ -363,17 +397,49 @@ const fetchUserInformation = () => {
 };
 
 onMounted(async () => {
-  users.value = fetchUserInformation();
-  await getLearnerDets();
-  await sessionInfo();
-  await mentorProfile();
-  await sessionForReview();
-  await fetchMentFiles();
-  console.log("User data:", userData.value);
+  try {
+    // Start loading before any fetch operations
+    startLoading();
+
+    // Use Promise.all to wait for all fetch operations to complete
+    await Promise.all([
+      getLearnerDets(),
+      sessionInfo(),
+      mentorProfile(),
+      sessionForReview(),
+      fetchMentFiles(),
+    ]);
+
+    console.log("All data loaded successfully");
+  } catch (error) {
+    console.error("Error loading data:", error);
+    createToast("Error loading data. Please refresh the page.", {
+      position: "top-right",
+      type: "danger",
+      transition: "slide",
+      timeout: 5000,
+      showIcon: true,
+    });
+  } finally {
+    // Hide loading overlay when all operations are complete or if there's an error
+    stopLoading();
+  }
 });
 </script>
 
 <template>
+  <!-- Loading Overlay -->
+  <loading
+    v-model:active="isLoading"
+    :can-cancel="false"
+    :is-full-page="true"
+    :opacity="1"
+    :color="'#006981'"
+    loader="spinner"
+    background-color="#ffffff"
+  />
+
+  <!-- Rest of your template content -->
   <!-- sidebar -->
   <div class="sidebar">
     <div class="logo-container">
@@ -1065,6 +1131,21 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* Add loading overlay styles */
+.vl-overlay {
+  z-index: 9999 !important;
+}
+
+.vl-icon {
+  border-top-color: #006981 !important;
+  border-left-color: #006981 !important;
+}
+
+.vl-backdrop {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(2px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .sidebar {
@@ -1113,5 +1194,13 @@ onMounted(async () => {
   .topbar-date {
     display: none;
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

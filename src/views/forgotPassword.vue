@@ -2,6 +2,8 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import api from "@/axios.js";
+import "mosha-vue-toastify/dist/style.css";
+import { createToast } from "mosha-vue-toastify";
 
 const router = useRouter();
 
@@ -64,29 +66,27 @@ const handleStep2 = async () => {
 
   try {
     await api
-      .post(
-        "/api/forgot-password",
-        verificationData.value,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      )
+      .post("/api/forgot-password", verificationData.value, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
       .then((response) => {
         console.log(
           "Password reset request sent successfully: ",
           response.data
         );
         if (response.status === 200) {
-          success.value =
-            "Verification successful. Check your email for password reset instructions.";
-          setTimeout(() => {
-            alert("Please check your email for the password reset link");
-            router.push("/");
-          }, 2000);
+          createToast("Password reset link sent!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
         }
       });
   } catch (error) {
@@ -97,6 +97,7 @@ const handleStep2 = async () => {
     }
   } finally {
     loading.value = false;
+    router.push("/login");
   }
 };
 </script>
@@ -632,5 +633,14 @@ button:disabled {
   .brand-name {
     font-size: 1.7rem;
   }
+}
+
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>

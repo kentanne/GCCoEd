@@ -626,6 +626,8 @@
 <script>
 import { registrationStore } from "@/stores/registrationStore.js"; // Adjust the import path as necessary
 import api from "@/axios.js";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.default.withCredentials = true; // Enable sending cookies with requests
 // axios.default.withXSRFToken = true; // Enable CSRF token handling
@@ -1276,7 +1278,7 @@ export default {
             },
           })
           .then((response) => {
-            console.log("Mentor registration successful");
+            // console.log("Mentor registration successful");
           });
 
         // Second API call - Set secondary role
@@ -1290,10 +1292,25 @@ export default {
               },
             })
             .then((response) => {
-              console.log("Secondary role set:", response.data);
+              // console.log("Secondary role set:", response.data);
+              createToast("Second Role Set Successfully!", {
+                position: "bottom-right",
+                type: "success",
+                transition: "slide",
+                timeout: 2000,
+                showIcon: true,
+                toastBackgroundColor: "#319cb0",
+              });
             });
         } catch (error) {
           console.error("Error setting secondary role:", error);
+          createToast("Registration failed!", {
+            position: "bottom-right",
+            type: "danger",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
           return null;
         }
 
@@ -2457,5 +2474,13 @@ body {
     border-radius: 2px;
     transform: translateX(-100px);
   }
+}
+.mosha__toast .mosha__toast__content {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.mosha__toast .mosha__toast__content .mosha__toast__content__text {
+  padding: 0.5rem;
 }
 </style>
