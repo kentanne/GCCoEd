@@ -1,5 +1,18 @@
 <template>
   <div class="wrapper">
+    <!-- Only render loading overlay when loading -->
+    <template v-if="isLoading">
+      <loading
+        v-model:active="isLoading"
+        :can-cancel="false"
+        :is-full-page="false"
+        :opacity="1"
+        :color="'#006981'"
+        loader="spinner"
+        background-color="#ffffff"
+      />
+    </template>
+
     <!-- Sticky Modal Header -->
     <div class="upper-element sticky-header">
       <div class="header-content">
@@ -36,7 +49,9 @@
                 <span class="info-label"
                   ><i class="fas fa-venus-mars"></i> Gender</span
                 >
-                <span class="info-value">{{ gender || "N/A" }}</span>
+                <span class="info-value">{{
+                  capitalizeFirstLetter(gender) || "N/A"
+                }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label"
@@ -90,7 +105,7 @@
                 <div class="detail-item">
                   <span class="detail-label">Subjects Offered:</span>
                   <span class="detail-value right-align wrap-text">{{
-                    subjects || "N/A"
+                    parseArrayString(subjects) || "N/A"
                   }}</span>
                 </div>
                 <div class="detail-item">
@@ -102,13 +117,13 @@
                 <div class="detail-item">
                   <span class="detail-label">Teaching Style:</span>
                   <span class="detail-value right-align">{{
-                    learnStyle || "N/A"
+                    parseArrayString(learnStyle) || "N/A"
                   }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Availability:</span>
                   <span class="detail-value availability-text right-align">{{
-                    availability || "N/A"
+                    parseArrayString(availability) || "N/A"
                   }}</span>
                 </div>
                 <div class="detail-item">
@@ -182,12 +197,15 @@
 import { ref, onMounted } from "vue";
 import Schedule from "@/components/learnerpage/schedule.vue";
 import axios from "axios";
-import api from "@/axios.js"; // Adjust the path as necessary
-
-// axios.defaults.withCredentials = true;
-// axios.defaults.withXSRFToken = true;
+import api from "@/axios.js";
+// Import loading overlay
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const baseURL = api.defaults.baseURL;
+
+// Add loading state
+const isLoading = ref(true);
 
 const props = defineProps({
   userId: {
@@ -211,13 +229,14 @@ function getCookie(name) {
 
 const userInfo = async (id) => {
   try {
+    isLoading.value = true; // Start loading
+
     const userDeets = await api
       .get(`/api/learner/users/${id}`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -254,6 +273,8 @@ const userInfo = async (id) => {
       });
   } catch (error) {
     console.error("Error fetching user details:", error);
+  } finally {
+    isLoading.value = false; // Stop loading regardless of success/failure
   }
 };
 
@@ -279,6 +300,20 @@ const availability = ref();
 const sessionDur = ref();
 const goal = ref();
 const profilePic = ref();
+
+const capitalizeFirstLetter = (str) => {
+  if (!str) return "Not specified";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+const parseArrayString = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed.join(", ") : str;
+  } catch (e) {
+    return str || "Not specified";
+  }
+};
 
 onMounted(() => {
   userInfo(props.userId);
@@ -671,6 +706,36 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+}
+
+/* Updated loading overlay styles */
+.loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+}
+
+.vl-overlay {
+  z-index: 1000 !important;
+  pointer-events: auto !important; /* Only capture events when visible */
+}
+
+.vl-backdrop {
+  pointer-events: auto !important;
+  /* Rest of your styles */
+}
+
+/* When loading is complete, ensure no events are captured */
+.vl-hidden {
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 /* Responsive Design */

@@ -141,6 +141,7 @@ const confirmSchedule = async () => {
       transition: "slide",
       timeout: 3000,
       showIcon: true,
+      toastBackgroundColor: "#319cb0", // Changed to a more appropriate color
     });
 
     // Emit events to parent component
@@ -545,7 +546,7 @@ const isToday = (date) => {
   color: white;
   padding: 0.75rem 1.25rem;
   border-top-left-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;

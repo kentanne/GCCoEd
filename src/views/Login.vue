@@ -43,9 +43,9 @@
           </div>
           <button type="submit">Login</button>
         </form>
-        <p class="switch-link">
+        <!-- <p class="switch-link">
           Don't have an account? <router-link to="/signup">Sign up</router-link>
-        </p>
+        </p> -->
       </div>
     </main>
   </div>
