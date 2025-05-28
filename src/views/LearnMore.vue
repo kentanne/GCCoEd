@@ -1,124 +1,189 @@
 <template>
   <div class="learnmore-container">
     <Navbar />
-    
+
     <div class="system-explanation">
       <button class="back-button" @click="goBack">
         <i class="fas fa-arrow-left back-icon"></i>
       </button>
-      
+
       <!-- HOW OUR SYSTEM WORKS -->
       <h1 class="title animated-title">HOW OUR SYSTEM WORKS</h1>
       <div class="divider animated-divider"></div>
-      
+
       <div class="intro-container">
-        <img src="@/assets/logo_gccoed.png" alt="GCCoEd Logo" class="logo animated-logo">
+        <img
+          src="@/assets/logo_gccoed.png"
+          alt="GCCoEd Logo"
+          class="logo animated-logo"
+        />
         <p class="intro animated-description">
-          GCCoEd is a web-based platform proposed to make the process of finding and scheduling peer-to-peer tutoring sessions efficient within our school community. With easy access for all students, it allows anyone to offer and receive tutoring in various subjects, book sessions at their convenience, and stay organized in their learning journey.
+          GCCoEd is a web-based platform proposed to make the process of finding
+          and scheduling peer-to-peer tutoring sessions efficient within our
+          school community. With easy access for all students, it allows anyone
+          to offer and receive tutoring in various subjects, book sessions at
+          their convenience, and stay organized in their learning journey.
         </p>
       </div>
-      
+
       <div class="divider tight-divider animated-divider"></div>
-      
-      
+
       <!-- Features section -->
       <div class="content-wrapper">
         <div class="feature-row">
           <div class="icon-container">
-            <img src="@/assets/icon1.png" alt="Icon1" class="feature-icon animated-icon">
+            <img
+              src="@/assets/icon1.png"
+              alt="Icon1"
+              class="feature-icon animated-icon"
+            />
           </div>
           <div class="feature-section">
-            <h3 class="feature-title animated-text">Find the Right Mentor or Learner</h3>
+            <h3 class="feature-title animated-text">
+              Find the Right Mentor or Learner
+            </h3>
             <p class="feature-description animated-text">
-              Students looking for guidance can search for mentors based on subjects, expertise, and availability. Filtering options allow users to narrow down their choices and find the most suitable match.
+              Students looking for guidance can search for mentors based on
+              subjects, expertise, and availability. Filtering options allow
+              users to narrow down their choices and find the most suitable
+              match.
             </p>
           </div>
         </div>
-        
+
         <div class="feature-row">
           <div class="icon-container">
-            <img src="@/assets/icon3.png" alt="Icon3" class="feature-icon animated-icon">
+            <img
+              src="@/assets/icon3.png"
+              alt="Icon3"
+              class="feature-icon animated-icon"
+            />
           </div>
           <div class="feature-section">
             <h3 class="feature-title animated-text">Connect and Learn</h3>
             <p class="feature-description animated-text">
-              Once a student finds a potential mentor, they can view their profile to learn more about their experience and qualifications. Communication is done via email, where both parties can discuss learning goals, session details, and scheduling.
+              Once a student finds a potential mentor, they can view their
+              profile to learn more about their experience and qualifications.
+              Communication is done via email, where both parties can discuss
+              learning goals, session details, and scheduling.
             </p>
           </div>
         </div>
-        
+
         <div class="feature-row">
           <div class="icon-container">
-            <img src="@/assets/icon4.png" alt="Icon4" class="feature-icon animated-icon">
+            <img
+              src="@/assets/icon4.png"
+              alt="Icon4"
+              class="feature-icon animated-icon"
+            />
           </div>
           <div class="feature-section">
-            <h3 class="feature-title animated-text">Schedule and Begin Sessions</h3>
+            <h3 class="feature-title animated-text">
+              Schedule and Begin Sessions
+            </h3>
             <p class="feature-description animated-text">
-              After finalizing the details, students and mentors can arrange tutoring sessions at convenient times. Sessions can be adjusted or rescheduled as needed to ensure a smooth learning experience.
+              After finalizing the details, students and mentors can arrange
+              tutoring sessions at convenient times. Sessions can be adjusted or
+              rescheduled as needed to ensure a smooth learning experience.
             </p>
           </div>
         </div>
       </div>
-      
+
       <div class="divider animated-divider"></div>
 
       <!-- Unique features section -->
       <div class="unique-features">
         <h2 class="section-title">What Makes GCCoEd Different?</h2>
         <p class="section-description">
-          GCCoEd is more than just a tutoring platform—it's a student-driven learning space designed specifically for our school community. Unlike other tutoring services, GCCoEd is built on peer-assisted learning, allowing students to be both learners and mentors, fostering a collaborative academic environment.
+          GCCoEd is more than just a tutoring platform—it's a student-driven
+          learning space designed specifically for our school community. Unlike
+          other tutoring services, GCCoEd is built on peer-assisted learning,
+          allowing students to be both learners and mentors, fostering a
+          collaborative academic environment.
         </p>
-        
+
         <div class="numbered-icons">
-          <div class="icon-wrapper" @mouseenter="activeIcon = 1" @mouseleave="activeIcon = 0">
+          <div
+            class="icon-wrapper"
+            @mouseenter="activeIcon = 1"
+            @mouseleave="activeIcon = 0"
+          >
             <div class="icon-circle">1</div>
-            <div class="icon-text" :class="{ active: activeIcon === 1 }">Peer-to-Peer Learning</div>
+            <div class="icon-text" :class="{ active: activeIcon === 1 }">
+              Peer-to-Peer Learning
+            </div>
           </div>
-          <div class="icon-wrapper" @mouseenter="activeIcon = 2" @mouseleave="activeIcon = 0">
+          <div
+            class="icon-wrapper"
+            @mouseenter="activeIcon = 2"
+            @mouseleave="activeIcon = 0"
+          >
             <div class="icon-circle">2</div>
-            <div class="icon-text" :class="{ active: activeIcon === 2 }">School-Specific Platform</div>
+            <div class="icon-text" :class="{ active: activeIcon === 2 }">
+              School-Specific Platform
+            </div>
           </div>
-          <div class="icon-wrapper" @mouseenter="activeIcon = 3" @mouseleave="activeIcon = 0">
+          <div
+            class="icon-wrapper"
+            @mouseenter="activeIcon = 3"
+            @mouseleave="activeIcon = 0"
+          >
             <div class="icon-circle">3</div>
-            <div class="icon-text" :class="{ active: activeIcon === 3 }">Flexible Learning</div>
+            <div class="icon-text" :class="{ active: activeIcon === 3 }">
+              Flexible Learning
+            </div>
           </div>
-          <div class="icon-wrapper" @mouseenter="activeIcon = 4" @mouseleave="activeIcon = 0">
+          <div
+            class="icon-wrapper"
+            @mouseenter="activeIcon = 4"
+            @mouseleave="activeIcon = 0"
+          >
             <div class="icon-circle">4</div>
-            <div class="icon-text" :class="{ active: activeIcon === 4 }">Comfortable Learning</div>
+            <div class="icon-text" :class="{ active: activeIcon === 4 }">
+              Comfortable Learning
+            </div>
           </div>
         </div>
       </div>
-      
+
       <div class="divider animated-divider"></div>
 
       <!-- FAQs section -->
       <div class="faq-section">
         <h2 class="section-title">FAQs</h2>
         <div class="faq-list">
-          <div 
-            class="faq-item" 
-            v-for="(faq, index) in faqs" 
+          <div
+            class="faq-item"
+            v-for="(faq, index) in faqs"
             :key="index"
             @click="toggleFaq(index)"
           >
             <div class="faq-question">
               {{ faq.question }}
-              <i class="fas" :class="{'fa-chevron-down': !faq.open, 'fa-chevron-up': faq.open}"></i>
+              <i
+                class="fas"
+                :class="{
+                  'fa-chevron-down': !faq.open,
+                  'fa-chevron-up': faq.open,
+                }"
+              ></i>
             </div>
-            <div class="faq-answer" :class="{ 'open': faq.open }">
+            <div class="faq-answer" :class="{ open: faq.open }">
               {{ faq.answer }}
             </div>
           </div>
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
 import Navbar from "@/components/Navbar.vue";
-import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { useRouter } from "vue-router";
+import { ref } from "vue";
 
 export default {
   name: "LearnMoreComponent",
@@ -126,20 +191,58 @@ export default {
   setup() {
     const router = useRouter();
     const activeIcon = ref(0);
-    
-    const faqs = ref([
-      { question: "Who can use GCCoEd?", answer: "GCCoEd is exclusively available to College of Computer Studies students of Gordon College. It is designed to help students connect with peers for tutoring and educational support." },
-      { question: "How do I become a mentor or learner?", answer: "To become a mentor or learner, you need to create two separate accounts using the same email and password — one for each role. This allows you to switch between mentoring and learning as needed." },
-      { question: "Is there a fee to use GCCoEd?", answer: "No, GCCoEd is completely free to use." },
-      { question: "How do I book a session?", answer: "Once you find a mentor, you can schedule a session as long as they are available on your preferred day and time. Simply choose a suitable slot and you're good to go." },
-      { question: "Can I cancel or reschedule a session?", answer: "Yes, you can cancel or reschedule a session through the session details page. However, we encourage timely communication to avoid inconveniencing mentors or learners." },
-      { question: "How does the rating system work?", answer: "After each session, learners can leave a rating and feedback based on their experience. Ratings help maintain quality and allow mentors to improve their tutoring approach." },
-      { question: "Is there a messaging feature?", answer: "Yes, GCCoEd allows users to send messages within the platform. However, instead of a chat system, messages are delivered via email to the recipient, ensuring important details are not missed." },
-      { question: "What types of subjects can I find on GCCoEd?", answer: "GCCoEd covers the subjects offered by the different programs in the Department of College of Computer Studies - Gordon College." },
-      { question: "How secure is GCCoEd?", answer: "GCCoEd uses secure protocols to protect user data. We continuously implement measures to keep your information secure." },
-      { question: "What if I encounter an issue or need help?", answer: "If you face any issues or need assistance, you can reach out through our support feature. We’re here to ensure you have a smooth experience." },
-    ]);
 
+    const faqs = ref([
+      {
+        question: "Who can use GCCoEd?",
+        answer:
+          "GCCoEd is exclusively available to College of Computer Studies students of Gordon College. It is designed to help students connect with peers for tutoring and educational support.",
+      },
+      {
+        question: "How do I become a mentor or learner?",
+        answer:
+          "To become a mentor or learner, you need to create two separate accounts using the same email and password — one for each role. This allows you to switch between mentoring and learning as needed.",
+      },
+      {
+        question: "Is there a fee to use GCCoEd?",
+        answer: "No, GCCoEd is completely free to use.",
+      },
+      {
+        question: "How do I book a session?",
+        answer:
+          "Once you find a mentor, you can schedule a session as long as they are available on your preferred day and time. Simply choose a suitable slot and you're good to go.",
+      },
+      {
+        question: "Can I cancel or reschedule a session?",
+        answer:
+          "Yes, you can cancel or reschedule a session through the session details page. However, we encourage timely communication to avoid inconveniencing mentors or learners.",
+      },
+      {
+        question: "How does the rating system work?",
+        answer:
+          "After each session, learners can leave a rating and feedback based on their experience. Ratings help maintain quality and allow mentors to improve their tutoring approach.",
+      },
+      {
+        question: "Is there a messaging feature?",
+        answer:
+          "Yes, GCCoEd allows users to send messages within the platform. However, instead of a chat system, messages are delivered via email to the recipient, ensuring important details are not missed.",
+      },
+      {
+        question: "What types of subjects can I find on GCCoEd?",
+        answer:
+          "GCCoEd covers the subjects offered by the different programs in the Department of College of Computer Studies - Gordon College.",
+      },
+      {
+        question: "How secure is GCCoEd?",
+        answer:
+          "GCCoEd uses secure protocols to protect user data. We continuously implement measures to keep your information secure.",
+      },
+      {
+        question: "What if I encounter an issue or need help?",
+        answer:
+          "If you face any issues or need assistance, you can reach out through our support feature. We’re here to ensure you have a smooth experience.",
+      },
+    ]);
 
     const toggleFaq = (index) => {
       faqs.value[index].open = !faqs.value[index].open;
@@ -150,13 +253,13 @@ export default {
     };
 
     return { activeIcon, faqs, toggleFaq, goBack };
-  }
+  },
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
 
 * {
   box-sizing: border-box;
@@ -164,11 +267,12 @@ export default {
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: #2c3e50;
 }
 
@@ -199,7 +303,7 @@ html, body {
   width: 100%;
   margin: 0 auto;
   padding: 40px 5%;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: #2c3e50;
   line-height: 1.6;
 }
@@ -413,7 +517,7 @@ html, body {
 }
 
 .icon-text::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -496,31 +600,32 @@ html, body {
     flex-direction: column;
     gap: 30px;
   }
-  
+
   .logo {
     transform: translateX(0);
     margin-bottom: 20px;
   }
-  
+
   .feature-row {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  
-  .feature-title, .feature-description {
+
+  .feature-title,
+  .feature-description {
     text-align: center;
   }
-  
+
   .numbered-icons {
     gap: 20px;
   }
-  
+
   .developer-card {
     width: 100%;
     max-width: 400px;
   }
-  
+
   .developers-container {
     flex-direction: column;
     align-items: center;
@@ -530,7 +635,7 @@ html, body {
     top: 120px;
     left: 20px;
   }
-  
+
   .back-icon {
     font-size: 24px;
   }
@@ -540,23 +645,23 @@ html, body {
   .numbered-icons {
     gap: 15px;
   }
-  
+
   .icon-circle {
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
   }
-  
+
   .icon-text {
     font-size: 0.8rem;
     padding: 6px 10px;
   }
 
-    .back-button {
+  .back-button {
     top: 100px;
     left: 15px;
   }
-  
+
   .back-icon {
     font-size: 20px;
   }

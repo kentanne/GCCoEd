@@ -104,7 +104,6 @@ const handleStep2 = async () => {
 
 <template>
   <div class="forgot-password-container">
-
     <header class="brand-header">
       <img
         src="/src/assets/logo_gccoed.png"
@@ -246,7 +245,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
-
 
 .logo-img {
   height: 50px;
@@ -501,7 +499,6 @@ button:disabled {
   }
 }
 
-
 /* Ultra-Compact Mobile Responsiveness */
 @media (max-width: 480px) {
   .forgot-password-container {
@@ -581,13 +578,13 @@ button:disabled {
   .form-wrapper {
     padding: 0.8rem;
   }
-  
+
   input,
   select {
     height: 36px;
     padding: 0.5rem 1.6rem 0.5rem 0.6rem;
   }
-  
+
   button {
     width: 80%;
     padding: 0.6rem;
@@ -607,10 +604,10 @@ button:disabled {
   }
 }
 
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+/* @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .forgot-password-container {
   }
-}
+} */
 
 .mosha__toast .mosha__toast__content {
   font-family: "Montserrat", sans-serif;

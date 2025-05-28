@@ -51,7 +51,6 @@ const subjectOptions = computed(() => {
   try {
     return JSON.parse(learnerSubjects || "[]");
   } catch (e) {
-    console.error("Error parsing subjects:", e);
     return [];
   }
 });
@@ -169,10 +168,7 @@ const confirmSchedule = async () => {
       });
 
     // // Debug logs
-    // console.log("Selected Subject:", selectedSubject.value);
-    // console.log("Schedule Data:", scheduleData);
   } catch (error) {
-    console.error("Error in schedule confirmation:", error);
     alert(error.response?.data?.message || "Error sending tutoring offer");
   }
 };
@@ -216,9 +212,7 @@ onMounted(() => {
       selectedDate.value = formatDateForInput(currentDate.value);
       generateDays();
     }
-  } catch (error) {
-    console.error("Error in mounted hook:", error);
-  }
+  } catch (error) {}
 });
 
 // Format date as YYYY-MM-DD for the input
@@ -234,7 +228,6 @@ const availableDays = computed(() => {
   try {
     return JSON.parse(learnerAvail || "[]").map((day) => day.toLowerCase());
   } catch (e) {
-    console.error("Error parsing available days:", e);
     return [];
   }
 });

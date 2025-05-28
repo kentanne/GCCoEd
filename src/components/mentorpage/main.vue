@@ -11,7 +11,6 @@ const searchQuery = ref("");
 const baseURL = api.defaults.baseURL;
 
 const openView = (id) => {
-  console.log("Selected user ID:", id);
   selectedUserId.value = id;
   isView.value = true;
 };

@@ -392,8 +392,6 @@ const approve = async (id) => {
     );
 
     if (response.status === 200) {
-      console.log("Application approved successfully:", response.data);
-
       // Add success toast notification
       createToast("Application approved successfully!", {
         position: "top-right",
@@ -408,8 +406,6 @@ const approve = async (id) => {
     }
     throw new Error(`Failed to approve application: ${response.status}`);
   } catch (error) {
-    console.error("Error approving application:", error);
-
     // Add error toast notification
     createToast("Failed to approve application. Please try again.", {
       position: "top-right",
@@ -438,8 +434,6 @@ const reject = async (id) => {
     );
 
     if (response.status === 200) {
-      console.log("Application rejected successfully:", response.data);
-
       // Add success toast notification
       createToast("Application rejected successfully.", {
         position: "top-right",
@@ -454,8 +448,6 @@ const reject = async (id) => {
     }
     throw new Error(`Failed to reject application: ${response.status}`);
   } catch (error) {
-    console.error("Error rejecting application:", error);
-
     // Add error toast notification
     createToast("Failed to reject application. Please try again.", {
       position: "top-right",
@@ -478,12 +470,10 @@ const getApplicantDetails = async (applicantId) => {
     });
 
     if (response.status === 200) {
-      console.log("User details fetched successfully:", response.data);
       return response.data;
     }
     throw new Error(`Failed to fetch user details: ${response.status}`);
   } catch (error) {
-    console.error("Error fetching user details:", error);
     throw error;
   }
 };
@@ -500,15 +490,12 @@ const getApplicantCreds = async (applicationId) => {
     });
 
     if (response.status === 200) {
-      console.log("Applicant credentials fetched successfully:", response.data);
       return response.data;
     }
     throw new Error(
       `Failed to fetch applicant credentials: ${response.status}`
     );
-  } catch (error) {
-    console.error("Error fetching applicant credentials:", error);
-  }
+  } catch (error) {}
 };
 
 // Replace the existing previewFile and downloadFile functions with these simpler versions
@@ -696,10 +683,8 @@ const confirmAction = async () => {
   try {
     if (actionToConfirm.value === "Approved") {
       await approve(currentAppId.value);
-      console.log("Application approved successfully");
     } else if (actionToConfirm.value === "Rejected") {
       await reject(currentAppId.value);
-      console.log("Application rejected successfully");
     }
 
     // Get the array based on status
@@ -742,7 +727,6 @@ const showCredentials = async (app) => {
     const credentialsResponse = await getApplicantCreds(app);
 
     if (!data || !data.user || !data.info) {
-      console.error("Invalid response data structure");
       return;
     }
 
@@ -787,9 +771,7 @@ const showCredentials = async (app) => {
     };
 
     showCredentialsModal.value = true;
-  } catch (error) {
-    console.error("Error showing credentials:", error);
-  }
+  } catch (error) {}
 };
 
 const hideCredentials = () => {
@@ -799,7 +781,6 @@ const hideCredentials = () => {
 // Modify the onMounted hook
 onMounted(async () => {
   if (props.applicantsList && props.applicantsList.applicants) {
-    console.log(props.applicantsList.applicants);
   }
 });
 

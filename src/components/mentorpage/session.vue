@@ -74,10 +74,8 @@ const sendReminder = async (item) => {
           });
         }
       });
-    // console.log(response.data);
     // Show success message or notification
   } catch (error) {
-    console.error("Error sending reminder:", error);
   } finally {
     showRemindConfirmation.value = false;
   }
@@ -114,7 +112,6 @@ const cancelSession = async (item) => {
           });
         }
       });
-    console.log(response.data);
     todaySchedule.value = todaySchedule.value.filter(
       (session) => session.id !== item.id
     );
@@ -123,7 +120,6 @@ const cancelSession = async (item) => {
     );
     // Show success message or notification
   } catch (error) {
-    console.error("Error cancelling session:", error);
   } finally {
     showCancelConfirmation.value = false;
   }

@@ -38,7 +38,6 @@ function getCookie(name) {
 const rescheduleSession = async () => {
   try {
     if (!selectedDate.value) {
-      console.error("No date selected");
       return;
     }
 
@@ -69,7 +68,6 @@ const rescheduleSession = async () => {
         }
       )
       .then((response) => {
-        console.log("Reschedule response:", response.data);
         createToast("Session rescheduled successfully!", {
           position: "top-right",
           type: "danger",
@@ -81,7 +79,6 @@ const rescheduleSession = async () => {
         isButtonActive.value = true;
       })
       .catch((error) => {
-        console.error("Error rescheduling session:", error);
         createToast("Failed to reschedule session.", {
           position: "top-right",
           type: "danger",
@@ -95,9 +92,7 @@ const rescheduleSession = async () => {
         isSubmitting.value = false;
       });
     // return response.data
-  } catch (error) {
-    console.error("Error rescheduling session:", error);
-  }
+  } catch (error) {}
 };
 </script>
 

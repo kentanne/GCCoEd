@@ -121,8 +121,6 @@ const confirmSchedule = async () => {
       subject: selectedSubject.value,
     };
 
-    console.log("Sending schedule data:", scheduleData);
-
     isSubmitting.value = true; // Set submitting state
     isButtonActive.value = false; // Disable button during submission
 
@@ -161,8 +159,6 @@ const confirmSchedule = async () => {
         isButtonActive.value = true;
       });
 
-    console.log("Schedule response:", response);
-
     createToast("Schedule created successfully", {
       position: "bottom-right",
       type: "success", // Changed from "danger" to "success"
@@ -176,7 +172,6 @@ const confirmSchedule = async () => {
     emit("confirm", scheduleData);
     emit("close");
   } catch (error) {
-    console.error("Error in schedule confirmation:", error);
     createToast("Failed to create schedule. Please try again.", {
       position: "bottom-right",
       type: "danger",
@@ -208,7 +203,6 @@ const availableDays = computed(() => {
       day.toLowerCase()
     );
   } catch (e) {
-    console.error("Error parsing available days:", e);
     return [];
   }
 });
@@ -352,7 +346,6 @@ const subjectOptions = computed(() => {
   try {
     return JSON.parse(mentorSubjects || "[]");
   } catch (e) {
-    console.error("Error parsing subjects:", e);
     return [];
   }
 });

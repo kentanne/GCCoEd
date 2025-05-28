@@ -25,10 +25,7 @@
             />
 
             <!-- Select Dropdown -->
-            <div
-              v-else-if="item.type === 'select'"
-              class="custom-dropdown"
-            >
+            <div v-else-if="item.type === 'select'" class="custom-dropdown">
               <div
                 class="dropdown-container"
                 @click.stop="toggleDropdown(toCamelCase(item.field))"
@@ -310,6 +307,9 @@ import {
 } from "vue";
 import api from "@/axios.js";
 import axios from "axios";
+import { create } from "core-js/core/object";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 const props = defineProps({
   userData: {
@@ -804,11 +804,18 @@ const saveChanges = async () => {
     });
 
     if (response.status === 200) {
-      alert("Changes saved successfully!");
+      createToast("Changes saved successfully!", {
+        position: "bottom-right",
+        type: "success",
+        transition: "slide",
+        timeout: 2000,
+        showIcon: true,
+        toastBackgroundColor: "#319cb0",
+      });
+      // alert("Changes saved successfully!");
       emit("close");
     }
   } catch (error) {
-    console.error("Error saving changes:", error);
     alert("An error occurred while saving changes.");
   }
 };
@@ -1063,5 +1070,4 @@ const isOptionChecked = (field, value) => {
   cursor: pointer;
   font-size: 16px;
 }
-
 </style>

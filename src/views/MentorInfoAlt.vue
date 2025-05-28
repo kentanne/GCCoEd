@@ -822,12 +822,8 @@ export default {
     async csrf() {
       await axios
         .get("/sanctum/csrf-cookie")
-        .then((response) => {
-          console.log("CSRF cookie set");
-        })
-        .catch((error) => {
-          console.error("Error setting CSRF cookie:", error);
-        });
+        .then((response) => {})
+        .catch((error) => {});
     },
     toggleSubjectDropdown() {
       this.showCategories = !this.showCategories;
@@ -1241,9 +1237,7 @@ export default {
               },
             }
           );
-          console.log("Secondary role set:", secondaryRoleResponse.data);
         } catch (error) {
-          console.error("Error setting secondary role:", error);
           throw new Error("Failed to set secondary role");
         }
 
@@ -1300,9 +1294,7 @@ export default {
               accept: "application/json",
             },
           })
-          .then((response) => {
-            // console.log("Mentor registration successful");
-          });
+          .then((response) => {});
 
         // Second API call - Set secondary role
         try {
@@ -1315,7 +1307,6 @@ export default {
               },
             })
             .then((response) => {
-              // console.log("Secondary role set:", response.data);
               createToast("Second Role Set Successfully!", {
                 position: "bottom-right",
                 type: "success",
@@ -1326,7 +1317,6 @@ export default {
               });
             });
         } catch (error) {
-          console.error("Error setting secondary role:", error);
           createToast("Registration failed!", {
             position: "bottom-right",
             type: "danger",
@@ -1341,7 +1331,6 @@ export default {
         this.showStatusPopup = true;
         this.isSubmitted = true;
       } catch (error) {
-        console.error("Application submission error:", error);
         alert(
           "An error occurred while submitting your application. Please try again."
         );
@@ -1351,9 +1340,7 @@ export default {
       }
     },
 
-    sendEmailToAdmin(formData) {
-      console.log("Sending email to admin with application data:", formData);
-    },
+    sendEmailToAdmin(formData) {},
 
     closeStatusPopup() {
       this.showStatusPopup = false;

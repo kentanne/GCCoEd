@@ -33,11 +33,9 @@ const logOut = async () => {
           toastBackgroundColor: "#319cb0",
         });
 
-        // console.log("Logout successful");
         emit("logout");
         router.push("/login");
       } else {
-        // console.error("Logout failed");
         createToast("Logout successful!", {
           position: "bottom-right",
           type: "error",
@@ -47,9 +45,7 @@ const logOut = async () => {
         });
       }
     })
-    .catch((error) => {
-      console.error("Error during logout:", error);
-    });
+    .catch((error) => {});
 };
 
 const emit = defineEmits(["logout", "close"]);

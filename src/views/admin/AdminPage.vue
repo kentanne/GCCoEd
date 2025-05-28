@@ -138,13 +138,12 @@
         <users v-if="activeTab === 'users'" :users="usersFetch" />
 
         <!-- Add this where you want to display the data -->
-        <div v-if="activeTab === 'users'" class="users-container">
+        <!-- <div v-if="activeTab === 'users'" class="users-container">
           <div v-for="user in users" :key="user.id" class="user-item">
             <h3>{{ user.name }}</h3>
             <p>{{ user.email }}</p>
-            <!-- Add more user properties as needed -->
           </div>
-        </div>
+        </div> -->
 
         <div v-if="activeTab === 'application'" class="applicants-container">
           <div
@@ -263,12 +262,7 @@ const fetchAll = async () => {
       mentors: response.data.counts.approved_mentors || 0,
       applicants: response.data.counts.pending_mentors || 0,
     };
-
-    console.log("Users:", usersFetch.value);
-    console.log("Stats:", stats.value);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+  } catch (error) {}
 };
 
 const fetchApplicants = async () => {
@@ -282,10 +276,7 @@ const fetchApplicants = async () => {
       },
     });
     applicantsList.value = response.data; // Store the applicants data
-    console.log("Applicants:", applicantsList.value);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+  } catch (error) {}
 };
 
 const logout = async () => {
@@ -324,10 +315,7 @@ const logout = async () => {
           });
         }
       });
-    console.log("Logout response:", response.data);
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
+  } catch (error) {}
 };
 
 // Lifecycle hook
@@ -342,10 +330,7 @@ onMounted(async () => {
 
     // Use Promise.all to wait for all fetch operations to complete
     await Promise.all([fetchAll(), fetchApplicants()]);
-
-    console.log("All data loaded successfully");
   } catch (error) {
-    console.error("Error loading data:", error);
     createToast("Error loading data. Please refresh the page.", {
       position: "top-right",
       type: "danger",

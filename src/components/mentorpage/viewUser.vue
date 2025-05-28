@@ -47,7 +47,6 @@ const userInfo = async (id) => {
       },
     });
 
-    // console.log("user details:", response.data);
     name.value = response.data.user.name;
     year.value = response.data.user_info.year;
     course.value = response.data.user_info.course;
@@ -81,11 +80,9 @@ const userInfo = async (id) => {
       subjects.value, // userSubjects
     ];
   } catch (error) {
-    console.error("Error fetching user details:", error);
     return null;
   } finally {
     isLoading.value = false; // Stop loading
-    // console.log("Loading completed, isLoading:", isLoading.value);
   }
 };
 
@@ -93,7 +90,6 @@ const userInfo = async (id) => {
 const confirmSendOffer = () => {
   showConfirmationModal.value = false; // Hide confirmation modal
   showOffer.value = true; // Show offer modal
-  console.log("Opening offer modal for", name.value);
 };
 
 const capitalizeFirstLetter = (str) => {
@@ -143,17 +139,13 @@ const openOffer = () => {
 // Add the handleOfferConfirm function
 const handleOfferConfirm = async (offerData) => {
   try {
-    console.log("Offer confirmed:", offerData);
     // Here you can add any additional logic needed after offer confirmation
     showOffer.value = false;
     emit("close");
-  } catch (error) {
-    console.error("Error handling offer confirmation:", error);
-  }
+  } catch (error) {}
 };
 
 onMounted(() => {
-  console.log("test mount");
   userInfo(props.userId);
 });
 </script>

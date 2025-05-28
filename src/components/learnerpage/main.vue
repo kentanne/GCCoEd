@@ -11,7 +11,6 @@ const selectedUserId = ref();
 const searchQuery = ref("");
 
 const openView = (id) => {
-  console.log("Selected user ID:", id);
   selectedUserId.value = id;
   isView.value = true;
 };

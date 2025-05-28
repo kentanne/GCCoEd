@@ -48,7 +48,6 @@ const cancelSession = async (item) => {
         // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     });
-    console.log(response.data);
     todaySchedule.value = todaySchedule.value.filter(
       (session) => session.id !== item.id
     );
@@ -56,7 +55,6 @@ const cancelSession = async (item) => {
       (session) => session.id !== item.id
     );
   } catch (error) {
-    console.error("Error cancelling session:", error);
   } finally {
     showCancelConfirmation.value = false;
   }
@@ -77,12 +75,8 @@ const reschedIsOpen = ref(false);
 
 const filteredFiles = computed(() => {
   if (!selectedMentorId.value || !props.mentFiles?.files) {
-    console.log("No mentor selected or no files available");
     return [];
   }
-
-  console.log("Selected Mentor ID:", selectedMentorId.value);
-  console.log("Available files:", props.mentFiles.files);
 
   const filtered = props.mentFiles.files.filter((file) => {
     const isMatch = String(file.owner_id) === String(selectedMentorId.value);
@@ -92,7 +86,6 @@ const filteredFiles = computed(() => {
     return isMatch;
   });
 
-  console.log("Filtered files:", filtered);
   return filtered.map((file) => ({
     id: file.id,
     name: file.file_name,
@@ -102,9 +95,7 @@ const filteredFiles = computed(() => {
 
 const openFileModal = (files, event, mentorId) => {
   event.stopPropagation();
-  console.log("Opening modal for mentor:", mentorId);
   selectedMentorId.value = mentorId;
-  console.log("filteredFiles:", filteredFiles.value);
   isFileModalOpen.value = true;
 };
 
@@ -171,12 +162,9 @@ const previewFile = (fileId) => {
       },
     })
     .then((response) => {
-      console.log("File URL:", response.data.url);
       window.open(response.data.webViewLink, "_blank");
     })
-    .catch((error) => {
-      console.error("Error fetching file URL:", error);
-    });
+    .catch((error) => {});
 };
 
 const downloadFile = async (fileId, fileName) => {
@@ -202,12 +190,8 @@ const downloadFile = async (fileId, fileName) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
-
-      console.log("File downloaded successfully.");
     })
-    .catch((error) => {
-      console.error("Error downloading file:", error);
-    });
+    .catch((error) => {});
 };
 </script>
 

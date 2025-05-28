@@ -690,12 +690,8 @@ export default {
     async csrf() {
       await api
         .get("/sanctum/csrf-cookie")
-        .then((response) => {
-          console.log("CSRF cookie set");
-        })
-        .catch((error) => {
-          console.error("Error setting CSRF cookie:", error);
-        });
+        .then((response) => {})
+        .catch((error) => {});
     },
 
     toggleSubjectDropdown() {
@@ -1137,7 +1133,6 @@ export default {
           toastBackgroundColor: "#319cb0",
         });
       } catch (error) {
-        console.error("Registration error:", error);
         createToast("Registration failed!", {
           position: "bottom-right",
           type: "danger",

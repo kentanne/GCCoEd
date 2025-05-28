@@ -276,7 +276,6 @@ const closeFileActions = () => {
 };
 
 const viewFile = (file) => {
-  console.log("Viewing file:", file);
   api
     .get("/api/preview/file/" + file.id, {
       withCredentials: true,
@@ -287,17 +286,13 @@ const viewFile = (file) => {
       },
     })
     .then((response) => {
-      console.log("File URL:", response.data.url);
       window.open(response.data.webViewLink, "_blank");
     })
-    .catch((error) => {
-      console.error("Error fetching file URL:", error);
-    });
+    .catch((error) => {});
   closeFileActions();
 };
 
 const downloadFile = (file) => {
-  console.log("Downloading file:", file.id);
   api
     .get("/api/download/file/" + file.id, {
       responseType: "blob",
@@ -319,16 +314,12 @@ const downloadFile = (file) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
-      console.log("File downloaded successfully.");
     })
-    .catch((error) => {
-      console.error("Error downloading file:", error);
-    });
+    .catch((error) => {});
   closeFileActions();
 };
 
 const deleteFile = (file) => {
-  console.log("Deleting file:", file.id);
   api
     .delete("/api/mentor/file/delete/" + file.id, {
       withCredentials: true,
@@ -339,12 +330,9 @@ const deleteFile = (file) => {
       },
     })
     .then((response) => {
-      console.log("File deleted successfully:", response.data);
       files.value = files.value.filter((f) => f.id !== file.id);
     })
-    .catch((error) => {
-      console.error("Error deleting file:", error);
-    });
+    .catch((error) => {});
   closeFileActions();
 };
 
@@ -387,7 +375,6 @@ onMounted(() => {
     "all",
     ...new Set(files.value.map((file) => file.File_type)),
   ];
-  console.log(files.value);
 
   document.addEventListener("click", (event) => {
     if (showTypeFilter.value) {
@@ -508,7 +495,7 @@ onMounted(() => {
   border-bottom: 2px solid var(--primary);
 }
 
-.data-table td{
+.data-table td {
   font-size: 15px;
 }
 .sortable-header {
@@ -541,11 +528,11 @@ onMounted(() => {
   background-color: rgba(59, 154, 169, 0.05);
 }
 
-.data-table th:nth-child(1),  
-.data-table td:nth-child(1) { 
-  width: 290px; 
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  width: 290px;
   max-width: 290px;
-  min-width: 80px; 
+  min-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

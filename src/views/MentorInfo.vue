@@ -1289,6 +1289,8 @@ export default {
               showIcon: true,
               toastBackgroundColor: "#319cb0",
             });
+            this.showStatusPopup = true;
+            this.isSubmitted = true;
           })
           .catch((error) => {
             console.error(error);
@@ -1303,8 +1305,6 @@ export default {
 
         // console.log('Mentor application submitted:', formData);
         this.sendEmailToAdmin(formData);
-        this.showStatusPopup = true;
-        this.isSubmitted = true;
       } catch (error) {
         console.error("Application submission error:", error);
       } finally {

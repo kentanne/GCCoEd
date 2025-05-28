@@ -504,7 +504,6 @@
     <button
       class="next-button"
       @click="nextStep"
-      :disabled="isSubmitting"
       :class="{ loading: isSubmitting, active: isButtonActive }"
       @mousedown="setButtonActive(true)"
       @mouseup="setButtonActive(false)"
@@ -702,12 +701,8 @@ export default {
     async csrf() {
       await api
         .get("/sanctum/csrf-cookie")
-        .then((response) => {
-          console.log("CSRF cookie set");
-        })
-        .catch((error) => {
-          console.error("Error setting CSRF cookie:", error);
-        });
+        .then((response) => {})
+        .catch((error) => {});
     },
     toggleSubjectDropdown() {
       this.showCategories = !this.showCategories;
@@ -1124,7 +1119,6 @@ export default {
             },
           })
           .then((response) => {
-            // console.log("Registration successful:", response);
             createToast("Registration successful!", {
               position: "bottom-right",
               type: "success",
@@ -1135,7 +1129,6 @@ export default {
             });
           })
           .catch((error) => {
-            console.error("Registration error:", error);
             createToast("Registration failed!", {
               position: "bottom-right",
               type: "danger",
@@ -1146,7 +1139,6 @@ export default {
             throw error;
           });
       } catch (error) {
-        console.error("Data collection error:", error);
         alert(
           "An error occurred while submitting your information. Please try again."
         );
@@ -1168,9 +1160,7 @@ export default {
             },
           }
         );
-        console.log("Secondary role set:", secondaryRoleResponse.data);
       } catch (error) {
-        console.error("Error setting secondary role:", error);
         throw new Error("Failed to set secondary role");
       }
     },

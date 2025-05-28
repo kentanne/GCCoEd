@@ -240,7 +240,6 @@ const userInfo = async (id) => {
         },
       })
       .then((response) => {
-        console.log("user details:", response.data);
         mentor_no.value = response.data.user_info.mentor_no;
         name.value = response.data.user.name;
         year.value = response.data.user_info.year;
@@ -272,7 +271,6 @@ const userInfo = async (id) => {
         ];
       });
   } catch (error) {
-    console.error("Error fetching user details:", error);
   } finally {
     isLoading.value = false; // Stop loading regardless of success/failure
   }
