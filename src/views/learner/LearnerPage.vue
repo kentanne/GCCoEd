@@ -410,6 +410,7 @@ onMounted(async () => {
       mentorProfile(),
       sessionForReview(),
       fetchMentFiles(),
+      mentFiles(),
     ]);
   } catch (error) {
     createToast("Error loading data. Please refresh the page.", {
@@ -888,19 +889,18 @@ onMounted(async () => {
 .subject-interest .all-courses-popup {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 50%;
+  left: 30px;
+  width:100%;
   display: flex;
   align-items: center;
-  margin-left: 23%;
-  margin-top: 28%;
+  margin-top: 104%;
   max-height: 50%;
   max-height: 200px;
 }
 
 .subject-interest .popup-content {
   background-color: white;
-  padding: 20px;
+  padding: 10px;
   border-radius: 15px;
   width: 80%;
   max-width: 400px;
@@ -1265,6 +1265,83 @@ onMounted(async () => {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   display: none;
+}
+
+/* Topbar and general button active states */
+.topbar-option:active {
+  background-color: #004d5a;
+  transform: scale(0.98);
+}
+
+/* Edit Information button states */
+.account-dropdown-content a:active {
+  background-color: #004d5a;
+  transform: scale(0.98);
+}
+
+/* Edit Information popup button states */
+.edit-information-popup button {
+  transition: all 0.2s ease;
+}
+
+.edit-information-popup button:active {
+  background-color: #004d5a;
+  color: white;
+  transform: scale(0.95);
+}
+
+/* Account dropdown button active state */
+.account-dropbtn:active {
+  background-color: #004d5a;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Course card active states */
+.subject-interest .course-card:active {
+  background-color: #004d5a;
+  transform: scale(0.98);
+}
+
+.subject-interest .remaining-courses:active {
+  background-color: #004d5a;
+}
+
+.subject-interest .remaining-courses:active .lines {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Popup course active state */
+.popup-course:active {
+  background-color: #004d5a;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Add transitions for smooth effect */
+.topbar-option,
+.account-dropbtn,
+.account-dropdown-content a,
+.course-card,
+.popup-course,
+.edit-information-popup button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Edit Information popup specific styling */
+.edit-information-popup {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.edit-information-popup button.save-btn:active {
+  background-color: #004d5a;
+  color: white;
+}
+
+.edit-information-popup button.cancel-btn:active {
+  background-color: #cc0000;
+  color: white;
 }
 
 /* Responsive styles */

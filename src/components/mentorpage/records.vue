@@ -586,6 +586,7 @@ onMounted(() => {
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
+  width: 90%;
 }
 
 .section-title {
@@ -600,6 +601,7 @@ onMounted(() => {
 
 .section-title i {
   font-size: 1rem;
+  
 }
 
 .divider2 {
@@ -614,6 +616,9 @@ onMounted(() => {
   line-height: 1.6;
   color: #4b5563;
   text-align: left;
+  overflow-x: hidden;
+  word-wrap: break-word;
+
 }
 
 .detail-item2 {
@@ -726,6 +731,319 @@ onMounted(() => {
   .profile-image {
     width: 100px;
     height: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .table-container {
+    width: 95%;
+    margin-left: 1rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .user-modal {
+    width: 50%;
+    transform: translateX(0);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    width: 100%;
+    margin-left: 0;
+    padding: 0 0.5rem;
+    /* Border radius maintained */
+  }
+
+  .table-header {
+    padding: 1rem;
+    /* Border radius maintained in gradient background */
+  }
+
+  .search-input {
+    width: 100%;
+    border-radius: 8px; /* Maintained */
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .user-modal {
+    width: 80%;
+    max-height: 85vh;
+    border-radius: 12px; /* Maintained */
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .profile-info {
+    width: 100%;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-title {
+    font-size: 1.3rem;
+  }
+
+  .data-table {
+    font-size: 0.85rem;
+  }
+
+  .details-btn span {
+    display: none;
+  }
+
+  .user-modal {
+    width: 95%;
+    border-radius: 12px; /* Maintained */
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Maintained */
+    border: 4px solid #e1e4e8; /* Maintained */
+  }
+
+  .user-name {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  .info-value {
+    margin-left: 0;
+  }
+
+  .bio-card {
+    border-radius: 10px; /* Maintained */
+  }
+}
+
+@media (max-width: 400px) {
+  .table-title {
+    font-size: 1.2rem;
+  }
+
+  .header-icon {
+    font-size: 1.1rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .star {
+    font-size: 1rem;
+  }
+
+  .details-btn {
+    border-radius: 6px; /* Maintained */
+  }
+}
+
+@media (max-width: 768px) {
+  /* ... (keep your existing mobile styles) ... */
+
+  /* Center align the course, year, and rating in feedback details */
+  .profile-info {
+    text-align: center;
+  }
+
+  .info-item {
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-value {
+    margin-left: 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .user-name {
+    text-align: center;
+  }
+
+  .divider {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Ensure centered alignment carries through to smaller screens */
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-item {
+    width: 100%;
+    align-items: center;
+  }
+}
+@media (max-width: 1200px) {
+  .user-modal {
+    width: 50%;
+    transform: translateX(0);
+    margin: 0 auto;
+  }
+  
+  .bio-card {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 992px) {
+  .user-modal {
+    width: 60%;
+  }
+  
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .profile-info {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .info-grid {
+    justify-content: center;
+  }
+  
+  .info-item {
+    align-items: center;
+  }
+  
+  .bio-card {
+    width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-modal {
+    width: 80%;
+    max-height: 85vh;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .user-name {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .divider {
+    margin: 0 auto 1rem;
+    width: 80%;
+  }
+  
+  .bio-card {
+    width: 100%;
+    padding: 1rem;
+  }
+  .bio-card{
+    width: 90%;
+  }
+}
+
+@media (max-width: 576px) {
+  .user-modal {
+    width: 95%;
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding: 0.75rem;
+  }
+  
+  .modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .footer-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+    .bio-card{
+    width: 90%;
+  }
+}
+
+@media (max-width: 400px) {
+  .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  .profile-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .user-name {
+    font-size: 1.2rem;
+  }
+  
+  .info-label {
+    font-size: 0.75rem;
+  }
+  
+  .info-value {
+    font-size: 0.85rem;
+  }
+  
+  .detail-value2 {
+    font-size: 0.8rem;
+  }
+  .bio-card{
+    width: 80%;
   }
 }
 </style>

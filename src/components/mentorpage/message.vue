@@ -127,4 +127,35 @@ textarea:focus {
 .lower-element button:active {
 	transform: translateY(0);
 }
+
+@media (max-width: 768px) {
+  .message-wrapper {
+    width: 90%;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 480px) {
+  .message-wrapper {
+    width: 160%;
+    height: 290px;
+  }
+  
+  .upper-element {
+    padding: 1rem;
+  }
+  
+  .upper-element h1 {
+    font-size: 1.1rem;
+  }
+  
+  .lower-element {
+    padding: 1rem;
+  }
+  
+  textarea {
+    width: 91%;
+  }
+}
 </style>

@@ -762,12 +762,12 @@ const parseArrayString = (str) => {
   overflow: hidden;
   width: 90%;
   margin: 0 auto;
-  padding: 0 1rem 0 1rem;
   text-align: center;
-  max-height: 465px;
-  height: 460px;
-  overflow-y: auto;
-  margin-top: 2rem;
+  height: calc(89vh - 120px); /* Set fixed height, considering some margin from top */
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 .table-header {
@@ -778,6 +778,9 @@ const parseArrayString = (str) => {
   gap: 1rem;
   flex-wrap: wrap;
   color: #0b2548;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .table-title {
@@ -864,13 +867,46 @@ const parseArrayString = (str) => {
 
 .table-scroll-container {
   overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  flex-grow: 1;
+  position: relative;
+  height: calc(100% - 80px); /* Subtract header height */
+  margin: 0 1rem;
+  /* Add smooth scrolling */
+  scroll-behavior: smooth;
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  
+  /* Hide scrollbar for Chrome/Safari/Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
+
+/* Remove these blocks since we're hiding scrollbars completely
+&::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+&::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+&::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} */
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: center;
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
 }
 
 .data-table th {
@@ -879,14 +915,31 @@ const parseArrayString = (str) => {
   background-color: #e5e5e5;
   color: var(--text-dark);
   font-weight: 600;
-  padding: 0.75rem;
+  padding: 0.5rem;
+  font-size: 0.9rem;
   border-bottom: 2px solid var(--primary);
+  z-index: 10;
+}
+
+.data-table tbody {
+  background-color: white;
+}
+
+/* Add box shadow to sticky header for better visual separation */
+.data-table th::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .data-table td {
-  padding: 0.8rem;
+  padding: 0.5rem; /* Reduced from 0.8rem */
   vertical-align: middle;
   border-bottom: 1px solid #eee;
+  font-size: 0.9rem; /* Added to reduce font size */
 }
 
 .data-table tr:hover {
@@ -895,18 +948,19 @@ const parseArrayString = (str) => {
 
 .id-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.35rem; /* Reduced from 0.25rem 0.5rem */
   border-radius: 6px;
   background-color: rgba(59, 154, 169, 0.1);
   color: var(--primary);
   font-weight: 500;
+  font-size: 0.85rem; /* Added to reduce font size */
 }
 
 .role-badge {
   display: inline-block;
-  padding: 0.35rem 0.75rem;
+  padding: 0.25rem 0.5rem; /* Reduced from 0.35rem 0.75rem */
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem; /* Reduced from 0.75rem */
   font-weight: 600;
   color: white;
 }
@@ -921,9 +975,9 @@ const parseArrayString = (str) => {
 
 .secondary-role-badge {
   display: inline-block;
-  padding: 0.35rem 0.75rem;
+  padding: 0.25rem 0.5rem; /* Reduced from 0.35rem 0.75rem */
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem; /* Reduced from 0.75rem */
   font-weight: 600;
   color: white;
 }
@@ -947,10 +1001,10 @@ const parseArrayString = (str) => {
   border: 1px solid var(--primary-dark);
   background-color: rgba(73, 152, 164, 0.103);
   color: var(--primary-dark);
-  padding: 6px 12px;
+  padding: 4px 8px; /* Reduced from 6px 12px */
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Reduced from 0.9rem */
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -985,21 +1039,33 @@ const parseArrayString = (str) => {
   max-width: 900px;
   width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow-y: scroll; /* Changed from auto to scroll */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  position: relative;
+  /* Add these lines to hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Add this to hide scrollbar in Webkit browsers (Chrome, Safari, etc.) */
+.user-modal::-webkit-scrollbar {
+  display: none;
 }
 
 .modal-header {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+  position: sticky; /* Add this line */
+  top: 0; /* Add this line */
+  z-index: 10; /* Add this line */
 }
 
 .header-content {
@@ -1040,6 +1106,7 @@ const parseArrayString = (str) => {
 
 .modal-body {
   padding: 1.5rem;
+  padding-bottom: 100px; /* Increased padding to ensure content doesn't get cut off */
 }
 
 .user-profile {
@@ -1093,7 +1160,8 @@ const parseArrayString = (str) => {
   font-size: 1.6rem;
   color: #0b2548;
   font-weight: 700;
-  text-align: left;
+  text-align: center; /* Changed from left to center */
+  width: 100%; /* Ensure full width */
 }
 
 .divider {
@@ -1209,6 +1277,8 @@ const parseArrayString = (str) => {
   line-height: 1.6;
   color: #4b5563;
   text-align: left;
+  word-break: break-word; /* Add this line */
+  white-space: pre-wrap; /* Add this line */
 }
 
 .detail-item2 {
@@ -1219,6 +1289,8 @@ const parseArrayString = (str) => {
   display: block;
   margin-top: 0.5rem;
   line-height: 1.5;
+  word-break: break-word; /* Add this line */
+  white-space: pre-wrap; /* Add this line */
 }
 
 /* Credentials Section */
@@ -1320,6 +1392,11 @@ const parseArrayString = (str) => {
   align-items: center;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
+  position: sticky; /* Add this */
+  bottom: 0; /* Add this */
+  z-index: 10; /* Add this */
+  backdrop-filter: blur(8px); /* Optional: adds blur effect to footer background */
+  background-color: rgba(249, 250, 251, 0.95); /* Semi-transparent background */
 }
 
 .footer-btn {
@@ -1495,99 +1572,289 @@ const parseArrayString = (str) => {
 .modal-btn.cancel:hover {
   background-color: #eee;
 }
-
-.modal-btn.confirm {
-  background-color: var(--primary);
-  color: white;
-}
-
 .modal-btn.confirm:hover {
   background-color: var(--primary-dark);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .table-container {
+    width: 95%;
+    margin: 1rem auto;
+    height: calc(95vh - 80px);
+    border-radius: 20px; /* Keep border radius */
+  }
+
   .table-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    padding: 1rem;
+    /* Remove flex-direction: column to keep items in row */
+  }
+
+  .filter-buttons {
+    order: 2;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    /* Remove width: 100% to prevent wrapping */
+    white-space: nowrap; /* Prevent button text wrapping */
   }
 
   .search-container {
-    margin-left: 0;
-    width: 100%;
+    order: 3;
+    min-width: 200px; /* Set minimum width */
+    margin-left: 0.5rem;
   }
 
   .search-input {
     width: 100%;
   }
 
+  .table-scroll-container {
+    margin: 0 1rem;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  /* Keep table structure and make it scrollable */
+  .data-table {
+    min-width: 800px; /* Minimum width to ensure all columns are visible */
+    width: 100%;
+  }
+
+  /* Keep original table styles */
+  .data-table thead {
+    display: table-header-group; /* Keep headers visible */
+  }
+
+  .data-table tbody {
+    display: table-row-group;
+  }
+
+  .data-table tr {
+    display: table-row;
+  }
+
+  .data-table td {
+    display: table-cell;
+    padding: 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  /* Remove the mobile-specific td::before since we're keeping the table structure */
+  .data-table td::before {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .search-input {
+    font-size: 0.85rem;
+  }
+
+  .table-container {
+    border-radius: 20px; /* Keep border radius */
+    margin: 1rem auto;
+  }
+}
+
+/* Add smooth scrollbar styling for the horizontal scroll */
+.table-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Add these responsive styles at the end of your existing CSS */
+@media screen and (max-width: 1024px) {
+  .details-section {
+    grid-template-columns: 1fr; /* Stack cards vertically on tablets */
+  }
+
   .user-profile {
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .profile-info {
+    width: 100%;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .table-container {
+    width: 95%;
+    margin: 1rem auto;
+  }
+
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+
+  .table-title {
+    width: 100%;
+    justify-content: center; /* Center the title */
+    font-size: 1.3rem;
+    margin: 0; /* Remove margin to ensure perfect centering */
+  }
+
+  .filter-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .search-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .export-btn {
+    margin-left: 0.5rem;
+  }
+
+  /* Modal Responsive Styles */
+  .user-modal {
+    width: 95%;
+    margin: 1rem;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+  }
+
+  .modal-body {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .details-content,
+  .bio-content {
+    max-width: 100%;
+  }
+
+  /* Adjust grid layout for details section */
+  .details-section {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }  /* Update the responsive styles for the table title */
+  @media screen and (max-width: 768px) {
+    .table-title {
+      width: 100%;
+      justify-content: center; /* Center the title */
+      font-size: 1.3rem;
+      margin: 0; /* Remove margin to ensure perfect centering */
+    }
+  
+    /* Add word-break for modal content */
+    .user-modal {
+      width: 95%;
+      margin: 1rem;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+  
+    .detail-value, 
+    .info-value,
+    .detail-value2 {
+      word-break: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+  
+    /* Add max-width to ensure content doesn't overflow */
+    .modal-body {
+      padding: 1rem;
+      max-width: 100%;
+    }
+  
+    .details-content,
+    .bio-content {
+      max-width: 100%;
+    }
+  
+    /* Adjust grid layout for details section */
+    .details-section {
+      grid-template-columns: 1fr;
+      max-width: 100%;
+    }
+  
+    .details-card,
+    .bio-card {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  
+    /* Make table header items stack properly */
+    .table-header {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  .details-card,
+  .bio-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Make table header items stack properly */
+  .table-header {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+@media screen and (max-width: 480px) {
+  .table-title {
+    font-size: 1.2rem;
+  }
+
+  .filter-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
   }
 
   .info-grid {
     grid-template-columns: 1fr;
   }
 
-  .details-section {
-    grid-template-columns: 1fr;
-  }
-
-  .credentials-section {
-    grid-column: span 1;
-  }
-
-  .info-value {
-    margin-left: 0;
-    text-align: left;
-  }
-
-  .mentor-actions {
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .footer-btn.warning,
-  .footer-btn.suspend {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .modal-actions {
-    flex-direction: column;
-  }
-
-  .modal-btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .data-table {
-    display: block;
-    overflow-x: auto;
-  }
-
-  .filter-buttons {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-
-  .filter-btn {
-    flex-shrink: 0;
-  }
-
-  .modal-body {
+  .details-card, 
+  .bio-card {
     padding: 1rem;
-  }
-
-  .user-profile {
-    gap: 1.5rem;
   }
 
   .profile-image {
@@ -1595,18 +1862,105 @@ const parseArrayString = (str) => {
     height: 100px;
   }
 
-  .details-card,
-  .bio-card {
+  .role-badge-large {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .modal-header {
     padding: 1rem;
   }
 
-  .credential-card {
-    flex-direction: column;
-    text-align: center;
+  .modal-title {
+    font-size: 1.2rem;
   }
 
-  .file-actions {
-    justify-content: center;
+  .section-title {
+    font-size: 1rem;
+  }
+}
+
+/* Add styles for horizontal scrolling on mobile */
+@media screen and (max-width: 768px) {
+  .table-scroll-container {
+    margin: 0;
+    padding: 0 1rem;
+  }
+
+  .data-table {
+    min-width: 800px;
+  }
+
+  /* Custom scrollbar for better UX */
+  .table-scroll-container::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .table-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+  }
+
+  .table-scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+  }
+
+  /* Add visual indicator for scrollable content */
+  .table-scroll-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .table-scroll-container:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Add smooth transitions for responsive changes */
+.table-container,
+.table-header,
+search-container,
+.filter-buttons,
+.user-modal,
+.details-section {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Update the user-name class in your existing CSS */
+.user-name {
+  margin: 0.6rem 0 1.5rem 0;
+  font-size: 1.6rem;
+  color: #0b2548;
+  font-weight: 700;
+  text-align: center; /* Changed from left to center */
+  width: 100%; /* Ensure full width */
+}
+
+@media screen and (max-width: 768px) {
+  .user-name {
+    text-align: center;
+    font-size: 1.4rem;
+    margin: 1rem 0;
+    width: 100%;
+    word-break: break-word; /* Handle long names */
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .profile-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center all profile info content */
   }
 }
 </style>

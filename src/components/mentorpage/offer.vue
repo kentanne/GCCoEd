@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
 import { createToast } from "mosha-vue-toastify";
@@ -212,7 +212,13 @@ onMounted(() => {
       selectedDate.value = formatDateForInput(currentDate.value);
       generateDays();
     }
+
+    document.body.style.overflow = "hidden";
   } catch (error) {}
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = "";
 });
 
 // Format date as YYYY-MM-DD for the input
@@ -356,6 +362,8 @@ const setButtonActive = (active) => {
 </script>
 
 <template>
+  <!-- Remove the modal-backdrop div from your template -->
+
   <div class="booking">
     <!-- Header -->
     <div class="header">
@@ -548,11 +556,23 @@ const setButtonActive = (active) => {
 .booking {
   border-bottom-width: 4px;
   width: 1000px;
-  max-width: 1000px;
+  max-width: 900px;
+  margin-left: 10rem;
+  margin-right: -10rem;
+  top: 1rem; /* Changed from 3rem to 1rem to move it higher */
+  max-height: 85vh; /* Increased from 85vh to 90vh */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5); /* Enhanced shadow */
+  position: fixed;
+  z-index: 999;
+  background: white;
+  border-radius: 1.5rem;
 }
 
 .header {
-  background-color: #0b3b44;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   padding: 0.75rem 1.25rem;
   border-top-left-radius: 1.5rem;
@@ -560,12 +580,18 @@ const setButtonActive = (active) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .header h1 {
   font-weight: 800;
   font-size: 1.125rem;
   user-select: none;
 }
+
 .header button {
   font-size: 2rem;
   font-weight: 800;
@@ -575,15 +601,23 @@ const setButtonActive = (active) => {
   border: none;
   cursor: pointer;
   user-select: none;
+  transition: transform 0.2s;
 }
+
+.header button:hover {
+  transform: scale(1.1);
+}
+
 .profile {
-  background-color: #d9d9d9;
+  background-color: #f8f9fa;
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
   color: #0b3b44;
+  border-bottom: 1px solid #e9ecef;
 }
+
 .profile img {
   width: 4rem;
   height: 4rem;
@@ -591,28 +625,44 @@ const setButtonActive = (active) => {
   border: 2px solid #0b3b44;
   object-fit: cover;
 }
+
+.profile div p {
+  margin: 0.25rem 0;
+}
+
+.profile div p:first-child {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
 .content {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   padding: 2.5rem;
   background-color: white;
+  overflow-y: auto;
+  flex-grow: 1;
+  height: calc(100% - 140px); /* Adjust based on header and footer height */
 }
+
 @media (min-width: 768px) {
   .content {
     flex-direction: row;
   }
 }
-.left,
-.right {
+
+.left, .right {
   flex: 1;
 }
+
 .time-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
+
 .time-header h2 {
   font-weight: 600;
   color: #0b3b44;
@@ -620,22 +670,25 @@ const setButtonActive = (active) => {
   user-select: none;
   margin: 0;
 }
+
 .time-header p {
   font-style: italic;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #6c757d;
   user-select: none;
   margin: 0;
 }
+
 .time-slots {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem 2rem;
   max-width: 20rem;
 }
+
 .time-btn {
-  background-color: #e5e7eb;
-  color: #4b5563;
+  background-color: #e9ecef;
+  color: #495057;
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.5rem 1.5rem;
@@ -645,10 +698,20 @@ const setButtonActive = (active) => {
   cursor: pointer;
   transition: all 0.2s;
 }
+
+.time-btn:hover {
+  background-color: #dee2e6;
+}
+
 .time-selected {
   background-color: #0b3b44;
   color: white;
 }
+
+.time-selected:hover {
+  background-color: #0a2e34;
+}
+
 .mode-header {
   font-weight: 600;
   color: #0b3b44;
@@ -656,108 +719,134 @@ const setButtonActive = (active) => {
   margin: 2rem 0 0.75rem 0;
   user-select: none;
 }
+
 .mode-buttons {
   display: flex;
   gap: 1.5rem;
 }
+
 .mode-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  padding: 0.25rem 0.75rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
   cursor: pointer;
   user-select: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ced4da;
   background-color: white;
   transition: all 0.2s;
 }
+
 .mode-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f3f4f6;
-  border-color: #e5e7eb;
+  background-color: #e9ecef;
 }
 
 .mode-btn:disabled:hover {
-  background-color: #f3f4f6;
+  background-color: #e9ecef;
 }
+
 .mode-btn:hover {
-  background-color: #f3f4f6;
+  background-color: #f1f3f5;
 }
+
 .mode-active {
   background-color: #0b3b44;
   color: white;
   border-color: #0b3b44;
 }
+
 .mode-active:hover {
   background-color: #0a2e34;
 }
+
 .location-input {
   margin-top: 1rem;
 }
+
 .location-field {
-  width: 70%;
+  width: 100%;
+  max-width: 300px;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ced4da;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  transition: border-color 0.2s;
 }
+
+.location-field:focus {
+  outline: none;
+  border-color: #0b3b44;
+  box-shadow: 0 0 0 2px rgba(11, 59, 68, 0.1);
+}
+
 .right {
   max-width: 22rem;
 }
+
 .calendar {
-  border: 1px solid #d1d5db;
+  border: 1px solid #dee2e6;
   border-radius: 0.375rem;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   padding: 0.75rem;
   font-family: Arial, sans-serif;
   font-size: 0.75rem;
-  color: #4b5563;
+  color: #495057;
   width: 100%;
 }
+
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
   font-size: 0.8125rem;
-  color: #9ca3af;
+  color: #6c757d;
 }
+
 .month-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
+
 .calendar-header .month {
   font-weight: 700;
-  color: #000000;
+  color: #212529;
   font-size: 0.8125rem;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
+  transition: background-color 0.2s;
 }
+
 .calendar-header .month:hover {
-  background-color: #f0f0f0;
+  background-color: #f1f3f5;
 }
+
 .calendar-header .today-btn {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   background: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ced4da;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
+
 .calendar-header .today-btn:hover {
-  background-color: #f0f0f0;
+  background-color: #f1f3f5;
 }
+
 .calendar-header .arrow {
   display: flex;
   gap: 0.25rem;
-  color: #4b5563;
+  color: #495057;
   cursor: pointer;
   user-select: none;
   background: none;
@@ -765,33 +854,41 @@ const setButtonActive = (active) => {
   font-size: 1rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
+  transition: background-color 0.2s;
 }
+
 .calendar-header .arrow:hover {
-  background-color: #f0f0f0;
+  background-color: #f1f3f5;
 }
+
 .year-select {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
-  background-color: #f9f9f9;
+  background-color: #f8f9fa;
   border-radius: 0.25rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e9ecef;
 }
+
 .year-option {
   padding: 0.25rem;
   text-align: center;
   cursor: pointer;
   border-radius: 0.25rem;
+  transition: all 0.2s;
 }
+
 .year-option:hover {
-  background-color: #e5e7eb;
+  background-color: #e9ecef;
 }
+
 .year-active {
   background-color: #0b3b44;
   color: white;
 }
+
 .calendar-legend {
   display: flex;
   justify-content: center;
@@ -799,11 +896,13 @@ const setButtonActive = (active) => {
   margin: 0.5rem 0;
   font-size: 0.75rem;
 }
+
 .legend-item {
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
+
 .legend-dot {
   width: 8px;
   height: 8px;
@@ -815,28 +914,9 @@ const setButtonActive = (active) => {
 }
 
 .legend-dot.unavailable {
-  background-color: #e5e7eb;
+  background-color: #e9ecef;
 }
 
-.day.available {
-  color: #000000;
-  cursor: pointer;
-}
-
-.day.unavailable {
-  color: #d1d5db;
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-}
-
-.day.unavailable:hover {
-  background-color: #f3f4f6;
-}
-
-.day.selected.available {
-  background-color: #0b3b44;
-  color: white;
-}
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -844,9 +924,10 @@ const setButtonActive = (active) => {
   text-align: center;
   font-size: 0.625rem;
   font-weight: 400;
-  color: #9ca3af;
+  color: #6c757d;
   margin-bottom: 0.25rem;
 }
+
 .days {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -855,69 +936,112 @@ const setButtonActive = (active) => {
   font-size: 0.6875rem;
   font-weight: 400;
 }
+
 .day {
   padding: 0.5rem 0;
   border-radius: 0.25rem;
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .day:hover {
-  background-color: #f0f0f0;
+  background-color: #f1f3f5;
 }
+
 .day.current {
-  color: #000000;
+  color: #212529;
   font-weight: 600;
 }
+
 .day.other {
-  color: #9ca3af;
+  color: #adb5bd;
   font-weight: 400;
 }
+
 .day.today {
   background-color: #349eb1;
   color: white;
 }
+
 .day.selected {
   background-color: #0b3b44;
   color: white;
 }
+
+.day.available {
+  color: #212529;
+  cursor: pointer;
+}
+
+.day.unavailable {
+  color: #ced4da;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.day.unavailable:hover {
+  background-color: #f8f9fa;
+}
+
+.day.selected.available {
+  background-color: #0b3b44;
+  color: white;
+}
+
 .footer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #d1d5db;
+  border-top: 1px solid #dee2e6;
   background-color: white;
   border-bottom-left-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .btn-cancel {
-  color: #e11d1d;
+  color: #dc3545;
   font-weight: 600;
   font-size: 0.875rem;
-  border: 1px solid #e11d1d;
+  border: 1px solid #dc3545;
   border-radius: 0.375rem;
-  padding: 0.25rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   cursor: pointer;
   user-select: none;
   background: none;
+  transition: all 0.2s;
 }
+
+.btn-cancel:hover {
+  background-color: #f8f9fa;
+}
+
 .btn-proceed {
-  background-color: #2b8a9e;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
   border-radius: 0.375rem;
-  padding: 0.25rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   cursor: pointer;
   user-select: none;
   border: none;
+  transition: all 0.2s;
 }
+
 .btn-proceed:hover {
-  background-color: #1f6d7e;
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
 }
+
 .subject-select {
   margin-top: 1.5rem;
+  width: 100%;
 }
+
 .subject-header {
   font-weight: 600;
   color: #0b3b44;
@@ -925,29 +1049,82 @@ const setButtonActive = (active) => {
   margin-bottom: 0.5rem;
   user-select: none;
 }
+
 .subject-dropdown {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   background-color: white;
-  color: #4b5563;
+  color: #495057;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3b44' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  transition: all 0.2s;
 }
+
 .subject-dropdown:focus {
   outline: none;
   border-color: #0b3b44;
-  /* ring: 2px;
-  ring-color: #0b3b44; */
+  box-shadow: 0 0 0 2px rgba(11, 59, 68, 0.1);
 }
 
-.mosha__toast .mosha__toast__content {
-  font-family: "Montserrat", sans-serif;
-  font-size: 0.9rem;
+.subject-dropdown option {
+  white-space: normal;
+  word-wrap: break-word;
+  padding: 8px 12px;
 }
 
-.mosha__toast .mosha__toast__content .mosha__toast__content__text {
-  padding: 0.5rem;
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .booking {
+    width: 100%;
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 992px) {
+  .content {
+    padding: 1.5rem;
+  }
+  
+  .time-slots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    height: calc(100% - 160px); /* Adjust for mobile header/footer sizes */
+  }
+  
+  .header {
+    position: sticky;
+    top: 0;
+  }
+  
+  .footer {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .booking {
+    margin-top: 0;
+    top: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 </style>
