@@ -884,7 +884,7 @@ onMounted(async () => {
   position: fixed;
   top: 0;
   left: 30px;
-  width:100%;
+  width: 100%;
   display: flex;
   align-items: center;
   margin-top: 104%;
@@ -1061,17 +1061,7 @@ onMounted(async () => {
 }
 
 .topbar-option.active {
-  background-color: #006981;
-  position: relative;
-}
-
-.topbar-option.active .nav-text {
-  color: white;
-  font-weight: 600;
-}
-
-.topbar-option.active .nav-icon {
-  filter: brightness(0) invert(1);
+  background-color: #e6f7ff;
 }
 
 .topbar-option.active::after {
@@ -1081,7 +1071,7 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #00a3cc;
+  background-color: #006981;
 }
 
 .nav-icon {
@@ -1108,6 +1098,15 @@ onMounted(async () => {
 .topbar-option.active .nav-text {
   color: #004d5a;
   font-weight: 600;
+}
+
+.topbar-date {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background-color: #f5f5f5;
 }
 
 .topbar-date {
