@@ -68,7 +68,9 @@
         </div>
 
         <div class="personal-field">
-          <label class="personal-label required" for="gender">SEX AT BIRTH</label>
+          <label class="personal-label required" for="gender"
+            >SEX AT BIRTH</label
+          >
           <div class="gender-dropdown">
             <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
@@ -493,7 +495,7 @@
           <div
             v-for="step in totalSteps"
             :key="step"
-            :class=" [
+            :class="[
               'step',
               { active: step === currentStep, completed: step < currentStep },
             ]"
@@ -502,17 +504,22 @@
         </div>
       </div>
     </div>
-    <button 
-      class="next-button" 
+    <button
+      class="next-button"
       @click="nextStep"
-      :disabled="isSubmitting"
-      :class="{ 'loading': isSubmitting, 'active': isButtonActive }"
+      :class="{ loading: isSubmitting, active: isButtonActive }"
       @mousedown="setButtonActive(true)"
       @mouseup="setButtonActive(false)"
       @mouseleave="setButtonActive(false)"
     >
       <span v-if="isSubmitting" class="loading-spinner"></span>
-      {{ isSubmitting ? 'Submitting...' : (currentStep === totalSteps ? "SUBMIT" : "NEXT") }}
+      {{
+        isSubmitting
+          ? "Submitting..."
+          : currentStep === totalSteps
+          ? "SUBMIT"
+          : "NEXT"
+      }}
     </button>
   </div>
 </template>
@@ -675,11 +682,11 @@ export default {
         this.isButtonActive = active;
       }
     },
-    
+
     scrollToGetStarted() {
       this.$router.push("/signup");
     },
-    
+
     async csrf() {
       await api
         .get("/sanctum/csrf-cookie")
@@ -690,7 +697,7 @@ export default {
           console.error("Error setting CSRF cookie:", error);
         });
     },
-    
+
     toggleSubjectDropdown() {
       if (!this.isSubmitting) {
         this.showCategories = !this.showCategories;
@@ -771,7 +778,8 @@ export default {
     toggleDropdown(type) {
       if (!this.isSubmitting) {
         for (const key in this.dropdownOpen) {
-          this.dropdownOpen[key] = key === type ? !this.dropdownOpen[key] : false;
+          this.dropdownOpen[key] =
+            key === type ? !this.dropdownOpen[key] : false;
         }
       }
     },
@@ -814,7 +822,7 @@ export default {
 
     nextStep() {
       if (this.isSubmitting) return; // Prevent multiple submissions
-      
+
       const validationErrors = this.validateForm();
 
       if (validationErrors.length > 0) {
@@ -846,7 +854,7 @@ export default {
 
     handleProfileUpload(event) {
       if (this.isSubmitting) return;
-      
+
       const file = event.target.files[0];
       if (file) {
         if (!file.type.match("image.*")) {
@@ -1066,9 +1074,9 @@ export default {
 
     async submitLearnerInfo() {
       if (this.isSubmitting) return; // Prevent multiple submissions
-      
+
       this.isSubmitting = true;
-      
+
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
 
@@ -1142,7 +1150,7 @@ export default {
         this.setButtonActive(false);
       }
     },
-    
+
     validateField(field, value) {
       const rules = this.validationRules[field];
       if (!rules) return;
@@ -1294,8 +1302,12 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Disabled states for form elements */

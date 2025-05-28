@@ -584,7 +584,6 @@
     <button
       class="next-button"
       @click="nextStep"
-      :disabled="isSubmitting"
       :class="{ loading: isSubmitting, active: isButtonActive }"
       @mousedown="setButtonActive(true)"
       @mouseup="setButtonActive(false)"
@@ -2314,8 +2313,12 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {

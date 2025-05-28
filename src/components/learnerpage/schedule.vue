@@ -554,12 +554,7 @@ const setButtonActive = (active) => {
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button
-        @click="confirmSchedule"
-        type="button"
-        class="btn-proceed"
-        :disabled="!isButtonActive || isSubmitting"
-      >
+      <button @click="confirmSchedule" type="button" class="btn-proceed">
         PROCEED
       </button>
     </div>

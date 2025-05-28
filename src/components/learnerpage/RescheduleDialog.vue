@@ -129,11 +129,7 @@ const rescheduleSession = async () => {
 
       <div class="button-container">
         <button @click="$emit('close')" class="cancel-button">Cancel</button>
-        <button
-          @click="rescheduleSession"
-          class="confirm-button"
-          :disabled="!selectedDate || isSubmitting"
-        >
+        <button @click="rescheduleSession" class="confirm-button">
           <span v-if="isSubmitting" class="loader"></span>
           <span v-else>Reschedule</span>
         </button>
