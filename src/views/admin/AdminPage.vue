@@ -33,7 +33,7 @@
       class="app-header"
       :class="{ 'header-expanded': isMobileView && !isSidebarVisible }"
     >
-      <div class="profile-section">
+      <!-- <div class="profile-section">
         <div class="avatar-container">
           <img
             alt="Profile image"
@@ -48,7 +48,7 @@
             BS Information Technology • College of Computer Studies
           </p>
         </div>
-      </div>
+      </div> -->
       <div class="current-date">
         {{ currentDate }}
       </div>
@@ -216,7 +216,7 @@ const isMobileView = ref(false);
 
 // Methods
 const handleLogout = () => {
-  alert("Logout clicked");
+  // alert("Logout clicked");
   logout();
   Router.push("/login");
 };

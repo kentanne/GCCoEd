@@ -12,7 +12,7 @@
           </div>
           <p class="card-value">{{ stats.learners.toLocaleString() }}</p>
           <div class="card-footer">
-            <button class="card-action">View Details</button>
+            <!-- <button class="card-action">View Details</button> -->
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
           </div>
           <p class="card-value">{{ stats.mentors.toLocaleString() }}</p>
           <div class="card-footer">
-            <button class="card-action">View Details</button>
+            <!-- <button class="card-action">View Details</button> -->
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@
           </div>
           <p class="card-value">{{ stats.applicants.toLocaleString() }}</p>
           <div class="card-footer">
-            <button class="card-action">View Details</button>
+            <!-- <button class="card-action">View Details</button> -->
           </div>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default {
   }
   .dashboard-cards-container {
     margin-top: 8rem;
-}
+  }
 }
 
 @media (max-width: 768px) {
@@ -259,10 +259,10 @@ export default {
     padding: 1.5rem;
   }
 
-.dashboard-cards-container {
+  .dashboard-cards-container {
     margin-top: 8rem;
-}
-   .card-content {
+  }
+  .card-content {
     padding: 1.5rem;
   }
 

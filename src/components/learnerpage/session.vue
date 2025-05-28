@@ -296,13 +296,13 @@ const downloadFile = async (fileId, fileName) => {
                     openFileModal(item.files, $event, item.mentor.ment_inf_id)
                   "
                 />
-                <font-awesome-icon
+                <!-- <font-awesome-icon
                   icon="fa-envelope"
                   size="2x"
                   color="#f72197"
                   class="envelope"
                   @click="toggleMessage($event)"
-                />
+                /> -->
               </div>
             </div>
           </div>
@@ -837,7 +837,7 @@ const downloadFile = async (fileId, fileName) => {
   transform: translateX(170px);
   height: 35rem;
   overflow-y: auto;
-    max-height: 310px;
+  max-height: 310px;
   padding: 0;
 }
 
@@ -852,7 +852,7 @@ const downloadFile = async (fileId, fileName) => {
   top: 0;
   z-index: 10;
   background-color: var(--primary);
-    padding: 1rem 1.5rem;
+  padding: 1rem 1.5rem;
 }
 
 .modal-content.files-modal .modal-body {
@@ -860,7 +860,6 @@ const downloadFile = async (fileId, fileName) => {
   overflow-y: auto;
   max-height: calc(70vh - 60px);
   padding: 0;
-  
 }
 
 .modal-content.files-modal .file-item {
@@ -1087,7 +1086,7 @@ const downloadFile = async (fileId, fileName) => {
   .session-card {
     padding: 0 0.3rem 0.5rem 0.3rem;
   }
-    .modal-content {
+  .modal-content {
     width: 95%;
     max-height: 300px;
   }
@@ -1169,24 +1168,24 @@ const downloadFile = async (fileId, fileName) => {
   .modal-content {
     width: 90%;
   }
-  
+
   .modal-header h3 {
     font-size: 1.1rem;
   }
-  
+
   .modal-body p {
     font-size: 0.95rem;
     margin-bottom: 0.8rem;
   }
-  
+
   .warning-text {
     font-size: 0.95rem;
   }
-  
+
   .modal-footer {
     padding: 0.8rem;
   }
-  
+
   .modal-button {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
@@ -1198,26 +1197,26 @@ const downloadFile = async (fileId, fileName) => {
     width: 95%;
     max-width: 100%;
   }
-  
+
   .modal-header {
     padding: 1rem;
   }
-  
+
   .modal-body {
     padding: 1rem;
   }
-  
+
   .modal-footer {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .modal-button {
     width: 100%;
     margin: 0;
     justify-content: center;
   }
-  
+
   .warning-text {
     padding: 6px;
     font-size: 0.9rem;
@@ -1228,21 +1227,18 @@ const downloadFile = async (fileId, fileName) => {
   .modal-header h3 {
     font-size: 1rem;
   }
-  
+
   .modal-body p {
     font-size: 0.85rem;
   }
-  
+
   .warning-text {
     font-size: 0.85rem;
   }
-  
+
   .modal-button {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
   }
 }
-
-
-
 </style>

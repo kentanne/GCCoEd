@@ -392,7 +392,7 @@ onUnmounted(() => {
                 />
                 <p>{{ item.location }}</p>
               </div>
-              <div>
+              <!-- <div>
                 <font-awesome-icon
                   icon="fa-envelope"
                   size="2x"
@@ -400,18 +400,18 @@ onUnmounted(() => {
                   class="envelope"
                   @click="toggleMessage($event)"
                 />
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <Transition name="fade" mode="out-in">
+    <!-- <Transition name="fade" mode="out-in">
       <div v-if="isMessage" class="message-pop-up">
         <Message @close="handleMessageClose" />
       </div>
-    </Transition>
+    </Transition> -->
 
     <!-- Remind Confirmation Modal -->
     <Transition name="fade" mode="out-in">
@@ -1033,24 +1033,24 @@ onUnmounted(() => {
   .modal-content {
     width: 90%;
   }
-  
+
   .modal-header h3 {
     font-size: 1.1rem;
   }
-  
+
   .modal-body p {
     font-size: 0.95rem;
     margin-bottom: 0.8rem;
   }
-  
+
   .warning-text {
     font-size: 0.95rem;
   }
-  
+
   .modal-footer {
     padding: 0.8rem;
   }
-  
+
   .modal-button {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
@@ -1062,26 +1062,26 @@ onUnmounted(() => {
     width: 95%;
     max-width: 100%;
   }
-  
+
   .modal-header {
     padding: 1rem;
   }
-  
+
   .modal-body {
     padding: 1rem;
   }
-  
+
   .modal-footer {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .modal-button {
     width: 100%;
     margin: 0;
     justify-content: center;
   }
-  
+
   .warning-text {
     padding: 6px;
     font-size: 0.9rem;
@@ -1092,20 +1092,19 @@ onUnmounted(() => {
   .modal-header h3 {
     font-size: 1rem;
   }
-  
+
   .modal-body p {
     font-size: 0.85rem;
   }
-  
+
   .warning-text {
     font-size: 0.85rem;
   }
-  
+
   .modal-button {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
   }
-
 }
 
 .mosha__toast .mosha__toast__content {
