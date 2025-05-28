@@ -7,6 +7,7 @@ import Offer from "./offer.vue";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/css/index.css";
 
+
 const baseURL = api.defaults.baseURL;
 
 // Add loading state
@@ -369,11 +370,28 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
+    overflow-y: auto; 
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Apply the same for any other scrollable elements */
+.popup-overlay .offer-component {
+  /* Keep existing styles */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.popup-overlay .offer-component::-webkit-scrollbar {
+  display: none;
 }
 
 .no-scroll {
-  overflow: hidden;
-}
+  overflow: hidden !important;}
 
 .sticky-header {
   position: sticky;
@@ -622,10 +640,19 @@ onMounted(() => {
 
 /* Action Button */
 .action-button {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 25%);
+  padding: 1.25rem;
+  margin-top: 1rem;
+  z-index: 150;
   display: flex;
   justify-content: flex-end;
-  padding: 1.25rem 0;
-  margin-top: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  left: 0;
+  margin: 0;
+  padding-right: 2rem;
 }
 
 .action-button button {
@@ -640,34 +667,20 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(12, 67, 77, 0.2);
-  font-size: 0.9rem;
-}
-
-.action-button button:hover {
-  background: linear-gradient(135deg, #0a3b44, #328c9a);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(12, 67, 77, 0.3);
-}
-
-.action-button button i {
+  box-shadow: 0 2px 8px rgba(12, 67, 77, 0.3);
   font-size: 0.9rem;
 }
 
 .confirmation-modal-overlay {
-  position: fixed;
-  top: 3rem;
+  position: absolute; /* Change from fixed to absolute */
+  top: 0; /* Adjust to cover the entire viewport */
   left: 0;
   right: 0;
   bottom: 0;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
-  left: 10rem;
-  width: 100%;
 }
 
 .confirmation-modal {
@@ -677,9 +690,9 @@ onMounted(() => {
   max-width: 400px;
   width: 90%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 2001;
-  margin-left: 3rem;
+  margin: auto; /* Center the modal */
 }
+
 
 .confirmation-modal h3 {
   margin-top: 0;
@@ -733,14 +746,12 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 3000; /* Higher than confirmation modal */
+  z-index: 3000;
 }
 
-/* Add to your component styles if needed */
 .popup-overlay .offer-component {
   background: white;
   border-radius: 12px;
@@ -748,6 +759,12 @@ onMounted(() => {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.popup-overlay .offer-component::-webkit-scrollbar {
+  display: none;
 }
 
 /* Responsive Design */
@@ -831,5 +848,196 @@ onMounted(() => {
   pointer-events: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
+}
+
+@media (max-width: 1400px) {
+  .wrapper {
+    left: 5rem;
+    width: 900px;
+    height: 75vh;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 5rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .wrapper {
+    left: 3rem;
+    width: 850px;
+    height: 70vh;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 3rem;
+  }
+  
+  .lower-upper {
+    gap: 1.75rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .wrapper {
+    left: 1.5rem;
+    width: 750px;
+    height: 70vh;
+    margin-top: 1.5rem;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 1.5rem;
+  }
+  
+  .profile-image {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+@media (max-width: 850px) {
+  .wrapper {
+    width: 90vw;
+    max-width: 700px;
+    height: 75vh;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .confirmation-modal-overlay {
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    width: 90vw;
+  }
+  
+  .details-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    width: 95%;
+    max-width: 95vw;
+    height: 80vh;
+    margin: 1rem auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .confirmation-modal-overlay {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .lower-upper {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .profile-information {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .info-item {
+    align-items: center;
+  }
+  
+  .info-value {
+    margin-left: 0;
+  }
+  
+  .action-button {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .wrapper {
+    height: 85vh;
+    max-height: 85vh;
+    border-radius: 15px;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .upper-element {
+    padding: 1rem;
+  }
+  
+  .modal-title {
+    font-size: 1.2rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .confirmation-modal {
+    padding: 1.5rem;
+    width: 85%;
+  }
+  
+  .scrollable-content {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .wrapper {
+    height: 90vh;
+    width: 43vh;
+    border-radius: 15px;
+  }
+  
+  .info-label,
+  .info-value {
+    font-size: 0.75rem;
+  }
+  
+  .action-button button {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .details-card,
+  .bio-card {
+    padding: 0.75rem;
+  }
+  
+  .confirmation-modal {
+    width: 90%;
+    padding: 1rem;
+    margin-right: 2rem;
+    margin-left: 2rem;
+  }
+    .confirmation-modal p {
+font-size: 13px;
+text-align: center;  }
 }
 </style>

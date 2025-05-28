@@ -211,7 +211,7 @@ onMounted(() => {
           >
             <font-awesome-icon
               icon="fa-file-arrow-up"
-              size="10x"
+              size="8x"
               :style="{
                 color: isOverDropZone ? '#066678' : '#a6a6a6',
                 opacity: isOverDropZone ? '0.3' : '0.1',
@@ -672,5 +672,113 @@ onMounted(() => {
 
 .mosha__toast .mosha__toast__content .mosha__toast__content__text {
   padding: 0.5rem;
+}
+
+@media (max-width: 1200px) {
+  .files-wrapper {
+    width: 95%;
+    margin-left: 1rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .lower-grid {
+    grid-template-columns: 1fr;
+    grid-gap: 20px;
+  }
+
+  .upload-file {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2rem;
+    height: 300px;
+  }
+
+  .lower-element {
+    height: auto;
+    padding: 1rem 0.5rem;
+  }
+
+  .displayed-files {
+    padding: 0 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .files-wrapper {
+    width: 100%;
+    margin-left: 0;
+    height: auto;
+    max-height: none;
+  }
+
+  .table-header {
+    padding: 1rem;
+  }
+
+  .drop-zone {
+    height: 250px;
+  }
+
+  .file-item {
+    padding: 10px;
+  }
+
+  .file-name {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-title {
+    font-size: 1.3rem;
+  }
+
+  .drop-zone {
+    height: 200px;
+  }
+
+  .drop-zone p {
+    font-size: 0.9rem;
+  }
+
+  .custom-file-upload {
+    height: 45px;
+    font-size: 0.9rem;
+  }
+
+  .file-name {
+    max-width: 150px;
+    font-size: 0.9rem;
+  }
+
+  .upload-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .table-title {
+    font-size: 1.05rem;
+  }
+
+  .header-icon {
+    font-size: 1.1rem;
+  }
+
+  .file-name {
+    max-width: 120px;
+  }
+
+  .file-content img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .file-type {
+    font-size: 0.7rem;
+  }
+
 }
 </style>

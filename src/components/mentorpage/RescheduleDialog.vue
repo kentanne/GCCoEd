@@ -94,11 +94,7 @@ const rescheduleSession = async () => {
 <template>
   <div class="wrapper">
     <div class="upper-element">
-      <font-awesome-icon
-        icon="fa-solid fa-xmark"
-        @click="$emit('close')"
-        class="close-icon"
-      />
+
       <h1>Reschedule Session</h1>
     </div>
 
@@ -274,4 +270,32 @@ const rescheduleSession = async () => {
 .mosha__toast .mosha__toast__content .mosha__toast__content__text {
   padding: 0.5rem;
 }
+
+@media (max-width: 600px) {
+  .wrapper {
+    width: calc(100vw - 40px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .dp__menu {
+    width: calc(100vw - 60px) !important;
+    left: 20px !important;
+    right: 20px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .wrapper {
+    width: calc(100vw - 30px);
+  }
+  
+  .dp__menu {
+    width: calc(100vw - 50px) !important;
+    left: 15px !important;
+    right: 15px !important;
+  }
+}
+
+
 </style>

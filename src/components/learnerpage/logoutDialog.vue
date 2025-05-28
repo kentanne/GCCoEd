@@ -157,4 +157,70 @@ const close = () => {
   cursor: pointer;
   font-size: 1rem;
 }
+
+
+@media (max-width: 768px) {
+  .wrapper {
+    height: auto;
+    min-height: 180px;
+    padding: 15px;
+  }
+
+  .upper-element {
+    padding: 8px 8px 8px 0;
+  }
+
+  .logout-icon {
+    font-size: 1.5rem !important;
+    margin-right: 15px; /* Added right margin to close icon */
+  }
+
+  .lower-element h1 {
+    font-size: 1.2rem;
+    margin-top: 15px;
+    padding: 0 10px;
+  }
+
+  .logout-buttons {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 15px; /* Space between buttons */
+    margin: 20px auto; /* Center the button group with auto margins */
+    width: 90%;
+    max-width: 300px; /* Limit maximum width */
+  }
+
+  .confirm-button,
+  .cancel-button {
+    width: 45%; /* Make buttons slightly smaller than full width */
+    padding: 10px 0;
+    font-size: 0.9rem;
+    margin-right: 10px; /* Added right margin to buttons */
+  }
+}
+
+@media (max-width: 480px) {
+  .wrapper {
+    padding: 10px;
+    width: 250px;
+     margin-right: 30px; 
+  }
+
+  .lower-element h1 {
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+
+  .logout-buttons {
+    flex-direction: row; /* Keep buttons in row even on small screens */
+    gap: 10px;
+    width: 95%;
+  }
+
+  .confirm-button,
+  .cancel-button {
+    width: 45%;
+    margin-right: 5px; /* Smaller right margin on very small screens */
+  }
+}
 </style>

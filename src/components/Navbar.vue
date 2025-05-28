@@ -194,9 +194,9 @@ header {
   flex-direction: column;
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 230px;
-  height: 55vh;
+  right: -120%;
+  width: 90%;
+  height:100%;
   background-color: rgb(220, 226, 230);
   border-radius: 25px 0 0 25px;
   padding: 6rem 1.5rem 2rem;
@@ -268,7 +268,7 @@ header {
   font-family: "Inter", sans-serif;
   cursor: pointer;
   font-size: 1rem;
-  margin: 5.5rem auto 0;
+  margin: 13rem auto 0;
   display: flex;
   align-items: center;
   justify-content: center;

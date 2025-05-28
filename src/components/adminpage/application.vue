@@ -830,14 +830,14 @@ onMounted(async () => {
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(26, 79, 159, 0.5);
   overflow: hidden;
-  width: 90%;
+  width: 95%; /* Increased from 90% */
   margin: 0 auto;
-  padding: 0 1rem 0 1rem;
   text-align: center;
-  max-height: 465px;
-  height: 460px;
-  overflow-y: auto;
-  margin-top: 2rem;
+  height: calc(89vh - 120px); /* Set fixed height, considering some margin from top */
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 .table-header {
@@ -848,6 +848,18 @@ onMounted(async () => {
   gap: 1rem;
   flex-wrap: wrap;
   color: #0b2548;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.table-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: rgb(18, 44, 84);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .filter-buttons {
@@ -859,13 +871,14 @@ onMounted(async () => {
 }
 
 .filter-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.8rem; /* Smaller filter buttons */
   border: none;
   border-radius: 20px;
   background: rgba(223, 223, 223, 0.5);
   color: var(--text-light);
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.8rem;
 }
 
 .filter-btn.active {
@@ -897,7 +910,13 @@ onMounted(async () => {
 }
 
 .table-scroll-container {
+  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none;     /* Hide scrollbar for Firefox */
   overflow-y: auto;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  display: none;  /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 .data-table thead th {
@@ -911,20 +930,16 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   text-align: center;
+  font-size: 0.85rem; /* Reduced font size */
 }
 
 .data-table th {
-  position: sticky;
-  top: 0;
-  background-color: #e5e5e5;
-  color: var(--text-dark);
-  font-weight: 600;
-  padding: 0.75rem;
-  border-bottom: 2px solid var(--primary);
+  padding: 0.5rem; /* Reduced padding */
+  font-size: 0.85rem; /* Smaller header text */
 }
 
 .data-table td {
-  padding: 0.8rem;
+  padding: 0.4rem; /* Reduced cell padding */
   vertical-align: middle;
 }
 
@@ -939,12 +954,12 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
-  padding: 0.5rem 0.9rem;
+  padding: 0.35rem 0.7rem; /* Smaller button padding */
   border: none;
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.7rem; /* Smaller button text */
   transition: all 0.2s ease;
 }
 
@@ -1021,20 +1036,20 @@ onMounted(async () => {
 }
 
 .action-btn i {
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Smaller icons */
 }
 
 .credentials-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
+  padding: 4px 8px; /* Smaller credentials button */
   border: 1px solid var(--primary-dark);
   background-color: rgba(73, 152, 164, 0.103);
   color: var(--primary-dark);
-  padding: 6px 12px;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -1045,19 +1060,20 @@ onMounted(async () => {
 
 .id-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.35rem; /* Smaller badge padding */
   border-radius: 6px;
   background-color: rgba(59, 154, 169, 0.1);
   color: var(--primary);
   font-weight: 500;
+  font-size: 0.8rem;
 }
 
 .date-badge {
   display: inline-block;
   background: rgba(0, 0, 0, 0.05);
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.35rem;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 .status-text {
@@ -1164,12 +1180,12 @@ onMounted(async () => {
 }
 
 .search-input {
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 0.5rem 1rem 0.5rem 2rem; /* Reduced input padding */
   border: 1px solid rgb(17, 17, 95);
   border-radius: 8px;
   width: 250px;
-  font-size: 0.8rem;
-  height: 13px;
+  font-size: 0.75rem;
+  height: 12px;
   transition: all 0.3s ease;
 }
 
@@ -1191,29 +1207,114 @@ onMounted(async () => {
   border-radius: 4px;
 }
 
+.table-scroll-container {
+  overflow-y: auto;
+  flex-grow: 1;
+  position: relative;
+  height: calc(100% - 80px); /* Subtract header height */
+  margin: 0 1rem;
+  /* Add smooth scrolling */
+  scroll-behavior: smooth;
+  /* Hide scrollbar for Chrome/Safari/Opera */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  background-color: #e5e5e5;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border-bottom: 2px solid var(--primary);
+  z-index: 10;
+}
+
+.data-table tbody {
+  background-color: white;
+}
+
+/* Add box shadow to sticky header for better visual separation */
+.data-table th::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table td {
+  padding: 0.5rem; /* Reduced from 0.8rem */
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem; /* Added to reduce font size */
+}
+
+.data-table tr:hover {
+  background-color: rgba(59, 154, 169, 0.05);
+}
+
 /* Credentials Modal */
 .credentials-modal {
   background: white;
   border-radius: 12px;
-  max-width: 900px;
-  width: 90%;
+  max-width: 1000px; /* Increased from 900px */
+  width: 95%; /* Increased from 90% */
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  position: relative; /* Add this for proper sticky positioning */
+}
+
+.credentials-modal::-webkit-scrollbar {
+  display: none;
 }
 
 /* Modal Header */
 .modal-header {
+  position: sticky;
+  top: 0;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0b3e8a, #3b9aa9);
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+  z-index: 20;
 }
 
 .header-content {
@@ -1255,6 +1356,7 @@ onMounted(async () => {
 /* Modal Body */
 .modal-body {
   padding: 1.5rem;
+  padding-bottom: calc(1.5rem + 70px); /* Add extra padding for sticky footer */
 }
 
 /* Applicant Profile */
@@ -1547,13 +1649,18 @@ onMounted(async () => {
 
 /* Modal Footer */
 .modal-footer {
+  position: sticky;
+  bottom: 0;
   padding: 1.25rem 1.5rem;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  justify-content: flex-end; /* Changed to flex-end to align right */
+  justify-content: flex-end;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+  background-color: rgba(249, 250, 251, 0.95);
 }
 
 .footer-btn {
@@ -1640,33 +1747,6 @@ onMounted(async () => {
     width: 100%;
     justify-content: center;
   }
-}
-/* Responsive Design */
-@media (max-width: 768px) {
-  .table-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .search-container {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .search-input {
-    width: 100%;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
 
   /* Credentials Modal Responsive */
   .applicant-profile {
@@ -1703,20 +1783,133 @@ onMounted(async () => {
   }
 }
 
-@media (max-width: 480px) {
-  .data-table {
-    display: block;
-    overflow-x: auto;
+@media (max-width: 1024px) {
+  .applicant-profile {
+    gap: 2rem;
   }
 
-  .filter-buttons {
+  .info-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .credentials-modal {
+    width: 95%;
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .detail-value {
+    text-align: left;
+    padding-left: 0;
     width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
   }
 
-  .filter-btn {
-    flex-shrink: 0;
+  .detail-value2 {
+    padding-left: 0;
+    width: 100%;
   }
+
+  .info-value {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .file-name {
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .credentials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .credential-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .file-actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .details-section {
+    gap: 1rem;
+  }
+
+  .detail-item, 
+  .detail-item2 {
+    margin-bottom: 1rem;
+  }
+
+  .file-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .applicant-name {
+    font-size: 1.2rem;
+  }
+}
+
+/* Update the table container styles */
+.table-scroll-container {
+  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none;     /* Hide scrollbar for Firefox */
+  overflow-y: auto;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  display: none;  /* Hide scrollbar for Chrome/Safari/Opera */
+}
+
+/* Update credentials modal styles */
+.credentials-modal {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: auto;
+  /* ... existing code ... */
+}
+
+/* Improve text wrapping and responsiveness */
+.detail-value, 
+.detail-value2, 
+.info-value,
+.file-name {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 </style>

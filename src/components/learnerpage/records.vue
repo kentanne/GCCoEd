@@ -905,4 +905,175 @@ onMounted(async () => {
     justify-content: center;
   }
 }
+
+@media (max-width: 1200px) {
+  .table-container {
+    width: 95%;
+    margin-left: 1rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .user-modal {
+    width: 50%;
+    transform: translateX(0);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    width: 100%;
+    margin-left: 0;
+    padding: 0 0.5rem;
+    /* Border radius maintained */
+  }
+
+  .table-header {
+    padding: 1rem;
+    /* Border radius maintained in gradient background */
+  }
+
+  .search-input {
+    width: 100%;
+    border-radius: 8px; /* Maintained */
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .user-modal {
+    width: 80%;
+    max-height: 85vh;
+    border-radius: 12px; /* Maintained */
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .profile-info {
+    width: 100%;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-title {
+    font-size: 1.3rem;
+  }
+
+  .data-table {
+    font-size: 0.85rem;
+  }
+
+  .details-btn span {
+    display: none;
+  }
+
+  .user-modal {
+    width: 95%;
+    border-radius: 12px; /* Maintained */
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Maintained */
+    border: 4px solid #e1e4e8; /* Maintained */
+  }
+
+  .user-name {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  .info-value {
+    margin-left: 0;
+  }
+
+  .bio-card {
+    border-radius: 10px; /* Maintained */
+  }
+}
+
+@media (max-width: 400px) {
+  .table-title {
+    font-size: 1.2rem;
+  }
+
+  .header-icon {
+    font-size: 1.1rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .star {
+    font-size: 1rem;
+  }
+
+  .details-btn {
+    border-radius: 6px; /* Maintained */
+  }
+}
+
+@media (max-width: 768px) {
+  /* ... (keep your existing mobile styles) ... */
+
+  /* Center align the course, year, and rating in feedback details */
+  .profile-info {
+    text-align: center;
+  }
+
+  .info-item {
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-value {
+    margin-left: 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .user-name {
+    text-align: center;
+  }
+
+  .divider {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Ensure centered alignment carries through to smaller screens */
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-item {
+    width: 100%;
+    align-items: center;
+  }
+}
 </style>

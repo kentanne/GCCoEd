@@ -57,12 +57,12 @@ const saveChanges = async () => {
 
   try {
     const response = await api.patch("/api/mentor/edit", combinedData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         // "X-CSRFToken": getCookie("csrftoken"),
-      },
+        },
     });
 
     if (response.status === 200) {
@@ -1003,7 +1003,7 @@ watch(
 .upper-element {
   display: flex;
   flex-direction: row;
-  background-color: #0c434d;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   justify-content: center;
   align-items: center;
   padding: 15px 20px;
@@ -1237,5 +1237,84 @@ watch(
   color: #ef4444;
   font-size: 0.875rem;
   margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .edit-information {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% - 30px), -50%); /* Adjusted to account for margin */
+    width: calc(80vw - 30px) !important; /* Reduced width to accommodate margin */
+    height: 85vh;
+    max-height: 85vh;
+    margin-right: 10px; 
+    border-radius: 15px;
+  }
+
+  .upper-element {
+    padding: 12px 15px;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .upper-element h1 {
+    font-size: 20px;
+  }
+
+  .upper-element img {
+    right: 15px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .lower-element {
+    padding: 0 15px;
+    max-height: calc(85vh - 120px);
+    overflow-y: auto;
+  }
+
+  .input-wrapper {
+    gap: 12px;
+  }
+
+  .input-fields {
+    margin-bottom: 12px;
+  }
+
+  .standard-input,
+  .dropdown-option,
+  .checkbox-option label,
+  .category-section h4,
+  .fixed-textarea {
+    font-size: 11px;
+  }
+
+  .save button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-information {
+    transform: translate(calc(-50% - 15px), -50%); 
+    width: calc(95vw - 10px) !important;
+    margin-right: 5px;
+    height: 90vh;
+    max-height: 90vh;
+  }
+
+  .upper-element h1 {
+    font-size: 18px;
+  }
+
+  .lower-element {
+    max-height: calc(90vh - 120px);
+  }
+
+  .lower-element h1 {
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
 }
 </style>

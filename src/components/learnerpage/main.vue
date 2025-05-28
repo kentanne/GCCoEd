@@ -321,4 +321,52 @@ const filteredUsers = computed(() => {
 .fade-leave-to {
   opacity: 0;
 }
+
+@media (max-width: 768px) {
+  .user-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  .search-container {
+    justify-content: center;
+  }
+  
+  .search-input {
+    width: 200px;
+  }
+  
+  .search-input:focus {
+    width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .user-card h1 {
+    font-size: 0.9rem;
+  }
+  
+  .lower-element p {
+    font-size: 0.75rem;
+  }
+  
+  .lower-element button {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .search-input {
+    width: 180px;
+  }
+  
+  .search-input:focus {
+    width: 200px;
+  }
+
+}
 </style>

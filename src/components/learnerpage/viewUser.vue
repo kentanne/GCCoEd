@@ -359,8 +359,15 @@ onMounted(() => {
   overflow-y: auto;
   flex: 1;
   padding: 0 1.5rem;
+  /* Add these properties to hide the scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
 }
 
+/* Add this to hide scrollbar in WebKit browsers (Chrome, Safari, etc.) */
+.scrollable-content::-webkit-scrollbar {
+  display: none;
+}
 .wrap-text {
   white-space: normal;
   word-wrap: break-word;
@@ -639,7 +646,6 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -790,5 +796,196 @@ onMounted(() => {
     width: 100px;
     height: 100px;
   }
+}
+
+@media (max-width: 1400px) {
+  .wrapper {
+    left: 5rem;
+    width: 900px;
+    height: 75vh;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 5rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .wrapper {
+    left: 3rem;
+    width: 850px;
+    height: 70vh;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 3rem;
+  }
+  
+  .lower-upper {
+    gap: 1.75rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .wrapper {
+    left: 1.5rem;
+    width: 750px;
+    height: 70vh;
+    margin-top: 1.5rem;
+  }
+  
+  .confirmation-modal-overlay {
+    left: 1.5rem;
+  }
+  
+  .profile-image {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+@media (max-width: 850px) {
+  .wrapper {
+    width: 90vw;
+    max-width: 700px;
+    height: 75vh;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .confirmation-modal-overlay {
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    width: 90vw;
+  }
+  
+  .details-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    width: 95%;
+    max-width: 95vw;
+    height: 80vh;
+    margin: 1rem auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .confirmation-modal-overlay {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .lower-upper {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .profile-information {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .info-item {
+    align-items: center;
+  }
+  
+  .info-value {
+    margin-left: 0;
+  }
+  
+  .action-button {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .wrapper {
+    height: 85vh;
+    max-height: 85vh;
+    border-radius: 15px;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .upper-element {
+    padding: 1rem;
+  }
+  
+  .modal-title {
+    font-size: 1.2rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .confirmation-modal {
+    padding: 1.5rem;
+    width: 85%;
+  }
+  
+  .scrollable-content {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .wrapper {
+    height: 90vh;
+    width: 43vh;
+    border-radius: 15px;
+  }
+  
+  .info-label,
+  .info-value {
+    font-size: 0.75rem;
+  }
+  
+  .action-button button {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .details-card,
+  .bio-card {
+    padding: 0.75rem;
+  }
+  
+  .confirmation-modal {
+    width: 90%;
+    padding: 1rem;
+    margin-right: 2rem;
+    margin-left: 2rem;
+  }
+    .confirmation-modal p {
+font-size: 13px;
+text-align: center;  }
 }
 </style>

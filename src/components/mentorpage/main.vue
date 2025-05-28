@@ -39,16 +39,18 @@ const props = defineProps({
   },
 });
 
+
 // Computed property to filter users based on search query
 const filteredUsers = computed(() => {
-  if (!searchQuery.value) return props.userInformation;
+  if (!searchQuery.value.trim()) return props.userInformation;
 
-  const query = searchQuery.value.toLowerCase();
+  const query = searchQuery.value.toLowerCase().trim();
   return props.userInformation.filter((user) => {
     return (
-      user.userName.toLowerCase().includes(query) ||
-      user.course.toLowerCase().includes(query) ||
-      user.yearLevel.toLowerCase().includes(query)
+      (user.userName && user.userName.toLowerCase().includes(query)) ||
+      (user.course && user.course.toLowerCase().includes(query)) ||
+      (user.yearLevel && user.yearLevel.toLowerCase().includes(query)) ||
+      (user.course.match(/\(([^)]+)\)/)?.[1]?.toLowerCase().includes(query))
     );
   });
 });
@@ -320,4 +322,93 @@ const filteredUsers = computed(() => {
 .fade-leave-to {
   opacity: 0;
 }
+
+
+@media (max-width: 768px) {
+  .search-container {
+    justify-content: flex-start; /* Changed from center to flex-start */
+    margin-bottom: 1rem;
+    padding-left: 0.5rem; /* Added to move it slightly left */
+  }
+  
+  .search-input {
+    width: 100%;
+    max-width: 400px;
+    margin-right: 0.75rem; /* Increased margin */
+  }
+  
+  .search-input:focus {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .user-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  .user-card {
+    border-radius: 8px;
+  }
+  
+  .upper-element, .lower-element {
+    padding: 1rem;
+  }
+  
+  .user-card img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .user-card h1 {
+    font-size: 0.9rem;
+  }
+  
+  .lower-element p {
+    font-size: 0.75rem;
+  }
+  
+  .lower-element button {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-wrapper {
+    padding: 1rem 1rem;
+    width: 90%
+  }
+  
+  .search-container {
+    padding-left: 0.25rem; 
+  }
+  
+  .user-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .user-card img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .user-card h1 {
+    font-size: 0.85rem;
+    margin: 0.5rem 0 0.3rem;
+  }
+  
+  .stars {
+    margin: 0.3rem 0;
+  }
+  
+  .filledStar {
+    font-size: 1.2rem;
+  }
+  
+  .lower-element button {
+    margin-top: 0.75rem;
+  }}
+  
 </style>

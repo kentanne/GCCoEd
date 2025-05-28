@@ -88,7 +88,7 @@
         <li><i class="fas fa-check-circle"></i> Flexible scheduling for sessions</li>
         <li><i class="fas fa-check-circle"></i> Join our supportive learning community</li>
       </ul>
-      <button class="signup-btn" @click="goToSignup"> NOW</button>
+      <button class="signup-btn" @click="goToSignup">JOIN NOW</button>
     </div>
   </div>
 </section> 
@@ -114,7 +114,7 @@ export default {
       this.$router.push('/learn-more');
     },
     goToSignup() {
-      this.$router.push('/signup');
+      this.$router.push('/login');
     }
   }
 };

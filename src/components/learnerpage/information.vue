@@ -311,6 +311,9 @@ import {
 import api from "@/axios.js";
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
 const props = defineProps({
   userData: {
     type: Object,
@@ -796,11 +799,11 @@ const saveChanges = async () => {
 
   try {
     const response = await api.patch("/api/learner/edit", combinedData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
     });
 
     if (response.status === 200) {
@@ -866,7 +869,7 @@ const isOptionChecked = (field, value) => {
 .upper-element {
   display: flex;
   flex-direction: row;
-  background-color: #0c434d;
+  background: linear-gradient(135deg, #0b2b31, #2b737e);
   justify-content: center;
   align-items: center;
   padding: 15px 20px;

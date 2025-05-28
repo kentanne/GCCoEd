@@ -73,10 +73,11 @@ export default {
   padding: 2rem;
   width: 100%;
   height: calc(100vh - 80px);
+  max-height: 475px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -5rem;
+  margin-top: 1rem; /* Changed from 1rem to 4rem to move cards down */
 }
 
 .dashboard-cards {
@@ -248,6 +249,9 @@ export default {
   .card-value {
     font-size: 3rem;
   }
+  .dashboard-cards-container {
+    margin-top: 8rem;
+}
 }
 
 @media (max-width: 768px) {
@@ -255,7 +259,10 @@ export default {
     padding: 1.5rem;
   }
 
-  .card-content {
+.dashboard-cards-container {
+    margin-top: 8rem;
+}
+   .card-content {
     padding: 1.5rem;
   }
 

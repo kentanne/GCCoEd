@@ -903,12 +903,11 @@ onMounted(async () => {
 .course-offered .all-courses-popup {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 50%;
+  left: 30px;
+  width:100%;
   display: flex;
   align-items: center;
-  margin-left: 23%;
-  margin-top: 28%;
+  margin-top: 104%;
   max-height: 50%;
   max-height: 200px;
 }
@@ -1016,6 +1015,13 @@ onMounted(async () => {
   color: white;
 }
 
+/* Account dropdown active states */
+.account-dropdown-content a:active {
+  background-color: #004d5a;
+  color: white;
+  transform: scale(0.98);
+}
+
 .account-dropdown-content a img {
   width: 16px;
   height: 16px;
@@ -1075,7 +1081,17 @@ onMounted(async () => {
 }
 
 .topbar-option.active {
-  background-color: #e6f7ff;
+  background-color: #006981;
+  position: relative;
+}
+
+.topbar-option.active .nav-text {
+  color: white;
+  font-weight: 600;
+}
+
+.topbar-option.active .nav-icon {
+  filter: brightness(0) invert(1);
 }
 
 .topbar-option.active::after {
@@ -1085,7 +1101,7 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #006981;
+  background-color: #00a3cc;
 }
 
 .nav-icon {
@@ -1307,5 +1323,38 @@ onMounted(async () => {
 /* Add styles for scrollable topbar */
 .topbar-option {
   flex-shrink: 0; /* Prevent options from shrinking */
+}
+
+/* Edit Information popup button states */
+.edit-information-popup button {
+  transition: all 0.2s ease;
+}
+
+.edit-information-popup button:active {
+  background-color: #004d5a;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Active state for clickable elements */
+.account-dropbtn:active,
+.course-card:active,
+.sidebar-toggle:active {
+  transform: scale(0.98);
+  transition: transform 0.2s ease;
+}
+
+/* Add active state styles for interactive elements */
+.lines:active,
+.popup-course:active {
+  background-color: #006981;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Edit mode highlight */
+.isEditing {
+  background-color: rgba(0, 105, 129, 0.1);
+  border: 2px solid #006981;
 }
 </style>
