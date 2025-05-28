@@ -134,8 +134,14 @@ const checkAuth = async () => {
 
 // Helper function to redirect based on user role
 function redirectToRolePage(user, next) {
-  if (!user || !user.role) {
+  if (!user) {
     next("/");
+    return;
+  }
+
+  // If user is logged in but has no role, redirect to signup
+  if (user.role === null || user.role === undefined) {
+    next("/signup");
     return;
   }
 
@@ -161,6 +167,13 @@ router.beforeEach(async (to, from, next) => {
   // If route requires authentication and user is not authenticated
   if (to.meta.requiresAuth && !isAuthenticated) {
     next("/login");
+    return;
+  }
+
+  // Special case: If user is authenticated with no role and trying to access signup page
+  // Allow them to stay on signup page to complete registration
+  if (isAuthenticated && user && !user.role && to.path === "/signup") {
+    next();
     return;
   }
 
