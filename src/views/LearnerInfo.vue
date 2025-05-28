@@ -36,6 +36,7 @@
             placeholder="Enter your address"
             class="personal-input"
             :class="{ error: validationErrors.address }"
+            :disabled="isSubmitting"
           />
           <span v-if="validationErrors.address" class="validation-message">
             {{ validationErrors.address }}
@@ -55,6 +56,7 @@
             placeholder="Enter your contact number (11 digits)"
             class="personal-input"
             :class="{ error: validationErrors.contactNumber }"
+            :disabled="isSubmitting"
             maxlength="11"
           />
           <span
@@ -66,7 +68,9 @@
         </div>
 
         <div class="personal-field">
-          <label class="personal-label required" for="gender">SEX AT BIRTH</label>
+          <label class="personal-label required" for="gender"
+            >SEX AT BIRTH</label
+          >
           <div class="gender-dropdown">
             <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
@@ -75,6 +79,7 @@
                 placeholder="Select your sex"
                 class="personal-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -85,11 +90,11 @@
               <div class="dropdown-option" @click="selectGender('Male')">
                 Male
               </div>
+            </div>
+            <span v-if="validationErrors.gender" class="validation-message">
+              {{ validationErrors.gender }}
+            </span>
           </div>
-          <span v-if="validationErrors.gender" class="validation-message">
-            {{ validationErrors.gender }}
-          </span>
-        </div>
         </div>
 
         <div class="personal-field">
@@ -105,6 +110,7 @@
                 placeholder="Select your year level"
                 class="personal-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -135,6 +141,7 @@
                 placeholder="Select your program"
                 class="personal-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -200,6 +207,7 @@
                 <div
                   class="choose-file-container"
                   @click.stop="uploadProfilePicture"
+                  :class="{ disabled: isSubmitting }"
                 >
                   <i class="fas fa-upload"></i>
                   <span>Choose File</span>
@@ -210,6 +218,7 @@
                   accept="image/*"
                   style="display: none"
                   @change="handleProfileUpload"
+                  :disabled="isSubmitting"
                 />
                 <span class="file-name">
                   {{ profilePictureName || "No file chosen" }}
@@ -235,6 +244,7 @@
                 placeholder="Select available days"
                 class="profile-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -253,6 +263,7 @@
                   :value="day"
                   v-model="selectedDays"
                   @click.stop
+                  :disabled="isSubmitting"
                 />
                 <label :for="'day-' + day">{{ day }}</label>
               </div>
@@ -274,6 +285,7 @@
                 readonly
                 class="profile-input"
                 :class="{ error: validationErrors.selectedSubjects }"
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -307,6 +319,7 @@
                   :value="subject"
                   v-model="selectedSubjects"
                   @change="updateSelectedCounts"
+                  :disabled="isSubmitting"
                 />
                 <label :for="subject">{{ subject }}</label>
               </div>
@@ -336,6 +349,7 @@
                 placeholder="Select learning modality"
                 class="profile-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -368,6 +382,7 @@
                 placeholder="Select duration"
                 class="profile-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -410,6 +425,7 @@
                 placeholder="Select learning style(s)"
                 class="profile-input"
                 readonly
+                :disabled="isSubmitting"
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -428,6 +444,7 @@
                   :value="style"
                   v-model="selectedsessionStyles"
                   @click.stop
+                  :disabled="isSubmitting"
                 />
                 <label :for="'style-' + style">{{ style }}</label>
               </div>
@@ -446,6 +463,7 @@
             rows="4"
             class="profile-textarea"
             :class="{ error: validationErrors.bio }"
+            :disabled="isSubmitting"
           ></textarea>
           <span v-if="validationErrors.bio" class="validation-message">
             {{ validationErrors.bio }}
@@ -463,6 +481,7 @@
             rows="4"
             class="profile-textarea"
             :class="{ error: validationErrors.goals }"
+            :disabled="isSubmitting"
           ></textarea>
           <span v-if="validationErrors.goals" class="validation-message">
             {{ validationErrors.goals }}
@@ -485,8 +504,22 @@
         </div>
       </div>
     </div>
-    <button class="next-button" @click="nextStep">
-      {{ currentStep === totalSteps ? "SUBMIT" : "NEXT" }}
+    <button
+      class="next-button"
+      @click="nextStep"
+      :class="{ loading: isSubmitting, active: isButtonActive }"
+      @mousedown="setButtonActive(true)"
+      @mouseup="setButtonActive(false)"
+      @mouseleave="setButtonActive(false)"
+    >
+      <span v-if="isSubmitting" class="loading-spinner"></span>
+      {{
+        isSubmitting
+          ? "Submitting..."
+          : currentStep === totalSteps
+          ? "SUBMIT"
+          : "NEXT"
+      }}
     </button>
   </div>
 </template>
@@ -497,22 +530,13 @@ import api from "@/axios.js";
 import { createToast } from "mosha-vue-toastify";
 import "mosha-vue-toastify/dist/style.css";
 
-// axios.defaults.withCredentials = true; // Enable sending cookies with requests
-// axios.defaults.withXSRFToken = true; // Enable CSRF token handling
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
-
 export default {
   data() {
     return {
       currentStep: 1,
       totalSteps: 2,
-      // fullName: "",
+      isSubmitting: false,
+      isButtonActive: false,
       gender: "",
       otherGender: "",
       yearLevel: "",
@@ -631,7 +655,6 @@ export default {
     isFormComplete() {
       if (this.currentStep === 1) {
         return (
-          this.fullName.trim() &&
           this.gender &&
           (this.gender !== "Other" || this.otherGender.trim()) &&
           this.yearLevel &&
@@ -654,35 +677,37 @@ export default {
   },
 
   methods: {
-    scrollToGetStarted() {
-      this.$router.push("/signup");
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+    setButtonActive(active) {
+      if (!this.isSubmitting) {
+        this.isButtonActive = active;
       }
     },
-    async csrf() {
-      await axios
-        .get("/sanctum/csrf-cookie")
-        .then((response) => {
-          console.log("CSRF cookie set");
-        })
-        .catch((error) => {
-          console.error("Error setting CSRF cookie:", error);
-        });
+
+    scrollToGetStarted() {
+      this.$router.push("/signup");
     },
+
+    async csrf() {
+      await api
+        .get("/sanctum/csrf-cookie")
+        .then((response) => {})
+        .catch((error) => {});
+    },
+
     toggleSubjectDropdown() {
-      this.showCategories = !this.showCategories;
-      this.showSubjectsDropdown = false;
+      if (!this.isSubmitting) {
+        this.showCategories = !this.showCategories;
+        this.showSubjectsDropdown = false;
+      }
     },
 
     selectCategory(category) {
-      this.selectedSubjectCategory = category.name;
-      this.showCategories = false;
-      this.showSubjects(category.type);
-      this.updateSelectedCounts();
+      if (!this.isSubmitting) {
+        this.selectedSubjectCategory = category.name;
+        this.showCategories = false;
+        this.showSubjects(category.type);
+        this.updateSelectedCounts();
+      }
     },
 
     showSubjects(categoryType) {
@@ -718,7 +743,6 @@ export default {
       const errors = [];
 
       if (this.currentStep === 1) {
-        // if (!this.fullName.trim()) errors.push("Full Name is required");
         if (!this.gender) errors.push("Gender is required");
         if (this.gender === "Other" && !this.otherGender.trim())
           errors.push("Please specify your gender");
@@ -748,38 +772,53 @@ export default {
     },
 
     toggleDropdown(type) {
-      for (const key in this.dropdownOpen) {
-        this.dropdownOpen[key] = key === type ? !this.dropdownOpen[key] : false;
+      if (!this.isSubmitting) {
+        for (const key in this.dropdownOpen) {
+          this.dropdownOpen[key] =
+            key === type ? !this.dropdownOpen[key] : false;
+        }
       }
     },
 
     selectGender(selectedGender) {
-      this.gender = selectedGender;
-      this.dropdownOpen.gender = false;
+      if (!this.isSubmitting) {
+        this.gender = selectedGender;
+        this.dropdownOpen.gender = false;
+      }
     },
 
     selectYearLevel(selectedYear) {
-      this.yearLevel = selectedYear;
-      this.dropdownOpen.yearLevel = false;
+      if (!this.isSubmitting) {
+        this.yearLevel = selectedYear;
+        this.dropdownOpen.yearLevel = false;
+      }
     },
 
     selectProgram(selectedProgram) {
-      this.program = selectedProgram;
-      this.dropdownOpen.program = false;
-      this.updateAvailableSubjects();
+      if (!this.isSubmitting) {
+        this.program = selectedProgram;
+        this.dropdownOpen.program = false;
+        this.updateAvailableSubjects();
+      }
     },
 
     selectModality(selectedModality) {
-      this.modality = selectedModality;
-      this.dropdownOpen.modality = false;
+      if (!this.isSubmitting) {
+        this.modality = selectedModality;
+        this.dropdownOpen.modality = false;
+      }
     },
 
     selectSessionDuration(duration) {
-      this.sessionDuration = duration;
-      this.dropdownOpen.sessionDuration = false;
+      if (!this.isSubmitting) {
+        this.sessionDuration = duration;
+        this.dropdownOpen.sessionDuration = false;
+      }
     },
 
     nextStep() {
+      if (this.isSubmitting) return; // Prevent multiple submissions
+
       const validationErrors = this.validateForm();
 
       if (validationErrors.length > 0) {
@@ -798,16 +837,20 @@ export default {
     },
 
     goToStep(step) {
-      if (step <= this.currentStep) {
+      if (step <= this.currentStep && !this.isSubmitting) {
         this.currentStep = step;
       }
     },
 
     uploadProfilePicture() {
-      this.$refs.profileInput.click();
+      if (!this.isSubmitting) {
+        this.$refs.profileInput.click();
+      }
     },
 
     handleProfileUpload(event) {
+      if (this.isSubmitting) return;
+
       const file = event.target.files[0];
       if (file) {
         if (!file.type.match("image.*")) {
@@ -928,7 +971,7 @@ export default {
               "Understanding the SELF",
               "Readings in Philippine History with Indigenous People Studies",
               "The Life and Works of Jose Rizal",
-              "People and Earth’s Ecosystem",
+              "People and Earth's Ecosystem",
               "Mathematics in the Modern World",
               "Science, Technology and Society",
               "Reading Visual Arts",
@@ -949,60 +992,62 @@ export default {
           break;
 
         case "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)":
-          availableSubjects.coreSubjects = [
-            "Introduction to EM Computing",
-            "Computer Programming 1",
-            "PC Troubleshooting with Basic Electronics",
-            "Computer Programming 2",
-            "Usability, HCI, UI Design",
-            "Free Hand and Digital Drawing",
-            "Data Structures and Algorithms",
-            "Information Management 1",
-            "Introduction to Game Design and Development",
-            "Computer Graphics Programming",
-            "Image and Video Processing",
-            "Script Writing and Storyboard Design",
-            "Applications Development and Emerging Technologies",
-            "Principles of 2D Animation",
-            "Audio Design and Sound Engineering Modelling and Rigging",
-            "Texture and Mapping",
-            "Social Issues and Professional Practice in Computing",
-            "Lighting and Effects",
-            "Principles of 3D Animation",
-            "Design and Production Process",
-            "Advanced Sound Production",
-            "Advanced 2D Animation",
-            "EMC Professional Elective 1",
-            "Research Methods",
-            "Advanced 3D Animation and Scripting",
-            "Compositing and Rendering",
-            "EMC Professional Elective 2",
-            "Animation Design and Production",
-            "EMC Professional Elective 3",
-            "Computing Seminars and Educational Trips",
-          ];
-          availableSubjects.gecSubjects = [
-            "Art Appreciation",
-            "Ethics",
-            "Mathematics in the Modern World",
-            "People and Earth's Ecosystem",
-            "Purposive Communication",
-            "Reading Visual Arts",
-            "Readings in Philippine History with Indigenous People Studies",
-            "Science, Technology and Society",
-            "The Contemporary World with Peace Studies",
-            "The Entrepreneurial Mind",
-            "The Life and Works of Rizal",
-            "Understanding the Self",
-          ];
-          availableSubjects.peNstpSubjects = [
-            "National Service Training Program with Anti-Smoking and Environmental Education",
-            "National Service Training Program with GAD and Peace Education",
-            "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
-            "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
-            "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
-            "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
-          ];
+          this.availableSubjects = {
+            coreSubjects: [
+              "Introduction to EM Computing",
+              "Computer Programming 1",
+              "PC Troubleshooting with Basic Electronics",
+              "Computer Programming 2",
+              "Usability, HCI, UI Design",
+              "Free Hand and Digital Drawing",
+              "Data Structures and Algorithms",
+              "Information Management 1",
+              "Introduction to Game Design and Development",
+              "Computer Graphics Programming",
+              "Image and Video Processing",
+              "Script Writing and Storyboard Design",
+              "Applications Development and Emerging Technologies",
+              "Principles of 2D Animation",
+              "Audio Design and Sound Engineering Modelling and Rigging",
+              "Texture and Mapping",
+              "Social Issues and Professional Practice in Computing",
+              "Lighting and Effects",
+              "Principles of 3D Animation",
+              "Design and Production Process",
+              "Advanced Sound Production",
+              "Advanced 2D Animation",
+              "EMC Professional Elective 1",
+              "Research Methods",
+              "Advanced 3D Animation and Scripting",
+              "Compositing and Rendering",
+              "EMC Professional Elective 2",
+              "Animation Design and Production",
+              "EMC Professional Elective 3",
+              "Computing Seminars and Educational Trips",
+            ],
+            gecSubjects: [
+              "Art Appreciation",
+              "Ethics",
+              "Mathematics in the Modern World",
+              "People and Earth's Ecosystem",
+              "Purposive Communication",
+              "Reading Visual Arts",
+              "Readings in Philippine History with Indigenous People Studies",
+              "Science, Technology and Society",
+              "The Contemporary World with Peace Studies",
+              "The Entrepreneurial Mind",
+              "The Life and Works of Rizal",
+              "Understanding the Self",
+            ],
+            peNstpSubjects: [
+              "National Service Training Program with Anti-Smoking and Environmental Education",
+              "National Service Training Program with GAD and Peace Education",
+              "Physical Activities Toward Health and Fitness 1 (PATHFit 1): Movement Competency",
+              "Physical Activities Toward Health and Fitness 2 (PATHFit 2): Exercise-Based Fitness Activities",
+              "Physical Activities Toward Health and Fitness 3 (PATHFit 3)",
+              "Physical Activities Toward Health and Fitness 4 (PATHFit 4)",
+            ],
+          };
           break;
 
         default:
@@ -1024,6 +1069,10 @@ export default {
     },
 
     async submitLearnerInfo() {
+      if (this.isSubmitting) return; // Prevent multiple submissions
+
+      this.isSubmitting = true;
+
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
 
@@ -1032,19 +1081,13 @@ export default {
           "Please complete all required fields before submitting:\n\n" +
             finalValidationErrors.join("\n")
         );
+        this.isSubmitting = false;
         return;
       }
 
       try {
         const formData = new FormData();
-        // formData.append("email", store.registrationData.email);
-        // formData.append("password", store.registrationData.password);
-        // formData.append(
-        //   "password_confirmation",
-        //   store.registrationData.password_confirmation
-        // );
         formData.append("role", store.registrationData.role);
-        // formData.append("name", this.fullName);
         formData.append(
           "gender",
           this.gender === "Other" ? this.otherGender : this.gender
@@ -1074,43 +1117,35 @@ export default {
           throw new Error("Profile image is missing or invalid.");
         }
 
-        await api
-          .post("/api/learner/register", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              accept: "application/json",
-              // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-            },
-          })
-          .then((response) => {
-            // console.log("Registration successful:", response);
-            createToast("Registration successful!", {
-              position: "bottom-right",
-              type: "success",
-              transition: "slide",
-              timeout: 2000,
-              showIcon: true,
-              toastBackgroundColor: "#319cb0",
-            });
-          })
-          .catch((error) => {
-            console.error("Registration error:", error);
-            createToast("Registration failed!", {
-              position: "bottom-right",
-              type: "danger",
-              transition: "slide",
-              timeout: 2000,
-              showIcon: true,
-            });
-            throw error;
-          });
+        await api.post("/api/learner/register", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            accept: "application/json",
+          },
+        });
+
+        createToast("Registration successful!", {
+          position: "bottom-right",
+          type: "success",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#319cb0",
+        });
       } catch (error) {
-        console.error("Data collection error:", error);
-        alert(
-          "An error occurred while submitting your information. Please try again."
-        );
+        createToast("Registration failed!", {
+          position: "bottom-right",
+          type: "danger",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+        });
+      } finally {
+        this.isSubmitting = false;
+        this.setButtonActive(false);
       }
     },
+
     validateField(field, value) {
       const rules = this.validationRules[field];
       if (!rules) return;
@@ -1165,9 +1200,6 @@ export default {
   },
 
   watch: {
-    fullName(newVal) {
-      this.validateField("fullName", newVal);
-    },
     address(newVal) {
       this.validateField("address", newVal);
     },
@@ -1204,6 +1236,94 @@ export default {
 
 <style scoped>
 @import "@/assets/learnerInfo.css";
+
+/* Additional styles for loading states and button feedback */
+.next-button {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  background-color: #155577;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 130px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  min-height: 40px;
+}
+
+.next-button:hover:not(:disabled) {
+  background-color: #032c58;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.next-button:active,
+.next-button.active {
+  transform: translateY(0);
+  background-color: #1a3a4a;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.next-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.next-button.loading {
+  pointer-events: none;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled states for form elements */
+.personal-input:disabled,
+.profile-input:disabled,
+.profile-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.choose-file-container.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dropdown-container:has(input:disabled) {
+  opacity: 0.6;
+  pointer-events: none;
+}
 
 .mosha__toast .mosha__toast__content {
   font-family: "Montserrat", sans-serif;

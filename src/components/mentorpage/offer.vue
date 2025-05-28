@@ -51,7 +51,6 @@ const subjectOptions = computed(() => {
   try {
     return JSON.parse(learnerSubjects || "[]");
   } catch (e) {
-    console.error("Error parsing subjects:", e);
     return [];
   }
 });
@@ -74,6 +73,8 @@ const sessionType = ref("in-person");
 const notes = ref("");
 const meetingLocation = ref("");
 const selectedSubject = ref(""); // Add this with other refs
+const isSubmitting = ref(false);
+const isButtonActive = ref(false);
 
 // Calendar variables
 const currentDate = ref(new Date());
@@ -127,7 +128,8 @@ const confirmSchedule = async () => {
     location: isInPersonModality.value ? meetingLocation.value : "online",
     subject: selectedSubject.value,
   };
-
+  isSubmitting.value = true;
+  isButtonActive.value = false;
   try {
     const response = await api
       .post("/api/mentor/send-offer", scheduleData, {
@@ -159,13 +161,14 @@ const confirmSchedule = async () => {
             showIcon: true,
           });
         }
+      })
+      .finally(() => {
+        isSubmitting.value = false;
+        isButtonActive.value = true;
       });
 
     // // Debug logs
-    // console.log("Selected Subject:", selectedSubject.value);
-    // console.log("Schedule Data:", scheduleData);
   } catch (error) {
-    console.error("Error in schedule confirmation:", error);
     alert(error.response?.data?.message || "Error sending tutoring offer");
   }
 };
@@ -211,9 +214,7 @@ onMounted(() => {
     }
 
     document.body.style.overflow = "hidden";
-  } catch (error) {
-    console.error("Error in mounted hook:", error);
-  }
+  } catch (error) {}
 });
 
 onUnmounted(() => {
@@ -233,7 +234,6 @@ const availableDays = computed(() => {
   try {
     return JSON.parse(learnerAvail || "[]").map((day) => day.toLowerCase());
   } catch (e) {
-    console.error("Error parsing available days:", e);
     return [];
   }
 });
@@ -353,6 +353,12 @@ const currentMonthYear = computed(() => {
     year: "numeric",
   });
 });
+
+const setButtonActive = (active) => {
+  if (!this.isSubmitting) {
+    this.isButtonActive = active;
+  }
+};
 </script>
 
 <template>

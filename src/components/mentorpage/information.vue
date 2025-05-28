@@ -1,9 +1,10 @@
-
 <script setup>
 // import { define } from "core-js/core/object";
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFTokens = true;
@@ -66,11 +67,18 @@ const saveChanges = async () => {
     });
 
     if (response.status === 200) {
-      alert("Changes saved successfully!");
+      createToast("Changes saved successfully!", {
+        position: "bottom-right",
+        type: "success",
+        transition: "slide",
+        timeout: 2000,
+        showIcon: true,
+        toastBackgroundColor: "#319cb0",
+      });
+      // alert("Changes saved successfully!");
       emit("close");
     }
   } catch (error) {
-    console.error("Error saving changes:", error);
     alert("An error occurred while saving changes.");
   }
 };
@@ -696,10 +704,7 @@ watch(
                   v-show="dropdownOpen.gender"
                   class="dropdown-options gender-options"
                 >
-                  <div
-                    class="dropdown-option"
-                    @click="selectGender('Female')"
-                  >
+                  <div class="dropdown-option" @click="selectGender('Female')">
                     Female
                   </div>
                   <div class="dropdown-option" @click="selectGender('Male')">
@@ -841,9 +846,7 @@ watch(
                       :id="`core-${i}`"
                       :value="option"
                       v-model="profileData.courseOffered"
-                      :checked="
-                        props.userData.ment.subjects?.includes(option)
-                      "
+                      :checked="props.userData.ment.subjects?.includes(option)"
                       @click.stop
                     />
                     <label :for="`core-${i}`">{{ option }}</label>

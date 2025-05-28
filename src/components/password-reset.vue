@@ -1,6 +1,5 @@
 <template>
   <div class="reset-password-container">
-
     <header class="brand-header">
       <img
         src="/src/assets/logo_gccoed.png"
@@ -74,10 +73,8 @@ const csrf = async () => {
     await api.get("/sanctum/csrf-cookie", {
       withCredentials: true,
     });
-    console.log("CSRF cookie set successfully");
     return true;
   } catch (error) {
-    console.error("Error setting CSRF cookie:", error);
     return false;
   }
 };
@@ -100,14 +97,13 @@ const resetUserPass = async () => {
 
     const response = await api
       .patch("/api/reset-password", newPass, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       })
       .then((response) => {
-        console.log("Password reset response:", response.data);
         createToast("Password reset successfully", {
           position: "top-right",
           type: "danger",
@@ -118,7 +114,6 @@ const resetUserPass = async () => {
         });
       })
       .catch((error) => {
-        console.error("Error resetting password:", error);
         createToast("Failed to reset password", {
           position: "top-right",
           type: "danger",
@@ -127,7 +122,7 @@ const resetUserPass = async () => {
           showIcon: true,
           toastBackgroundColor: "#e53e3e",
         });
-    });
+      });
 
     if (response.status === 200) {
       success.value = "Password reset successfully! Redirecting to login...";
@@ -136,7 +131,6 @@ const resetUserPass = async () => {
       }, 2000);
     }
   } catch (error) {
-    console.error("Error resetting password:", error);
     error.value = error.response?.data?.message || "Failed to reset password";
   } finally {
     loading.value = false;
@@ -197,8 +191,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
-
-
 
 .logo-img {
   height: 50px;
@@ -311,7 +303,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(135deg, #2b737e,  #0b2b31);
+  background: linear-gradient(135deg, #2b737e, #0b2b31);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(52, 158, 177, 0.25);
 }

@@ -43,7 +43,6 @@ const getLearnerDets = async () => {
         },
       })
       .then((response) => {
-        console.log("User details fetched successfully:", response.data);
         if (response.status === 200) {
           userData.value = {
             user: response.data.user,
@@ -59,7 +58,6 @@ const getLearnerDets = async () => {
         }
       });
   } catch (error) {
-    console.error("Error fetching user details:", error);
     return null;
   }
 };
@@ -75,12 +73,10 @@ const sessionInfo = async () => {
         },
       })
       .then((response) => {
-        console.log("session details:", response.data);
         todaySchedule.value = response.data.schedules_today;
         upcommingSchedule.value = response.data.upcoming_schedules;
       });
   } catch (error) {
-    console.error("Error fetching session details:", error);
     return null;
   }
 };
@@ -96,11 +92,9 @@ const sessionForReview = async () => {
         },
       })
       .then((response) => {
-        console.log("done session details:", response.data);
         schedForReview.value = response.data.schedules_done;
       });
   } catch (error) {
-    console.error("Error fetching session details:", error);
     return null;
   }
 };
@@ -116,7 +110,6 @@ const mentorProfile = async () => {
         },
       })
       .then((response) => {
-        console.log("Mentor profiles fetched successfully: ", response.data);
         if (response.status === 200) {
           users.value = response.data.map((item) => ({
             id: item.mentor_infos.mentor_no,
@@ -136,9 +129,7 @@ const mentorProfile = async () => {
           }));
         }
       });
-  } catch (error) {
-    console.error("Error fetching mentor profiles:", error);
-  }
+  } catch (error) {}
 };
 
 const registerMentorRole = async () => {
@@ -164,11 +155,9 @@ const switchRole = async () => {
           showIcon: true,
           toastBackgroundColor: "#319cb0",
         });
-        console.log("Role switched:", response.data);
         router.push("/login");
       })
       .catch((error) => {
-        // console.error("Error switching role:", error);
         createToast(
           "Failed to switch role. Please try again or Register as Mentor.",
           {
@@ -182,7 +171,6 @@ const switchRole = async () => {
         );
       });
   } catch (error) {
-    console.error("Error switching role:", error);
     return null;
   }
 };
@@ -199,12 +187,10 @@ const mentFiles = async () => {
         },
       })
       .then((response) => {
-        console.log("Mentor files:", response.data);
         return response.data;
       });
     return response;
   } catch (error) {
-    console.error("Error fetching mentor files:", error);
     return null;
   }
 };
@@ -219,11 +205,8 @@ const fetchMentFiles = async () => {
         "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     });
-    console.log("Mentor files fetched:", response.data);
     mentorFiles.value = response.data;
-  } catch (error) {
-    console.error("Error fetching mentor files:", error);
-  }
+  } catch (error) {}
 };
 
 const logout = async () => {
@@ -240,10 +223,7 @@ const logout = async () => {
         },
       }
     );
-    console.log("Logout response:", response.data);
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
+  } catch (error) {}
 };
 
 const userData = ref({
@@ -344,7 +324,7 @@ const filteredUsers = computed(() => {
 });
 
 const handleLogout = () => {
-  alert("User logged out");
+  // alert("User logged out");
   confirmLogout.value = false;
   logout();
   router.push("/login");
@@ -432,10 +412,7 @@ onMounted(async () => {
       fetchMentFiles(),
       mentFiles(),
     ]);
-
-    console.log("All data loaded successfully");
   } catch (error) {
-    console.error("Error loading data:", error);
     createToast("Error loading data. Please refresh the page.", {
       position: "top-right",
       type: "danger",

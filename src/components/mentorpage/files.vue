@@ -31,7 +31,6 @@ const uploadFiles = async () => {
         },
       })
       .then((response) => {
-        console.log("File upload response:", response.data);
         createToast("File uploaded successfully!", {
           position: "bottom-right",
           type: "success",
@@ -42,9 +41,7 @@ const uploadFiles = async () => {
         });
         files.value = []; // Clear the files after upload
       });
-  } catch (error) {
-    console.error("Error uploading files:", error);
-  }
+  } catch (error) {}
 };
 
 const fileInput = ref(null);
@@ -167,7 +164,6 @@ const handleFiles = (newFiles) => {
   );
 
   files.value = [...files.value, ...uniqueFiles];
-  console.log("Files received:", uniqueFiles);
 };
 
 const { isOverDropZone } = useDropZone(dropZoneRef, {
@@ -176,13 +172,10 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
       handleFiles(Array.from(droppedFiles));
     }
   },
-  onEnter: () => console.log("Files entered drop zone"),
-  onLeave: () => console.log("Files left drop zone"),
 });
 
 onMounted(() => {
   // files.value = props.files;
-  console.log(files);
 });
 </script>
 

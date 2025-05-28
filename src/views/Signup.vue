@@ -1,8 +1,16 @@
 <template>
   <div class="signup-container">
     <button @click="scrollToGetStarted" class="back-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z"
+          clip-rule="evenodd"
+        />
       </svg>
       Back
     </button>
@@ -11,7 +19,11 @@
     <div v-if="showConfirmationModal" class="modal-overlay">
       <div class="confirmation-modal">
         <h3>Confirm Your Role</h3>
-        <p>You've selected to proceed as <strong>{{ selectedRole.toUpperCase() }}</strong>. Is this correct?</p>
+        <p>
+          You've selected to proceed as
+          <strong>{{ selectedRole.toUpperCase() }}</strong
+          >. Is this correct?
+        </p>
         <div class="modal-actions">
           <button @click="cancelSelection" class="cancel-btn">Cancel</button>
           <button @click="confirmSelection" class="confirm-btn">Confirm</button>
@@ -23,22 +35,30 @@
       <h1>Complete Your Account</h1>
       <p>Pick a role to proceed with your profile setup</p>
     </div>
-    
+
     <section class="join-section" id="get-started">
       <div class="join-card learner-card" @click="initiateSignUp('learner')">
         <div class="card-content">
           <div class="role-title">
             <span>PROCEED AS</span>
             <h3>LEARNER</h3>
-            <hr class="divider">
+            <hr class="divider" />
           </div>
           <div class="card-icon">
-           <img src="@/assets/learners.png" alt="Learner Icon" />
+            <img src="@/assets/learners.png" alt="Learner Icon" />
           </div>
           <button class="join-btn">
             Get Started
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                clip-rule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -49,15 +69,23 @@
           <div class="role-title">
             <span>PROCEED AS</span>
             <h3>MENTOR</h3>
-            <hr class="divider">
+            <hr class="divider" />
           </div>
           <div class="card-icon">
             <img src="@/assets/mentors.png" alt="Mentor Icon" />
           </div>
           <button class="join-btn">
             Get Started
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                clip-rule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -74,18 +102,18 @@ export default {
   data() {
     return {
       showConfirmationModal: false,
-      selectedRole: '',
+      selectedRole: "",
       passwordVisible: false,
-      confirmPasswordVisible: false
+      confirmPasswordVisible: false,
     };
   },
   methods: {
     scrollToGetStarted() {
-    this.$router.push("/#get-started");
+      this.$router.push("/#get-started");
       if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }
     },
@@ -108,7 +136,7 @@ export default {
     },
     cancelSelection() {
       this.showConfirmationModal = false;
-      this.selectedRole = '';
+      this.selectedRole = "";
     },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
@@ -116,7 +144,7 @@ export default {
     toggleConfirmPasswordVisibility() {
       this.confirmPasswordVisible = !this.confirmPasswordVisible;
     },
-  }
+  },
 };
 </script>
 
@@ -130,7 +158,8 @@ export default {
   font-family: "Montserrat", sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -303,7 +332,6 @@ html, body {
   transition: all 0.3s ease;
 }
 
-
 .join-btn {
   margin-top: auto;
   background: linear-gradient(135deg, #02475e 0%, #037a96 100%);
@@ -362,7 +390,7 @@ html, body {
   width: 100%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .confirmation-modal h3 {
@@ -415,24 +443,24 @@ html, body {
   .header-text h1 {
     font-size: 2rem;
   }
-  
+
   .header-text p {
     font-size: 1rem;
   }
-  
+
   .join-section {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .join-card {
     width: 100%;
     max-width: 350px;
   }
 
-    .card-icon img {
+  .card-icon img {
     width: 200px;
-    }
+  }
 
   .back-btn {
     top: 1rem;
@@ -444,11 +472,11 @@ html, body {
   .confirmation-modal {
     padding: 1.75rem;
   }
-  
+
   .confirmation-modal h3 {
     font-size: 1.3rem;
   }
-  
+
   .confirmation-modal p {
     font-size: 0.95rem;
   }
@@ -462,26 +490,26 @@ html, body {
   .header-text h1 {
     font-size: 1.8rem;
   }
-  
+
   .confirmation-modal {
     padding: 1.5rem;
   }
-  
+
   .confirmation-modal h3 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
-  
+
   .confirmation-modal p {
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .modal-actions {
     flex-direction: row;
     gap: 0.75rem;
   }
-  
+
   .modal-actions button {
     padding: 0.5rem 0.8rem;
     font-size: 0.9rem;

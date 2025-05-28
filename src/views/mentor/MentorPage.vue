@@ -48,7 +48,6 @@ const loggedUserDets = async () => {
         },
       })
       .then((response) => {
-        console.log("User details fetched successfully:", response.data);
         if (response.status === 200) {
           // Store data in unified userData ref
           userData.value = {
@@ -66,7 +65,6 @@ const loggedUserDets = async () => {
         }
       });
   } catch (error) {
-    console.error("Error fetching user details:", error);
     return null;
   }
 };
@@ -83,18 +81,14 @@ const learnersProfile = async () => {
         },
       })
       .then((response) => {
-        console.log("Learner profiles fetched successfully:", response.data);
         if (response.status === 200) {
           users.value = response.data;
         } else {
           throw new Error("Failed to fetch learner profiles");
         }
       })
-      .catch((error) => {
-        console.error("Error fetching learner profiles:", error);
-      });
+      .catch((error) => {});
   } catch (error) {
-    console.error("Error fetching learner profiles:", error);
     return null;
   }
 };
@@ -111,12 +105,10 @@ const sessionInfo = async () => {
         },
       })
       .then((response) => {
-        console.log("session details:", response.data);
         todaySchedule.value = response.data.schedules_today;
         upcommingSchedule.value = response.data.upcoming_schedules;
       });
   } catch (error) {
-    console.error("Error fetching session details:", error);
     return null;
   }
 };
@@ -133,11 +125,9 @@ const getFeedbacks = async () => {
         },
       })
       .then((response) => {
-        console.log("Feedbacks:", response.data);
         feedbacks.value = response.data.feedbacks;
       });
   } catch (error) {
-    console.error("Error fetching feedbacks:", error);
     return null;
   }
 };
@@ -154,11 +144,9 @@ const getFiles = async () => {
         },
       })
       .then((response) => {
-        console.log("Files:", response.data);
         files.value = response.data.files;
       });
   } catch (error) {
-    console.error("Error fetching files:", error);
     return null;
   }
 };
@@ -175,11 +163,9 @@ const registerLearnerRole = async () => {
         },
       })
       .then((response) => {
-        console.log("Learner registration:", response.data);
         router.push("/learner-info/alt");
       });
   } catch (error) {
-    console.error("Error registering as learner:", error);
     return null;
   }
 };
@@ -220,7 +206,6 @@ const switchRole = async () => {
         );
       });
   } catch (error) {
-    console.error("Error switching role:", error);
     return null;
   }
 };
@@ -239,10 +224,7 @@ const logout = async () => {
         },
       }
     );
-    console.log("Logout response:", response.data);
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
+  } catch (error) {}
 };
 
 const userData = ref({
@@ -361,7 +343,7 @@ const currentDay = computed(() => {
 });
 
 const handleLogout = () => {
-  alert("User logged out");
+  // alert("User logged out");
   confirmLogout.value = false;
   logout();
   router.push("/login");
@@ -369,7 +351,6 @@ const handleLogout = () => {
 
 const handleOfferConfirm = () => {
   // Handle the offer confirmation logic here
-  console.log("Offer confirmed for user ID:", userId.value);
   // You can also close the offer modal here if needed
   showOffer.value = false;
 };
@@ -410,7 +391,6 @@ onMounted(async () => {
       getFiles(),
     ]);
   } catch (error) {
-    console.error("Error loading data:", error);
     createToast("Error loading data. Please refresh the page.", {
       position: "top-right",
       type: "danger",

@@ -360,7 +360,7 @@ import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import logoGccoed from "@/assets/logo_gccoed.png";
 import axios from "axios";
-import api from "@/axios.js"; // Adjust the path as necessary
+import api from "@/axios.js";
 
 // axios.defaults.withCredentials = true;
 // axios.defaults.withXSRFToken = true;

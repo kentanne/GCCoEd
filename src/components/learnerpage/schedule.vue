@@ -43,6 +43,8 @@ const notes = ref("");
 const meetingLocation = ref("");
 const selectedSubject = ref("");
 const showConfirmationModal = ref(false); // Add this for modal control
+const isSubmitting = ref(false); // Add this for submit state
+const isButtonActive = ref(false); // Add this for button state
 
 // Calendar variables
 const currentDate = ref(new Date());
@@ -119,21 +121,43 @@ const confirmSchedule = async () => {
       subject: selectedSubject.value,
     };
 
-    console.log("Sending schedule data:", scheduleData);
+    isSubmitting.value = true; // Set submitting state
+    isButtonActive.value = false; // Disable button during submission
 
-    const response = await api.post(
-      "/api/learner/scheduleCreate",
-      scheduleData,
-      {
+    const response = await api
+      .post("/api/learner/scheduleCreate", scheduleData, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-      }
-    );
-
-    console.log("Schedule response:", response);
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Schedule set successfully!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+          emit("confirm", scheduleData);
+          emit("close");
+        } else {
+          createToast("Failed to set schedule.", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      })
+      .finally(() => {
+        isSubmitting.value = false;
+        isButtonActive.value = true;
+      });
 
     createToast("Schedule created successfully", {
       position: "bottom-right",
@@ -148,7 +172,6 @@ const confirmSchedule = async () => {
     emit("confirm", scheduleData);
     emit("close");
   } catch (error) {
-    console.error("Error in schedule confirmation:", error);
     createToast("Failed to create schedule. Please try again.", {
       position: "bottom-right",
       type: "danger",
@@ -180,7 +203,6 @@ const availableDays = computed(() => {
       day.toLowerCase()
     );
   } catch (e) {
-    console.error("Error parsing available days:", e);
     return [];
   }
 });
@@ -324,7 +346,6 @@ const subjectOptions = computed(() => {
   try {
     return JSON.parse(mentorSubjects || "[]");
   } catch (e) {
-    console.error("Error parsing subjects:", e);
     return [];
   }
 });
@@ -337,6 +358,12 @@ const isToday = (date) => {
     date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
   );
+};
+
+const setButtonActive = (active) => {
+  if (!this.isSubmitting) {
+    this.isButtonActive = active;
+  }
 };
 </script>
 

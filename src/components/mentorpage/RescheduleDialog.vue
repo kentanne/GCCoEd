@@ -18,6 +18,8 @@ const props = defineProps({
 });
 
 const selectedDate = ref(null);
+const isSubmitting = ref(false);
+const isButtonActive = ref(false);
 
 // Emit the selected date when rescheduling
 const emit = defineEmits(["close", "reschedule"]);
@@ -36,7 +38,6 @@ function getCookie(name) {
 const rescheduleSession = async () => {
   try {
     if (!selectedDate.value) {
-      console.error("No date selected");
       return;
     }
 
@@ -48,6 +49,8 @@ const rescheduleSession = async () => {
       minute: "2-digit",
       hour12: false,
     }); // Format: HH:mm
+
+    isSubmitting.value = true;
 
     const response = await api
       .patch(
@@ -73,9 +76,9 @@ const rescheduleSession = async () => {
           showIcon: true,
           toastBackgroundColor: "#319cb0",
         });
+        isButtonActive.value = true;
       })
       .catch((error) => {
-        // console.error("Error rescheduling session:", error);
         createToast("Failed to reschedule session", {
           position: "bottom-right",
           type: "error",
@@ -83,11 +86,12 @@ const rescheduleSession = async () => {
           timeout: 2000,
           showIcon: true,
         });
+      })
+      .finally(() => {
+        isSubmitting.value = false;
       });
     // return response.data
-  } catch (error) {
-    console.error("Error rescheduling session:", error);
-  }
+  } catch (error) {}
 };
 </script>
 
@@ -115,12 +119,9 @@ const rescheduleSession = async () => {
 
       <div class="button-container">
         <button @click="$emit('close')" class="cancel-button">Cancel</button>
-        <button
-          @click="rescheduleSession"
-          class="confirm-button"
-          :disabled="!selectedDate"
-        >
-          Reschedule
+        <button @click="rescheduleSession" class="confirm-button">
+          <span v-if="isSubmitting" class="loader"></span>
+          <span v-else>Reschedule</span>
         </button>
       </div>
     </div>
@@ -232,6 +233,7 @@ const rescheduleSession = async () => {
 .confirm-button {
   background: #2c3e50;
   color: white;
+  position: relative;
 }
 
 .confirm-button:disabled {
@@ -241,6 +243,79 @@ const rescheduleSession = async () => {
 
 .confirm-button:not(:disabled):hover {
   background: #1a2634;
+}
+
+.loader {
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  border-top: 2px solid #fff;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.6s linear infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button states */
+.your-button-class {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  min-height: 40px; /* Prevents height changes */
+}
+
+.your-button-class:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.your-button-class:active,
+.your-button-class.active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.your-button-class:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.your-button-class.loading {
+  pointer-events: none;
+}
+
+/* Disabled form elements */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
 }
 
 .dp__input {

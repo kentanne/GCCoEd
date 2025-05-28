@@ -86,7 +86,6 @@ const closeFeedback = () => {
 onMounted(() => {
   // records.value = props.feedbacks;
   // fetchRecordTable();
-  // console.log(records.value);
   records.value = props.feedbacks;
 });
 </script>
