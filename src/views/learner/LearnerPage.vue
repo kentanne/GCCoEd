@@ -1063,15 +1063,7 @@ onMounted(async () => {
   background-color: #e6f7ff;
 }
 
-.topbar-option.active::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: #006981;
-}
+
 
 .nav-icon {
   width: 20px;
@@ -1094,10 +1086,7 @@ onMounted(async () => {
   color: #004d5a;
 }
 
-.topbar-option.active .nav-text {
-  color: #004d5a;
-  font-weight: 600;
-}
+
 
 .topbar-date {
   color: #666;
