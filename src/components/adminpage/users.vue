@@ -721,7 +721,7 @@ const exportUserToPDF = async (user) => {
 };
 
 const downloadFile = (file) => {
-  alert(`Downloading file: ${file.name}`);
+  // alert(`Downloading file: ${file.name}`);
 };
 
 // Add this computed property or helper function
@@ -763,7 +763,9 @@ const parseArrayString = (str) => {
   width: 90%;
   margin: 0 auto;
   text-align: center;
-  height: calc(89vh - 120px); /* Set fixed height, considering some margin from top */
+  height: calc(
+    89vh - 120px
+  ); /* Set fixed height, considering some margin from top */
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -876,7 +878,7 @@ const parseArrayString = (str) => {
   /* Hide scrollbar */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
-  
+
   /* Hide scrollbar for Chrome/Safari/Opera */
   &::-webkit-scrollbar {
     display: none;
@@ -927,7 +929,7 @@ const parseArrayString = (str) => {
 
 /* Add box shadow to sticky header for better visual separation */
 .data-table th::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   right: 0;
@@ -1395,7 +1397,9 @@ const parseArrayString = (str) => {
   position: sticky; /* Add this */
   bottom: 0; /* Add this */
   z-index: 10; /* Add this */
-  backdrop-filter: blur(8px); /* Optional: adds blur effect to footer background */
+  backdrop-filter: blur(
+    8px
+  ); /* Optional: adds blur effect to footer background */
   background-color: rgba(249, 250, 251, 0.95); /* Semi-transparent background */
 }
 
@@ -1716,7 +1720,6 @@ const parseArrayString = (str) => {
     padding: 1rem;
   }
 
-
   .table-title {
     width: 100%;
     justify-content: center; /* Center the title */
@@ -1772,7 +1775,7 @@ const parseArrayString = (str) => {
   .details-section {
     grid-template-columns: 1fr;
     max-width: 100%;
-  }  /* Update the responsive styles for the table title */
+  } /* Update the responsive styles for the table title */
   @media screen and (max-width: 768px) {
     .table-title {
       width: 100%;
@@ -1780,45 +1783,45 @@ const parseArrayString = (str) => {
       font-size: 1.3rem;
       margin: 0; /* Remove margin to ensure perfect centering */
     }
-  
+
     /* Add word-break for modal content */
     .user-modal {
       width: 95%;
       margin: 1rem;
       overflow-x: hidden; /* Prevent horizontal scroll */
     }
-  
-    .detail-value, 
+
+    .detail-value,
     .info-value,
     .detail-value2 {
       word-break: break-word;
       overflow-wrap: break-word;
       hyphens: auto;
     }
-  
+
     /* Add max-width to ensure content doesn't overflow */
     .modal-body {
       padding: 1rem;
       max-width: 100%;
     }
-  
+
     .details-content,
     .bio-content {
       max-width: 100%;
     }
-  
+
     /* Adjust grid layout for details section */
     .details-section {
       grid-template-columns: 1fr;
       max-width: 100%;
     }
-  
+
     .details-card,
     .bio-card {
       width: 100%;
       box-sizing: border-box;
     }
-  
+
     /* Make table header items stack properly */
     .table-header {
       flex-direction: column;
@@ -1852,7 +1855,7 @@ const parseArrayString = (str) => {
     grid-template-columns: 1fr;
   }
 
-  .details-card, 
+  .details-card,
   .bio-card {
     padding: 1rem;
   }
@@ -1908,13 +1911,17 @@ const parseArrayString = (str) => {
 
   /* Add visual indicator for scrollable content */
   .table-scroll-container::after {
-    content: '';
+    content: "";
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
     width: 20px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 255, 255, 0.9)
+    );
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s;
