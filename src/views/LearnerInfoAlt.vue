@@ -34,6 +34,7 @@
             @input="validateField('address', address)"
             @blur="validateField('address', address)"
             placeholder="Enter your address"
+            :disabled="isSubmitting"
             class="personal-input"
             :class="{ error: validationErrors.address }"
           />
@@ -53,6 +54,7 @@
             @input="validateField('contactNumber', contactNumber)"
             @blur="validateField('contactNumber', contactNumber)"
             placeholder="Enter your contact number (11 digits)"
+            :disabled="isSubmitting"
             class="personal-input"
             :class="{ error: validationErrors.contactNumber }"
             maxlength="11"
@@ -66,32 +68,34 @@
         </div>
 
         <div class="personal-field">
-          <label class="personal-label required" for="gender">SEX AT BIRTH</label>
+          <label class="personal-label required" for="gender"
+            >SEX AT BIRTH</label
+          >
           <div class="gender-dropdown">
             <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
                 type="text"
                 v-model="gender"
                 placeholder="Select your sex"
+                :disabled="isSubmitting"
                 class="personal-input"
                 readonly
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
-             <div v-if="dropdownOpen.gender" class="dropdown-options">
+            <div v-if="dropdownOpen.gender" class="dropdown-options">
               <div class="dropdown-option" @click="selectGender('Female')">
                 Female
               </div>
               <div class="dropdown-option" @click="selectGender('Male')">
                 Male
               </div>
+            </div>
+            <span v-if="validationErrors.gender" class="validation-message">
+              {{ validationErrors.gender }}
+            </span>
           </div>
-          <span v-if="validationErrors.gender" class="validation-message">
-            {{ validationErrors.gender }}
-          </span>
         </div>
-        </div>
-
 
         <div class="personal-field">
           <label class="personal-label" for="year-level">YEAR LEVEL </label>
@@ -104,6 +108,7 @@
                 type="text"
                 v-model="yearLevel"
                 placeholder="Select your year level"
+                :disabled="isSubmitting"
                 class="personal-input"
                 readonly
               />
@@ -134,6 +139,7 @@
                 type="text"
                 v-model="program"
                 placeholder="Select your program"
+                :disabled="isSubmitting"
                 class="personal-input"
                 readonly
               />
@@ -234,6 +240,7 @@
                 id="availability-days"
                 v-model="availabilityDaysDisplay"
                 placeholder="Select available days"
+                :disabled="isSubmitting"
                 class="profile-input"
                 readonly
               />
@@ -253,6 +260,7 @@
                   :id="'day-' + day"
                   :value="day"
                   v-model="selectedDays"
+                  :disabled="isSubmitting"
                   @click.stop
                 />
                 <label :for="'day-' + day">{{ day }}</label>
@@ -272,6 +280,7 @@
                     ? `${selectedSubjects.length} subjects selected`
                     : 'Select subjects'
                 "
+                :disabled="isSubmitting"
                 readonly
                 class="profile-input"
                 :class="{ error: validationErrors.selectedSubjects }"
@@ -306,6 +315,7 @@
                   type="checkbox"
                   :id="subject"
                   :value="subject"
+                  :disabled="isSubmitting"
                   v-model="selectedSubjects"
                   @change="updateSelectedCounts"
                 />
@@ -367,6 +377,7 @@
                 type="text"
                 v-model="sessionDuration"
                 placeholder="Select duration"
+                :disabled="isSubmitting"
                 class="profile-input"
                 readonly
               />
@@ -408,6 +419,7 @@
                 type="text"
                 id="learning-style"
                 v-model="learningStyleDisplay"
+                :disabled="isSubmitting"
                 placeholder="Select learning style(s)"
                 class="profile-input"
                 readonly
@@ -428,6 +440,7 @@
                   :id="'style-' + style"
                   :value="style"
                   v-model="selectedsessionStyles"
+                  :disabled="isSubmitting"
                   @click.stop
                 />
                 <label :for="'style-' + style">{{ style }}</label>
@@ -447,6 +460,7 @@
             rows="4"
             class="profile-textarea"
             :class="{ error: validationErrors.bio }"
+            :disabled="isSubmitting"
           ></textarea>
           <span v-if="validationErrors.bio" class="validation-message">
             {{ validationErrors.bio }}
@@ -463,6 +477,7 @@
             placeholder="Describe your learning goals (50-500 characters)"
             rows="4"
             class="profile-textarea"
+            :disabled="isSubmitting"
             :class="{ error: validationErrors.goals }"
           ></textarea>
           <span v-if="validationErrors.goals" class="validation-message">
@@ -486,8 +501,23 @@
         </div>
       </div>
     </div>
-    <button class="next-button" @click="nextStep">
-      {{ currentStep === totalSteps ? "SUBMIT" : "NEXT" }}
+    <button
+      class="next-button"
+      @click="nextStep"
+      :disabled="isSubmitting"
+      :class="{ loading: isSubmitting, active: isButtonActive }"
+      @mousedown="setButtonActive(true)"
+      @mouseup="setButtonActive(false)"
+      @mouseleave="setButtonActive(false)"
+    >
+      <span v-if="isSubmitting" class="loading-spinner"></span>
+      {{
+        isSubmitting
+          ? "Submitting..."
+          : currentStep === totalSteps
+          ? "SUBMIT"
+          : "NEXT"
+      }}
     </button>
   </div>
 </template>
@@ -655,6 +685,11 @@ export default {
   },
 
   methods: {
+    setButtonActive(active) {
+      if (!this.isSubmitting) {
+        this.isButtonActive = active;
+      }
+    },
     scrollToGetStarted() {
       this.$router.push("/signup");
       if (element) {
@@ -781,6 +816,8 @@ export default {
     },
 
     nextStep() {
+      if (this.isSubmitting) return;
+
       const validationErrors = this.validateForm();
 
       if (validationErrors.length > 0) {
@@ -1025,6 +1062,9 @@ export default {
     },
 
     async submitLearnerInfo() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
+
       const finalValidationErrors = this.validateForm();
       const store = registrationStore();
 
@@ -1110,6 +1150,9 @@ export default {
         alert(
           "An error occurred while submitting your information. Please try again."
         );
+      } finally {
+        this.isSubmitting = false;
+        this.setButtonActive(false);
       }
 
       // First API call - Set secondary role
@@ -1232,5 +1275,37 @@ export default {
 
 .mosha__toast .mosha__toast__content .mosha__toast__content__text {
   padding: 0.5rem;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.next-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.next-button:active,
+.next-button.active {
+  transform: translateY(0);
+  background-color: #1a3a4a;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 </style>

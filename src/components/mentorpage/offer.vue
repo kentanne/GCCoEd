@@ -74,6 +74,8 @@ const sessionType = ref("in-person");
 const notes = ref("");
 const meetingLocation = ref("");
 const selectedSubject = ref(""); // Add this with other refs
+const isSubmitting = ref(false);
+const isButtonActive = ref(false);
 
 // Calendar variables
 const currentDate = ref(new Date());
@@ -159,6 +161,10 @@ const confirmSchedule = async () => {
             showIcon: true,
           });
         }
+      })
+      .finally(() => {
+        isSubmitting.value = false;
+        isButtonActive.value = true;
       });
 
     // // Debug logs
@@ -347,6 +353,12 @@ const currentMonthYear = computed(() => {
     year: "numeric",
   });
 });
+
+const setButtonActive = (active) => {
+  if (!this.isSubmitting) {
+    this.isButtonActive = active;
+  }
+};
 </script>
 
 <template>
@@ -531,7 +543,12 @@ const currentMonthYear = computed(() => {
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button @click="confirmSchedule" type="button" class="btn-proceed">
+      <button
+        @click="confirmSchedule"
+        type="button"
+        class="btn-proceed"
+        :disabled="isSubmitting || !isButtonActive"
+      >
         PROCEED
       </button>
     </div>

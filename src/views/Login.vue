@@ -18,6 +18,7 @@
                 type="text"
                 v-model="email"
                 placeholder="Enter your email"
+                :disabled="isLoading"
                 required
               />
             </div>
@@ -34,6 +35,7 @@
                 :type="passwordVisible ? 'text' : 'password'"
                 v-model="password"
                 placeholder="Enter your password"
+                :disabled="isLoading"
                 required
               />
             </div>
@@ -41,11 +43,18 @@
               <router-link to="/forgot-password">Forgot Password?</router-link>
             </p>
           </div>
-          <button type="submit">Login</button>
+          <button 
+            type="submit" 
+            :disabled="isLoading"
+            :class="{ 'loading': isLoading, 'active': isButtonActive }"
+            @mousedown="setButtonActive(true)"
+            @mouseup="setButtonActive(false)"
+            @mouseleave="setButtonActive(false)"
+          >
+            <span v-if="isLoading" class="loading-spinner"></span>
+            {{ isLoading ? 'Logging in...' : 'Login' }}
+          </button>
         </form>
-        <!-- <p class="switch-link">
-          Don't have an account? <router-link to="/signup">Sign up</router-link>
-        </p> -->
       </div>
     </main>
   </div>
@@ -64,6 +73,14 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 const passwordVisible = ref(false);
+const isLoading = ref(false);
+const isButtonActive = ref(false);
+
+function setButtonActive(active) {
+  if (!isLoading.value) {
+    isButtonActive.value = active;
+  }
+}
 
 function getCookie(name) {
   try {
@@ -91,13 +108,11 @@ async function csrf() {
 }
 
 async function login() {
+  if (isLoading.value) return; // Prevent multiple submissions
+  
+  isLoading.value = true;
+  
   try {
-    // await csrf().then((success) => {
-    //   if (!success) {
-    //     console.error("Failed to set CSRF cookie");
-    //     return;
-    //   }
-
     console.log("All cookies:", document.cookie);
     const token = getCookie("XSRF-TOKEN");
     console.log("Retrieved XSRF-TOKEN:", token);
@@ -107,62 +122,61 @@ async function login() {
       password: password.value,
     };
 
-    const response = api
-      .post("/api/login", loginData, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Login successful:", response.data);
+    const response = await api.post("/api/login", loginData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-        createToast("Login successful!", {
-          position: "bottom-right",
-          type: "success",
-          transition: "slide",
-          timeout: 2000,
-          showIcon: true,
-          toastBackgroundColor: "#319cb0",
-        });
+    console.log("Login successful:", response.data);
 
-        switch (response.data.user_role) {
-          case null:
-            router.push("/signup");
-            break;
-          case "learner":
-            router.push("/learner");
-            break;
-          case "mentor":
-            router.push("/mentor");
-            break;
-          case "admin":
-            router.push("/admin");
-            break;
-          default:
-            console.error("Unknown user role:", response.data.user_role);
-            break;
-        }
-        // return response;
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        createToast("Login failed. Please try again.", {
-          position: "bottom-right",
-          type: "error",
-          transition: "slide",
-          timeout: 2000,
-          showIcon: true,
-          toastBackgroundColor: "#e74c3c",
-        });
-      });
+    createToast("Login successful!", {
+      position: "bottom-right",
+      type: "success",
+      transition: "slide",
+      timeout: 2000,
+      showIcon: true,
+      toastBackgroundColor: "#319cb0",
+    });
+
+    switch (response.data.user_role) {
+      case null:
+        router.push("/signup");
+        break;
+      case "learner":
+        router.push("/learner");
+        break;
+      case "mentor":
+        router.push("/mentor");
+        break;
+      case "admin":
+        router.push("/admin");
+        break;
+      default:
+        console.error("Unknown user role:", response.data.user_role);
+        break;
+    }
   } catch (error) {
     console.error("Login failed:", error);
+    createToast("Login failed. Please try again.", {
+      position: "bottom-right",
+      type: "error",
+      transition: "slide",
+      timeout: 2000,
+      showIcon: true,
+      toastBackgroundColor: "#e74c3c",
+    });
+  } finally {
+    isLoading.value = false;
+    setButtonActive(false);
   }
 }
 
 function togglePasswordVisibility() {
-  passwordVisible.value = !passwordVisible.value;
+  if (!isLoading.value) {
+    passwordVisible.value = !passwordVisible.value;
+  }
 }
 
 onMounted(async () => {
@@ -291,6 +305,11 @@ form {
   font-family: "Montserrat", sans-serif;
 }
 
+.input-with-icon input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .input-with-icon i {
   position: absolute;
   top: 50%;
@@ -336,15 +355,53 @@ button {
   font-weight: bold;
   width: 50%;
   text-align: center;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   margin: 0.5rem auto 0;
   transition: all 0.3s ease;
   font-family: "Montserrat", sans-serif;
+  min-height: 48px;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   background: #319cb0;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+button:active,
+button.active {
+  transform: translateY(0);
+  background: #2a8a9e;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+button.loading {
+  pointer-events: none;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .switch-link {
@@ -375,11 +432,9 @@ button:hover {
   .main-content {
     max-width: 380px;
     padding: 1.5rem;
-    
   }
 }
 
-/* Mobile Screens */
 @media (max-width: 767px) {
   main {
     flex-direction: column;
@@ -388,7 +443,7 @@ button:hover {
   }
 
   .main-image img {
-display: none;
+    display: none;
   }
 
   .main-content {
@@ -420,7 +475,6 @@ display: none;
   }
 }
 
-/* Large Desktop Screens */
 @media (min-width: 1200px) {
   main {
     gap: 8rem;
@@ -435,7 +489,7 @@ display: none;
     padding: 2.5rem;
   }
 }
-/* Add this after your existing styles */
+
 .mosha__toast .mosha__toast__content {
   font-family: "Montserrat", sans-serif;
   font-size: 0.9rem;

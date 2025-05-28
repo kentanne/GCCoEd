@@ -43,6 +43,8 @@ const notes = ref("");
 const meetingLocation = ref("");
 const selectedSubject = ref("");
 const showConfirmationModal = ref(false); // Add this for modal control
+const isSubmitting = ref(false); // Add this for submit state
+const isButtonActive = ref(false); // Add this for button state
 
 // Calendar variables
 const currentDate = ref(new Date());
@@ -121,17 +123,43 @@ const confirmSchedule = async () => {
 
     console.log("Sending schedule data:", scheduleData);
 
-    const response = await api.post(
-      "/api/learner/scheduleCreate",
-      scheduleData,
-      {
+    isSubmitting.value = true; // Set submitting state
+    isButtonActive.value = false; // Disable button during submission
+
+    const response = await api
+      .post("/api/learner/scheduleCreate", scheduleData, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-      }
-    );
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          createToast("Schedule set successfully!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
+          emit("confirm", scheduleData);
+          emit("close");
+        } else {
+          createToast("Failed to set schedule.", {
+            position: "bottom-right",
+            type: "error",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+          });
+        }
+      })
+      .finally(() => {
+        isSubmitting.value = false;
+        isButtonActive.value = true;
+      });
 
     console.log("Schedule response:", response);
 
@@ -338,6 +366,12 @@ const isToday = (date) => {
     date.getFullYear() === today.getFullYear()
   );
 };
+
+const setButtonActive = (active) => {
+  if (!this.isSubmitting) {
+    this.isButtonActive = active;
+  }
+};
 </script>
 
 <template>
@@ -520,7 +554,12 @@ const isToday = (date) => {
       <button @click="emit('close')" type="button" class="btn-cancel">
         CANCEL
       </button>
-      <button @click="confirmSchedule" type="button" class="btn-proceed">
+      <button
+        @click="confirmSchedule"
+        type="button"
+        class="btn-proceed"
+        :disabled="!isButtonActive || isSubmitting"
+      >
         PROCEED
       </button>
     </div>

@@ -35,6 +35,7 @@
             @input="validateField('address', address)"
             @blur="validateField('address', address)"
             placeholder="Enter your address"
+            :disabled="isSubmitting"
             class="personal-input"
             :class="{ error: validationErrors.address }"
           />
@@ -55,6 +56,7 @@
             @input="validateField('contactNumber', contactNumber)"
             @blur="validateField('contactNumber', contactNumber)"
             placeholder="Enter your contact number (11 digits)"
+            :disabled="isSubmitting"
             class="personal-input"
             :class="{ error: validationErrors.contactNumber }"
             maxlength="11"
@@ -69,13 +71,16 @@
 
         <div class="personal-field">
           <!-- For Gender -->
-          <label class="personal-label required" for="gender">SEX AT BIRTH</label>
+          <label class="personal-label required" for="gender"
+            >SEX AT BIRTH</label
+          >
           <div class="gender-dropdown">
             <div class="dropdown-container" @click="toggleDropdown('gender')">
               <input
                 type="text"
                 v-model="gender"
                 placeholder="Select your sex"
+                :disabled="isSubmitting"
                 class="personal-input"
                 readonly
               />
@@ -88,13 +93,12 @@
               <div class="dropdown-option" @click="selectGender('Male')">
                 Male
               </div>
+            </div>
+            <span v-if="validationErrors.gender" class="validation-message">
+              {{ validationErrors.gender }}
+            </span>
           </div>
-          <span v-if="validationErrors.gender" class="validation-message">
-            {{ validationErrors.gender }}
-          </span>
         </div>
-        </div>
-
 
         <div class="personal-field">
           <label class="personal-label" for="year-level">YEAR LEVEL </label>
@@ -107,6 +111,7 @@
                 type="text"
                 v-model="yearLevel"
                 placeholder="Select your year level"
+                :disabled="isSubmitting"
                 class="personal-input"
                 readonly
               />
@@ -137,6 +142,7 @@
                 v-model="program"
                 placeholder="Select your program"
                 class="personal-input"
+                :disabled="isSubmitting"
                 readonly
               />
               <i class="fas fa-chevron-down dropdown-icon"></i>
@@ -205,6 +211,7 @@
                   type="file"
                   ref="profileInput"
                   accept="image/*"
+                  :disabled="isSubmitting"
                   style="display: none"
                   @change="handleProfileUpload"
                 />
@@ -233,6 +240,7 @@
                 type="file"
                 ref="credentialInput"
                 multiple
+                :disabled="isSubmitting"
                 accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                 style="display: none"
                 @change="handleCredentialUpload"
@@ -260,6 +268,7 @@
                 id="availability-days"
                 v-model="availabilityDaysDisplay"
                 placeholder="Select available days"
+                :disabled="isSubmitting"
                 class="profile-input"
                 readonly
               />
@@ -277,6 +286,7 @@
                 <input
                   type="checkbox"
                   :id="'day-' + day"
+                  :disabled="isSubmitting"
                   :value="day"
                   v-model="selectedDays"
                   @click.stop
@@ -300,6 +310,7 @@
                     : 'Select subjects'
                 "
                 readonly
+                :disabled="isSubmitting"
                 class="profile-input"
                 :class="{ error: validationErrors.selectedSubjects }"
               />
@@ -332,6 +343,7 @@
                 <input
                   type="checkbox"
                   :id="subject"
+                  :disabled="isSubmitting"
                   :value="subject"
                   v-model="selectedSubjects"
                   @change="updateSelectedCounts"
@@ -367,6 +379,7 @@
                 type="text"
                 id="teaching-style"
                 v-model="learningStyleDisplay"
+                :disabled="isSubmitting"
                 placeholder="Select teaching style(s)"
                 class="profile-input"
                 readonly
@@ -386,6 +399,7 @@
                   type="checkbox"
                   :id="'style-' + style"
                   :value="style"
+                  :disabled="isSubmitting"
                   v-model="selectedsessionStyles"
                   @click.stop
                 />
@@ -405,6 +419,7 @@
               <input
                 type="text"
                 v-model="modality"
+                :disabled="isSubmitting"
                 placeholder="Select teaching modality"
                 class="profile-input"
                 readonly
@@ -437,6 +452,7 @@
               <input
                 type="text"
                 v-model="sessionDuration"
+                :disabled="isSubmitting"
                 placeholder="Select duration"
                 class="profile-input"
                 readonly
@@ -478,6 +494,7 @@
               <input
                 type="text"
                 v-model="proficiency"
+                :disabled="isSubmitting"
                 placeholder="Select proficiency level"
                 class="profile-input"
                 readonly
@@ -515,6 +532,7 @@
             v-model="bio"
             @input="validateField('bio', bio)"
             @blur="validateField('bio', bio)"
+            :disabled="isSubmitting"
             placeholder="Tell us about yourself (50-500 characters)"
             rows="4"
             class="profile-textarea"
@@ -535,6 +553,7 @@
             v-model="experience"
             @input="validateField('experience', experience)"
             @blur="validateField('experience', experience)"
+            :disabled="isSubmitting"
             placeholder="Describe your tutoring experience (50-500 characters)"
             rows="4"
             class="profile-textarea"
@@ -562,10 +581,19 @@
       ></div>
     </div>
 
-    <button class="next-button" @click="nextStep" :disabled="isSubmitted">
+    <button
+      class="next-button"
+      @click="nextStep"
+      :disabled="isSubmitting"
+      :class="{ loading: isSubmitting, active: isButtonActive }"
+      @mousedown="setButtonActive(true)"
+      @mouseup="setButtonActive(false)"
+      @mouseleave="setButtonActive(false)"
+    >
+      <span v-if="isSubmitting" class="loading-spinner"></span>
       {{
-        isSubmitted
-          ? "SUBMITTED"
+        isSubmitting
+          ? "Submitting..."
           : currentStep === totalSteps
           ? "SUBMIT"
           : "NEXT"
@@ -701,6 +729,8 @@ export default {
       ],
       showStatusPopup: false,
       isSubmitted: false,
+      isSubmitting: false,
+      isButtonActive: false,
       validationErrors: {
         fullName: "",
         address: "",
@@ -782,6 +812,12 @@ export default {
   },
 
   methods: {
+    setButtonActive(active) {
+      if (!this.isSubmitting) {
+        this.isButtonActive = active;
+      }
+    },
+
     async csrf() {
       await api
         .get("/sanctum/csrf-cookie")
@@ -908,6 +944,8 @@ export default {
     },
 
     nextStep() {
+      if (this.isSubmitting) return; // Prevent multiple submissions
+
       const validationErrors = this.validateForm();
 
       if (validationErrors.length > 0) {
@@ -1189,6 +1227,8 @@ export default {
       }
 
       try {
+        this.isSubmitting = true;
+
         const formData = new FormData(); // Use FormData for file uploads
         formData.append("email", store.registrationData.email); // Corrected property
         formData.append("password", store.registrationData.password); // Corrected property
@@ -1268,6 +1308,9 @@ export default {
         this.isSubmitted = true;
       } catch (error) {
         console.error("Application submission error:", error);
+      } finally {
+        this.isSubmitting = false;
+        this.setButtonActive(false);
       }
     },
 
@@ -2132,8 +2175,17 @@ body {
 }
 
 .next-button:disabled {
-  background-color: #cccccc;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.next-button:active,
+.next-button.active {
+  transform: translateY(0);
+  background-color: #1a3a4a;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .fas {
@@ -2152,9 +2204,6 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   max-height: 300px;
   overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 999;
-  box-sizing: border-box;
 }
 
 .subject-item {
@@ -2253,6 +2302,20 @@ body {
   font-size: 0.75rem;
   margin-top: 0.25rem;
   margin-left: 0.5rem;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
