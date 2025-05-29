@@ -209,100 +209,102 @@ const downloadFile = async (fileId, fileName) => {
         <!-- Today Schedule -->
         <div class="session-card">
           <h1>TODAY</h1>
-          <div
-            v-for="(item, index) in todaySchedule"
-            :key="index"
-            class="today-card"
-          >
-            <div class="card-header">
-              <h1>{{ item.subject }}</h1>
-              <div class="ellipsis-container">
+          <div class="session-card-content">
+            <div
+              v-for="(item, index) in todaySchedule"
+              :key="index"
+              class="today-card"
+            >
+              <div class="card-header">
+                <h1>{{ item.subject }}</h1>
+                <div class="ellipsis-container">
+                  <font-awesome-icon
+                    icon="fa-ellipsis-h"
+                    size="2x"
+                    color="#066678"
+                    style="cursor: pointer"
+                    @click="togglePopup('today', index, $event)"
+                  />
+                  <transition name="fade" mode="out-in">
+                    <div
+                      v-if="
+                        activePopup.type === 'today' &&
+                        activePopup.index === index
+                      "
+                      class="popup-menu"
+                      @click.stop
+                    >
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('reschedule', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-calendar-alt"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Reschedule</p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('cancel', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-times"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Cancel Session</p>
+                      </div>
+                    </div>
+                  </transition>
+                </div>
+              </div>
+              <div class="info name">
+                <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
+                <h2>{{ item.mentor.user.name }}</h2>
+              </div>
+              <div class="info">
                 <font-awesome-icon
-                  icon="fa-ellipsis-h"
+                  icon="fa-calendar-alt"
                   size="2x"
-                  color="#066678"
-                  style="cursor: pointer"
-                  @click="togglePopup('today', index, $event)"
+                  color="#0084ce"
                 />
-                <transition name="fade" mode="out-in">
-                  <div
-                    v-if="
-                      activePopup.type === 'today' &&
-                      activePopup.index === index
+                <p>{{ item.date }}</p>
+              </div>
+              <div class="info">
+                <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
+                <p>{{ item.time }}</p>
+              </div>
+              <div class="info last">
+                <div class="location-container">
+                  <font-awesome-icon
+                    icon="fa-map-marker-alt"
+                    size="2x"
+                    color="#f72197"
+                  />
+                  <p class="location-text">{{ item.location }}</p>
+                </div>
+                <div class="action-icons">
+                  <font-awesome-icon
+                    icon="fa-file-alt"
+                    size="2x"
+                    color="#f72197"
+                    class="file-icon"
+                    @click="
+                      openFileModal(item.files, $event, item.mentor.ment_inf_id)
                     "
-                    class="popup-menu"
-                    @click.stop
-                  >
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('reschedule', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-calendar-alt"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Reschedule</p>
-                    </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('cancel', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-times"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Cancel Session</p>
-                    </div>
-                  </div>
-                </transition>
-              </div>
-            </div>
-            <div class="info name">
-              <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.mentor.user.name }}</h2>
-            </div>
-            <div class="info">
-              <font-awesome-icon
-                icon="fa-calendar-alt"
-                size="2x"
-                color="#0084ce"
-              />
-              <p>{{ item.date }}</p>
-            </div>
-            <div class="info">
-              <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
-              <p>{{ item.time }}</p>
-            </div>
-            <div class="info last">
-              <div class="location-container">
-                <font-awesome-icon
-                  icon="fa-map-marker-alt"
-                  size="2x"
-                  color="#f72197"
-                />
-                <p class="location-text">{{ item.location }}</p>
-              </div>
-              <div class="action-icons">
-                <font-awesome-icon
-                  icon="fa-file-alt"
-                  size="2x"
-                  color="#f72197"
-                  class="file-icon"
-                  @click="
-                    openFileModal(item.files, $event, item.mentor.ment_inf_id)
-                  "
-                />
-                <!-- <font-awesome-icon
-                  icon="fa-envelope"
-                  size="2x"
-                  color="#f72197"
-                  class="envelope"
-                  @click="toggleMessage($event)"
-                /> -->
+                  />
+                  <!-- <font-awesome-icon
+                    icon="fa-envelope"
+                    size="2x"
+                    color="#f72197"
+                    class="envelope"
+                    @click="toggleMessage($event)"
+                  /> -->
+                </div>
               </div>
             </div>
           </div>
@@ -311,100 +313,102 @@ const downloadFile = async (fileId, fileName) => {
         <!-- Upcoming Schedule -->
         <div class="session-card">
           <h1>UPCOMING</h1>
-          <div
-            v-for="(item, index) in upcommingSchedule"
-            :key="index"
-            class="upcomming-card"
-          >
-            <div class="card-header">
-              <h1>{{ item.subject }}</h1>
-              <div class="ellipsis-container">
+          <div class="session-card-content">
+            <div
+              v-for="(item, index) in upcommingSchedule"
+              :key="index"
+              class="upcomming-card"
+            >
+              <div class="card-header">
+                <h1>{{ item.subject }}</h1>
+                <div class="ellipsis-container">
+                  <font-awesome-icon
+                    icon="fa-ellipsis-h"
+                    size="2x"
+                    color="#066678"
+                    style="cursor: pointer"
+                    @click="togglePopup('upcoming', index, $event)"
+                  />
+                  <transition name="fade" mode="out-in">
+                    <div
+                      v-if="
+                        activePopup.type === 'upcoming' &&
+                        activePopup.index === index
+                      "
+                      class="popup-menu"
+                      @click.stop
+                    >
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('reschedule', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-calendar-alt"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Reschedule</p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('cancel', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-times"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Cancel Session</p>
+                      </div>
+                    </div>
+                  </transition>
+                </div>
+              </div>
+              <div class="info name">
+                <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
+                <h2>{{ item.mentor.user.name }}</h2>
+              </div>
+              <div class="info">
                 <font-awesome-icon
-                  icon="fa-ellipsis-h"
+                  icon="fa-calendar-alt"
                   size="2x"
-                  color="#066678"
-                  style="cursor: pointer"
-                  @click="togglePopup('upcoming', index, $event)"
+                  color="#0084ce"
                 />
-                <transition name="fade" mode="out-in">
-                  <div
-                    v-if="
-                      activePopup.type === 'upcoming' &&
-                      activePopup.index === index
+                <p>{{ item.date }}</p>
+              </div>
+              <div class="info">
+                <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
+                <p>{{ item.time }}</p>
+              </div>
+              <div class="info last">
+                <div class="location-container">
+                  <font-awesome-icon
+                    icon="fa-map-marker-alt"
+                    size="2x"
+                    color="#f72197"
+                  />
+                  <p class="location-text">{{ item.location }}</p>
+                </div>
+                <div class="action-icons">
+                  <font-awesome-icon
+                    icon="fa-file-alt"
+                    size="2x"
+                    color="#f72197"
+                    class="file-icon"
+                    @click="
+                      openFileModal(item.files, $event, item.mentor.ment_inf_id)
                     "
-                    class="popup-menu"
-                    @click.stop
-                  >
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('reschedule', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-calendar-alt"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Reschedule</p>
-                    </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('cancel', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-times"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Cancel Session</p>
-                    </div>
-                  </div>
-                </transition>
-              </div>
-            </div>
-            <div class="info name">
-              <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.mentor.user.name }}</h2>
-            </div>
-            <div class="info">
-              <font-awesome-icon
-                icon="fa-calendar-alt"
-                size="2x"
-                color="#0084ce"
-              />
-              <p>{{ item.date }}</p>
-            </div>
-            <div class="info">
-              <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
-              <p>{{ item.time }}</p>
-            </div>
-            <div class="info last">
-              <div class="location-container">
-                <font-awesome-icon
-                  icon="fa-map-marker-alt"
-                  size="2x"
-                  color="#f72197"
-                />
-                <p class="location-text">{{ item.location }}</p>
-              </div>
-              <div class="action-icons">
-                <font-awesome-icon
-                  icon="fa-file-alt"
-                  size="2x"
-                  color="#f72197"
-                  class="file-icon"
-                  @click="
-                    openFileModal(item.files, $event, item.mentor.ment_inf_id)
-                  "
-                />
-                <!-- <font-awesome-icon
-                  icon="fa-envelope"
-                  size="2x"
-                  color="#f72197"
-                  class="envelope"
-                  @click="toggleMessage($event)"
-                /> -->
+                  />
+                  <!-- <font-awesome-icon
+                    icon="fa-envelope"
+                    size="2x"
+                    color="#f72197"
+                    class="envelope"
+                    @click="toggleMessage($event)"
+                  /> -->
+                </div>
               </div>
             </div>
           </div>
@@ -528,7 +532,7 @@ const downloadFile = async (fileId, fileName) => {
   flex-direction: column;
   height: 37.4rem;
   max-height: 37.5rem;
-  overflow-y: scroll;
+  overflow: hidden; /* Changed from overflow-y: scroll */
 }
 
 .table-header {
@@ -543,12 +547,13 @@ const downloadFile = async (fileId, fileName) => {
   position: sticky;
   top: 0;
   z-index: 20;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .table-title {
   margin: 0;
   font-size: 1.6rem;
-  color: var(--text-light);
+  color: var(--text-dark); /* Changed from var(--text-light) */
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -569,8 +574,9 @@ const downloadFile = async (fileId, fileName) => {
   gap: 1.5rem;
   background-color: #fff;
   overflow: hidden;
-  height: 542px;
+  height: 100%; /* Changed from fixed height */
   padding: 0.8rem;
+  flex: 1; /* Allow to grow and fill available space */
 }
 
 .session-grid {
@@ -580,6 +586,7 @@ const downloadFile = async (fileId, fileName) => {
   width: 100%;
   height: 100%;
   padding: 0 0.5rem;
+  overflow: hidden; /* Ensure grid doesn't overflow */
 }
 
 .session-card {
@@ -588,6 +595,8 @@ const downloadFile = async (fileId, fileName) => {
   gap: 0.8rem;
   padding: 0 0.5rem 0.8rem 0.5rem;
   max-width: 100%;
+  height: 100%; /* Full height of grid cell */
+  overflow: hidden; /* Hide overflow at card level */
 }
 
 .session-card h1 {
@@ -597,21 +606,39 @@ const downloadFile = async (fileId, fileName) => {
   margin-bottom: 0.3rem;
   margin-top: 1rem;
   padding-left: 0.5rem;
+  flex-shrink: 0; /* Prevent title from shrinking */
+}
+
+/* Add scrollable container for the cards */
+.session-card-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.2rem; /* Space for scrollbar */
+  /* Hide scrollbars */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for WebKit browsers */
+.session-card-content::-webkit-scrollbar {
+  display: none;
 }
 
 .today-card,
 .upcomming-card {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0.8rem;
+  padding: 0.5rem 0.9rem;
   background-color: #e4f3f5;
   border-radius: 8px;
   margin-bottom: 0.8rem;
   transition: all 0.3s ease;
-  border-left: 3px solid var(--primary);
+  border-left: 5px solid var(--primary);
   max-width: 100%;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
   transform: translateY(0);
+  flex-shrink: 0; /* Prevent cards from shrinking */
 }
 
 .today-card:hover,
@@ -646,6 +673,7 @@ const downloadFile = async (fileId, fileName) => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  min-width: 0; /* Important for flex child overflow */
 }
 
 .card-header h1 {
@@ -654,10 +682,18 @@ const downloadFile = async (fileId, fileName) => {
   font-weight: 600;
   margin-bottom: 0.2rem;
   text-decoration: underline;
+  /* Add overflow ellipsis for subjects */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  margin-right: 0.5rem; /* Add space between title and ellipsis icon */
 }
 
 .ellipsis-container {
   position: relative;
+  flex-shrink: 0; /* Prevent the ellipsis icon from shrinking */
 }
 
 .popup-menu {

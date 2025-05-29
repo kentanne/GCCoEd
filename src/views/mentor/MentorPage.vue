@@ -622,6 +622,12 @@ onMounted(async () => {
       </div>
     </div>
     <div class="topbar-date">
+      <font-awesome-icon
+        icon="fa-calendar-alt"
+        class="date-icon"
+        size="1x"
+        color="#066678"
+      />
       {{
         new Date().toLocaleDateString("en-US", {
           weekday: "long",
@@ -1024,6 +1030,7 @@ onMounted(async () => {
 
 /* Updated Topbar Styles */
 .topbar {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   position: fixed;
   top: 0;
   left: 330px;
@@ -1101,21 +1108,19 @@ onMounted(async () => {
 }
 
 .topbar-date {
-  color: #666;
-  font-size: 14px;
+  font-size: 0.875rem;
+  color: rgba(42, 67, 98, 0.9);
   font-weight: 500;
-  padding: 8px 15px;
+  background-color: #d4d7dd;
+  padding: 10px 15px;
   border-radius: 20px;
-  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.topbar-date {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 15px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
+.date-icon {
+  margin-right: 2px;
 }
 
 /* Popup Styles */

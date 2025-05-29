@@ -612,6 +612,12 @@ onMounted(async () => {
       </div>
     </div>
     <div class="topbar-date">
+      <font-awesome-icon
+        icon="fa-calendar-alt"
+        class="date-icon"
+        size="1x"
+        color="#066678"
+      />
       {{
         new Date().toLocaleDateString("en-US", {
           weekday: "long",
@@ -890,7 +896,7 @@ onMounted(async () => {
   position: fixed;
   top: 0;
   left: 30px;
-  width:100%;
+  width: 100%;
   display: flex;
   align-items: center;
   margin-top: 104%;
@@ -1023,6 +1029,7 @@ onMounted(async () => {
 
 /* Updated Topbar Styles with Icon Beside Text */
 .topbar {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   position: fixed;
   top: 0;
   left: 330px;
@@ -1063,7 +1070,15 @@ onMounted(async () => {
   background-color: #e6f7ff;
 }
 
-
+.topbar-option.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #006981;
+}
 
 .nav-icon {
   width: 20px;
@@ -1086,15 +1101,20 @@ onMounted(async () => {
   color: #004d5a;
 }
 
-
-
 .topbar-date {
-  color: #666;
-  font-size: 14px;
+  font-size: 0.875rem;
+  color: rgba(42, 67, 98, 0.9);
   font-weight: 500;
-  padding: 8px 15px;
+  background-color: #d4d7dd;
+  padding: 10px 15px;
   border-radius: 20px;
-  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-icon {
+  margin-right: 2px;
 }
 
 /* Popup Styles */
@@ -1193,7 +1213,8 @@ onMounted(async () => {
 
   .topbar-date {
     font-size: 12px;
-    padding: 5px 10px;
+    padding: 5px 12px;
+    gap: 6px;
   }
 }
 

@@ -16,11 +16,18 @@ function getCookie(name) {
   return null;
 }
 
+const capitalizeFirstLetter = (str) => {
+  if (!str) return "Not specified";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
 const saveChanges = async () => {
   // Combine personal and profile data into a single object
   const combinedData = {
     name: personalData.fullName || props.userData.user.name,
-    gender: personalData.gender || props.userData.ment.gender,
+    gender: capitalizeFirstLetter(
+      personalData.gender || props.userData.ment.gender
+    ),
     phoneNum: personalData.contactNumber || props.userData.ment.phoneNum,
     address: personalData.address || props.userData.ment.address,
     course: personalData.program || props.userData.ment.course,
@@ -58,12 +65,12 @@ const saveChanges = async () => {
 
   try {
     const response = await api.patch("/api/mentor/edit", combinedData, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
         // "X-CSRFToken": getCookie("csrftoken"),
-        },
+      },
     });
 
     if (response.status === 200) {
@@ -123,7 +130,7 @@ const programOptions = ref([
   "Bachelor of Science in Computer Science (BSCS)",
   "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)",
 ]);
-const genderOptions = ref(["Male", "Female", "Non-binary", "Other"]);
+const genderOptions = ref(["Male", "Female"]);
 const teachingModalityOptions = ref(["Online", "In-person", "Hybrid"]);
 const proficiencyOptions = ref(["Beginner", "Intermediate", "Advanced"]);
 const durationOptions = ref(["1 hour", "2 hours", "3 hours"]);
@@ -152,7 +159,7 @@ const inputFieldPersonalInformation = ref([
   { field: "Year Level", type: "select", options: yearLevelOptions },
   { field: "Program", type: "select", options: programOptions },
   { field: "Address", type: "text" },
-  { field: "Gender", type: "select", options: genderOptions },
+  // { field: "Sex at Birth", type: "select", options: genderOptions },
   { field: "Contact Number", type: "text" },
 ]);
 
@@ -430,13 +437,10 @@ const selectOption = (field, value, section = "profile") => {
   }
 };
 
+// Simplify the selectGender function since we no longer need the "Other" case
 const selectGender = (gender) => {
   personalData.gender = gender;
   dropdownOpen.gender = false;
-
-  if (gender !== "Other") {
-    personalData.otherGender = "";
-  }
 };
 
 const getDisplayValue = (field) => {
@@ -482,6 +486,7 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 
+// Update the getPlaceholder function to include the new field name
 const getPlaceholder = (field, section) => {
   const mappings = {
     personal: {
@@ -490,13 +495,13 @@ const getPlaceholder = (field, section) => {
       Program: props.userData.ment.course,
       Address: props.userData.ment.address,
       "Contact Number": props.userData.ment.phoneNum,
-      Gender: props.userData.ment.gender,
+      "Sex at Birth": capitalizeFirstLetter(props.userData.ment.gender),
     },
     profile: {
       "Teaching Modality": props.userData.ment.learn_modality,
       "Days of Availability": props.userData.ment.availability?.join(", "),
       "Proficiency Level": props.userData.ment.proficiency,
-      "Teaching Style": props.userData.ment.teach_sty?.join(", "),
+      "Teaching Style": props.userData.ment.teach_sty?.join(", ") || "",
       "Preferred Session Duration": props.userData.ment.prefSessDur,
       "Course Offered": props.userData.ment.subjects?.join(", "),
       "Short Bio": props.userData.ment.bio,
@@ -678,8 +683,11 @@ watch(
               </div>
             </div>
 
-            <!-- Gender Dropdown -->
-            <div v-else-if="item.field === 'Gender'" class="gender-section">
+            <!-- Update the Gender dropdown to Sex at Birth -->
+            <div
+              v-else-if="item.field === 'Sex at Birth'"
+              class="gender-section"
+            >
               <div class="gender-dropdown">
                 <div
                   class="dropdown-container"
@@ -689,7 +697,8 @@ watch(
                     type="text"
                     v-model="personalData.gender"
                     :placeholder="
-                      props.userData.ment.gender || 'Select your gender'
+                      capitalizeFirstLetter(props.userData.ment.gender) ||
+                      'Select your sex at birth'
                     "
                     class="standard-input"
                     readonly
@@ -710,30 +719,7 @@ watch(
                   <div class="dropdown-option" @click="selectGender('Male')">
                     Male
                   </div>
-                  <div
-                    class="dropdown-option"
-                    @click="selectGender('Non-binary')"
-                  >
-                    Non-binary
-                  </div>
-                  <div class="dropdown-option" @click="selectGender('Other')">
-                    Other
-                  </div>
                 </div>
-              </div>
-
-              <!-- Other Gender Input -->
-              <div
-                v-if="personalData.gender === 'Other'"
-                class="other-gender-input"
-              >
-                <label>Please specify: </label>
-                <input
-                  type="text"
-                  v-model="personalData.otherGender"
-                  class="standard-input"
-                  placeholder="Specify your gender"
-                />
               </div>
             </div>
           </div>
@@ -1247,11 +1233,16 @@ watch(
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(calc(-50% - 30px), -50%); /* Adjusted to account for margin */
-    width: calc(80vw - 30px) !important; /* Reduced width to accommodate margin */
+    transform: translate(
+      calc(-50% - 30px),
+      -50%
+    ); /* Adjusted to account for margin */
+    width: calc(
+      80vw - 30px
+    ) !important; /* Reduced width to accommodate margin */
     height: 85vh;
     max-height: 85vh;
-    margin-right: 10px; 
+    margin-right: 10px;
     border-radius: 15px;
   }
 
@@ -1300,7 +1291,7 @@ watch(
 
 @media (max-width: 480px) {
   .edit-information {
-    transform: translate(calc(-50% - 15px), -50%); 
+    transform: translate(calc(-50% - 15px), -50%);
     width: calc(95vw - 10px) !important;
     margin-right: 5px;
     height: 90vh;

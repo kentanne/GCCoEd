@@ -33,24 +33,39 @@
       class="app-header"
       :class="{ 'header-expanded': isMobileView && !isSidebarVisible }"
     >
-      <!-- <div class="profile-section">
+      <div class="profile-section">
         <div class="avatar-container">
           <img
             alt="Profile image"
             class="avatar"
-            src="https://storage.googleapis.com/a1aa/image/b5c5c738-a11d-4e1f-5c35-598c085890e6.jpg"
+            src="https://gordoncollegeccs.edu.ph/ccs/students/lamp/assets/profile.jpg"
           />
         </div>
         <div class="profile-meta">
-          <h1 class="profile-name">Barry D. Allen</h1>
-          <p class="profile-title">Program Coordinator</p>
-          <p class="profile-details">
-            BS Information Technology • College of Computer Studies
+          <h1 class="profile-name">{{ adminNameValue }}</h1>
+          <p class="profile-title">
+            College of Computer Science | Program Coordinator
           </p>
+          <!-- <p class="profile-details">
+            BS Information Technology • College of Computer Studies
+          </p> -->
         </div>
-      </div> -->
-      <div class="current-date">
-        {{ currentDate }}
+      </div>
+      <div class="topbar-date">
+        <font-awesome-icon
+          icon="fa-calendar-alt"
+          class="date-icon"
+          size="1x"
+          color="#066678"
+        />
+        {{
+          new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        }}
       </div>
     </header>
 
@@ -177,6 +192,28 @@ import "vue-loading-overlay/dist/css/index.css";
 
 const Router = useRouter();
 
+const adminName = async () => {
+  try {
+    const response = await api
+      .get("/api/admin/profile", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        // console.log("Admin name fetched:", response.data.name);
+        if (response.status === 200) {
+          adminNameValue.value = response.data.name || "Admin";
+        }
+      });
+    // return response.data.name || "Admin";
+  } catch (error) {
+    console.error("Error fetching admin name:", error);
+  }
+};
+
 // Add loading state
 const isLoading = ref(false);
 
@@ -213,6 +250,7 @@ const currentDate = ref(
 // Add these variables after your existing ref declarations
 const isSidebarVisible = ref(false); // For mobile devices only
 const isMobileView = ref(false);
+const adminNameValue = ref("");
 
 // Methods
 const handleLogout = () => {
@@ -329,7 +367,7 @@ onMounted(async () => {
     window.addEventListener("resize", checkMobileView);
 
     // Use Promise.all to wait for all fetch operations to complete
-    await Promise.all([fetchAll(), fetchApplicants()]);
+    await Promise.all([fetchAll(), fetchApplicants(), adminName()]);
   } catch (error) {
     createToast("Error loading data. Please refresh the page.", {
       position: "top-right",
@@ -438,7 +476,7 @@ onMounted(async () => {
   color: rgba(44, 59, 106, 0.7);
 }
 
-.current-date {
+.topbar-date {
   font-size: 0.875rem;
   color: rgba(42, 67, 98, 0.9);
   font-weight: 500;

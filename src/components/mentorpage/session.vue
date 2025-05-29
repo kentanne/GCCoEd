@@ -194,105 +194,96 @@ onUnmounted(() => {
         <!-- Today Schedule -->
         <div class="session-card">
           <h1>TODAY</h1>
-          <div
-            v-for="(item, index) in todaySchedule"
-            :key="index"
-            class="today-card"
-          >
-            <div class="card-header">
-              <h1>{{ item.subject }}</h1>
-              <div class="ellipsis-container">
-                <font-awesome-icon
-                  icon="fa-ellipsis-h"
-                  size="2x"
-                  color="#066678"
-                  style="cursor: pointer"
-                  @click="togglePopup('today', index, $event)"
-                />
-                <transition name="fade" mode="out-in">
-                  <div
-                    v-if="
-                      activePopup.type === 'today' &&
-                      activePopup.index === index
-                    "
-                    class="popup-menu"
-                    @click.stop
-                  >
+          <div class="session-card-content">
+            <div
+              v-for="(item, index) in todaySchedule"
+              :key="index"
+              class="today-card"
+            >
+              <div class="card-header">
+                <h1>{{ item.subject }}</h1>
+                <div class="ellipsis-container">
+                  <font-awesome-icon
+                    icon="fa-ellipsis-h"
+                    size="2x"
+                    color="#066678"
+                    style="cursor: pointer"
+                    @click="togglePopup('today', index, $event)"
+                  />
+                  <transition name="fade" mode="out-in">
                     <div
-                      class="popup-option"
-                      @click="handleOptionClick('remind', item, $event)"
+                      v-if="
+                        activePopup.type === 'today' &&
+                        activePopup.index === index
+                      "
+                      class="popup-menu"
+                      @click.stop
                     >
-                      <font-awesome-icon
-                        icon="fa-bell"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Remind</p>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('remind', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-bell"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Remind</p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('reschedule', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-calendar-alt"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text" @click="reschedIsOpen = true">
+                          Reschedule
+                        </p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('cancel', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-times"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Cancel Session</p>
+                      </div>
                     </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('reschedule', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-calendar-alt"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text" @click="reschedIsOpen = true">
-                        Reschedule
-                      </p>
-                    </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('cancel', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-times"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Cancel Session</p>
-                    </div>
-                  </div>
-                </transition>
+                  </transition>
+                </div>
               </div>
-            </div>
-            <div class="info name">
-              <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.learner.user.name }}</h2>
-            </div>
-            <div class="info">
-              <font-awesome-icon
-                icon="fa-calendar-alt"
-                size="2x"
-                color="#0084ce"
-              />
-              <p>{{ item.date }}</p>
-            </div>
-            <div class="info">
-              <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
-              <p>{{ item.time }}</p>
-            </div>
-            <div class="info last">
-              <div>
+              <div class="info name">
+                <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
+                <h2>{{ item.learner.user.name }}</h2>
+              </div>
+              <div class="info">
+                <font-awesome-icon
+                  icon="fa-calendar-alt"
+                  size="2x"
+                  color="#0084ce"
+                />
+                <p>{{ item.date }}</p>
+              </div>
+              <div class="info">
+                <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
+                <p>{{ item.time }}</p>
+              </div>
+              <div class="info">
                 <font-awesome-icon
                   icon="fa-map-marker-alt"
                   size="2x"
                   color="#f72197"
                 />
                 <p>{{ item.location }}</p>
-              </div>
-              <div>
-                <!-- <font-awesome-icon
-                  icon="fa-envelope"
-                  size="2x"
-                  color="#f72197"
-                  class="envelope"
-                  @click="toggleMessage($event)"
-                /> -->
               </div>
             </div>
           </div>
@@ -301,90 +292,90 @@ onUnmounted(() => {
         <!-- Upcoming Schedule -->
         <div class="session-card">
           <h1>UPCOMING</h1>
-          <div
-            v-for="(item, index) in upcommingSchedule"
-            :key="index"
-            class="upcomming-card"
-          >
-            <div class="card-header">
-              <h1>{{ item.subject }}</h1>
-              <div class="ellipsis-container">
-                <font-awesome-icon
-                  icon="fa-ellipsis-h"
-                  size="2x"
-                  color="#066678"
-                  style="cursor: pointer"
-                  @click="togglePopup('upcoming', index, $event)"
-                />
-                <transition name="fade" mode="out-in">
-                  <div
-                    v-if="
-                      activePopup.type === 'upcoming' &&
-                      activePopup.index === index
-                    "
-                    class="popup-menu"
-                    @click.stop
-                  >
+          <div class="session-card-content">
+            <div
+              v-for="(item, index) in upcommingSchedule"
+              :key="index"
+              class="upcomming-card"
+            >
+              <div class="card-header">
+                <h1>{{ item.subject }}</h1>
+                <div class="ellipsis-container">
+                  <font-awesome-icon
+                    icon="fa-ellipsis-h"
+                    size="2x"
+                    color="#066678"
+                    style="cursor: pointer"
+                    @click="togglePopup('upcoming', index, $event)"
+                  />
+                  <transition name="fade" mode="out-in">
                     <div
-                      class="popup-option"
-                      @click="handleOptionClick('remind', item, $event)"
+                      v-if="
+                        activePopup.type === 'upcoming' &&
+                        activePopup.index === index
+                      "
+                      class="popup-menu"
+                      @click.stop
                     >
-                      <font-awesome-icon
-                        icon="fa-bell"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Remind</p>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('remind', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-bell"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Remind</p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('reschedule', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-calendar-alt"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text" @click="reschedIsOpen = true">
+                          Reschedule
+                        </p>
+                      </div>
+                      <div
+                        class="popup-option"
+                        @click="handleOptionClick('cancel', item, $event)"
+                      >
+                        <font-awesome-icon
+                          icon="fa-times"
+                          size="1x"
+                          color="#066678"
+                          class="option-icon"
+                        />
+                        <p class="option-text">Cancel</p>
+                      </div>
                     </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('reschedule', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-calendar-alt"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text" @click="reschedIsOpen = true">
-                        Reschedule
-                      </p>
-                    </div>
-                    <div
-                      class="popup-option"
-                      @click="handleOptionClick('cancel', item, $event)"
-                    >
-                      <font-awesome-icon
-                        icon="fa-times"
-                        size="1x"
-                        color="#066678"
-                        class="option-icon"
-                      />
-                      <p class="option-text">Cancel</p>
-                    </div>
-                  </div>
-                </transition>
+                  </transition>
+                </div>
               </div>
-            </div>
-            <div class="info name">
-              <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
-              <h2>{{ item.learner.user.name }}</h2>
-            </div>
-            <div class="info">
-              <font-awesome-icon
-                icon="fa-calendar-alt"
-                size="2x"
-                color="#0084ce"
-              />
-              <p>{{ item.date }}</p>
-            </div>
-            <div class="info">
-              <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
-              <p>{{ item.time }}</p>
-            </div>
-            <div class="info last">
-              <div>
+              <div class="info name">
+                <font-awesome-icon icon="fa-user" size="2x" color="#533566" />
+                <h2>{{ item.learner.user.name }}</h2>
+              </div>
+              <div class="info">
+                <font-awesome-icon
+                  icon="fa-calendar-alt"
+                  size="2x"
+                  color="#0084ce"
+                />
+                <p>{{ item.date }}</p>
+              </div>
+              <div class="info">
+                <font-awesome-icon icon="fa-clock" size="2x" color="#f8312f" />
+                <p>{{ item.time }}</p>
+              </div>
+              <div class="info">
                 <font-awesome-icon
                   icon="fa-map-marker-alt"
                   size="2x"
@@ -392,15 +383,6 @@ onUnmounted(() => {
                 />
                 <p>{{ item.location }}</p>
               </div>
-              <!-- <div>
-                <font-awesome-icon
-                  icon="fa-envelope"
-                  size="2x"
-                  color="#f72197"
-                  class="envelope"
-                  @click="toggleMessage($event)"
-                />
-              </div> -->
             </div>
           </div>
         </div>
@@ -519,7 +501,7 @@ onUnmounted(() => {
   flex-direction: column;
   height: 37.4rem;
   max-height: 37.5rem;
-  overflow-y: scroll;
+  overflow: hidden; /* Changed from overflow-y: scroll */
 }
 
 .table-header {
@@ -534,6 +516,7 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 20;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .table-title {
@@ -560,8 +543,9 @@ onUnmounted(() => {
   gap: 1.5rem;
   background-color: #fff;
   overflow: hidden;
-  height: 542px;
+  height: 100%; /* Changed from fixed height */
   padding: 0.8rem;
+  flex: 1; /* Allow to grow and fill available space */
 }
 
 .session-grid {
@@ -571,6 +555,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   padding: 0 0.5rem;
+  overflow: hidden; /* Ensure grid doesn't overflow */
 }
 
 .session-card {
@@ -579,6 +564,8 @@ onUnmounted(() => {
   gap: 0.8rem;
   padding: 0 0.5rem 0.8rem 0.5rem;
   max-width: 100%;
+  height: 100%; /* Full height of grid cell */
+  overflow: hidden; /* Hide overflow at card level */
 }
 
 .session-card h1 {
@@ -588,7 +575,50 @@ onUnmounted(() => {
   margin-bottom: 0.3rem;
   margin-top: 1rem;
   padding-left: 0.5rem;
+  flex-shrink: 0; /* Prevent title from shrinking */
 }
+
+/* Add scrollable container for the cards */
+.session-card-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.2rem; /* Space for scrollbar */
+  /* Hide scrollbars */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for WebKit browsers */
+.session-card-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Remove the previous scrollbar styling since we're hiding them */
+/* 
+.session-card-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.session-card-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.session-card-content::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.session-card-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+.session-card-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #f1f1f1;
+}
+*/
 
 .today-card,
 .upcomming-card {
@@ -603,6 +633,7 @@ onUnmounted(() => {
   max-width: 100%;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
   transform: translateY(0);
+  flex-shrink: 0; /* Prevent cards from shrinking */
 }
 
 .today-card:hover,
@@ -637,6 +668,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  min-width: 0; /* Important for flex child overflow */
 }
 
 .card-header h1 {
@@ -645,10 +677,18 @@ onUnmounted(() => {
   font-weight: 600;
   margin-bottom: 0.2rem;
   text-decoration: underline;
+  /* Add overflow ellipsis for subjects */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  margin-right: 0.5rem; /* Add space between title and ellipsis icon */
 }
 
 .ellipsis-container {
   position: relative;
+  flex-shrink: 0; /* Prevent the ellipsis icon from shrinking */
 }
 
 .popup-menu {
