@@ -238,7 +238,25 @@ const availableDays = computed(() => {
   }
 });
 
+// Add this new function to check if a date is in the past
+const isPastDate = (date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const compareDate = new Date(date);
+  compareDate.setHours(0, 0, 0, 0);
+
+  return compareDate < today;
+};
+
+// Update the isDateAvailable function to check for past dates first
 const isDateAvailable = (date) => {
+  // First check if it's a past date
+  if (isPastDate(date)) {
+    return false;
+  }
+
+  // Then check if it's on available days
   const dayName = date
     .toLocaleDateString("en-US", { weekday: "long" })
     .toLowerCase();
@@ -652,7 +670,8 @@ const setButtonActive = (active) => {
   }
 }
 
-.left, .right {
+.left,
+.right {
   flex: 1;
 }
 
@@ -1093,7 +1112,7 @@ const setButtonActive = (active) => {
   .content {
     padding: 1.5rem;
   }
-  
+
   .time-slots {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem 1.5rem;
@@ -1104,12 +1123,12 @@ const setButtonActive = (active) => {
   .content {
     height: calc(100% - 160px); /* Adjust for mobile header/footer sizes */
   }
-  
+
   .header {
     position: sticky;
     top: 0;
   }
-  
+
   .footer {
     position: sticky;
     bottom: 0;

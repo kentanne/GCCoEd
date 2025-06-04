@@ -208,10 +208,23 @@ const availableDays = computed(() => {
 });
 
 const isDateAvailable = (date) => {
+  // First check if it's a past date
+  if (isPastDate(date)) {
+    return false;
+  }
+
+  // Then check if it's on available days
   const dayName = date
     .toLocaleDateString("en-US", { weekday: "long" })
     .toLowerCase();
   return availableDays.value.includes(dayName);
+};
+
+// Add this helper function to check if a date is in the past
+const isPastDate = (date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time portion for accurate date comparison
+  return date < today;
 };
 
 // Function to generate days of the current month with padding
@@ -240,6 +253,7 @@ const generateDays = () => {
       isSelected: false,
       isToday: isToday(date),
       isAvailable: isDateAvailable(date),
+      isPast: isPastDate(date), // Add flag for past dates
     });
   }
 
@@ -253,6 +267,7 @@ const generateDays = () => {
       isSelected: selectedDate.value === dateString,
       isToday: isToday(date),
       isAvailable: isDateAvailable(date),
+      isPast: isPastDate(date), // Add flag for past dates
     });
   }
 
@@ -265,6 +280,7 @@ const generateDays = () => {
       isSelected: false,
       isToday: isToday(date),
       isAvailable: isDateAvailable(date),
+      isPast: isPastDate(date), // Add flag for past dates
     });
   }
 };
@@ -507,7 +523,7 @@ const setButtonActive = (active) => {
             <div
               v-for="(day, index) in days"
               :key="index"
-              @click="day.isAvailable ? selectDate(day) : null"
+              @click="day.isAvailable && !day.isPast ? selectDate(day) : null"
               :class="[
                 'day',
                 {
@@ -515,8 +531,9 @@ const setButtonActive = (active) => {
                   selected: day.isSelected,
                   current: day.isCurrentMonth,
                   other: !day.isCurrentMonth,
-                  available: day.isAvailable,
-                  unavailable: !day.isAvailable,
+                  available: day.isAvailable && !day.isPast,
+                  unavailable: !day.isAvailable || day.isPast,
+                  'past-date': day.isPast,
                 },
               ]"
             >
@@ -1206,7 +1223,8 @@ const setButtonActive = (active) => {
     gap: 1.5rem;
   }
 
-  .left, .right {
+  .left,
+  .right {
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -1254,7 +1272,7 @@ const setButtonActive = (active) => {
     background: white;
   }
 
-  .btn-cancel, 
+  .btn-cancel,
   .btn-proceed {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
@@ -1301,7 +1319,7 @@ const setButtonActive = (active) => {
     font-size: 0.65rem;
   }
 
-   .booking {
+  .booking {
     width: 100%;
   }
 }

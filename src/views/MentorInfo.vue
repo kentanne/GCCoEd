@@ -1322,7 +1322,16 @@ export default {
     },
 
     proceedToHome() {
-      this.$router.push("/");
+      document.cookie.split(";").forEach((cookie) => {
+        const [name] = cookie.split("=");
+        document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+
+      // Clear localStorage too if you're using it
+      localStorage.clear();
+
+      // Redirect to login instead of home
+      this.$router.push("/login");
     },
 
     validateField(field, value) {

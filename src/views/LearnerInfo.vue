@@ -1131,7 +1131,12 @@ export default {
           timeout: 2000,
           showIcon: true,
           toastBackgroundColor: "#319cb0",
+
+          // this.$router.push('/');
         });
+        setTimeout(() => {
+          this.$router.push("/login");
+        }, 2000);
       } catch (error) {
         createToast("Registration failed!", {
           position: "bottom-right",

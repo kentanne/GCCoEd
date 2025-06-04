@@ -592,7 +592,7 @@ onMounted(async () => {
         :class="{ active: activeComponent === 'main' }"
       >
         <img src="/main.svg" alt="Main" class="nav-icon" />
-        <span class="nav-text">Main</span>
+        <span class="nav-text">Mentors</span>
       </div>
       <div
         @click="switchComponent('session')"
@@ -600,7 +600,7 @@ onMounted(async () => {
         :class="{ active: activeComponent === 'session' }"
       >
         <img src="/calendar.svg" alt="Session" class="nav-icon" />
-        <span class="nav-text">Sessions</span>
+        <span class="nav-text">Schedules</span>
       </div>
       <div
         @click="switchComponent('records')"
@@ -608,7 +608,7 @@ onMounted(async () => {
         :class="{ active: activeComponent === 'records' }"
       >
         <img src="/records.svg" alt="Records" class="nav-icon" />
-        <span class="nav-text">Records</span>
+        <span class="nav-text">Reviews</span>
       </div>
     </div>
     <div class="topbar-date">
