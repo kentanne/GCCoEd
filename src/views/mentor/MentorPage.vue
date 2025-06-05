@@ -44,7 +44,6 @@ const loggedUserDets = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -59,6 +58,7 @@ const loggedUserDets = async () => {
               teach_sty: JSON.parse(response.data.ment.teach_sty),
               rating_ave: response.data.ment.rating_ave || 0,
             },
+            image_url: response.data.image_url, // Add image URL
           };
         } else {
           throw new Error("Failed to fetch user details");
@@ -77,7 +77,6 @@ const learnersProfile = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -101,7 +100,6 @@ const sessionInfo = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -121,7 +119,6 @@ const getFeedbacks = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -140,7 +137,6 @@ const getFiles = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -159,7 +155,6 @@ const registerLearnerRole = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -178,7 +173,6 @@ const switchRole = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       })
       .then((response) => {
@@ -220,7 +214,6 @@ const logout = async () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
         },
       }
     );
@@ -250,6 +243,7 @@ const userData = ref({
     exp: "",
     rating_ave: 0,
   },
+  image_url: null, // Add image URL property
 });
 
 const department = ref("College of Computer Studies");
@@ -445,11 +439,9 @@ onMounted(async () => {
       <div>
         <h1>Hi, Mentor!</h1>
         <img
-          :src="
-            `${baseURL}/api/image/` + userData.ment.image ||
-            'http://placehold.co/600x400'
-          "
+          :src="userData.image_url || 'http://placehold.co/600x400'"
           alt="profile-pic"
+          @error="$event.target.src = 'http://placehold.co/600x400'"
         />
       </div>
       <div>

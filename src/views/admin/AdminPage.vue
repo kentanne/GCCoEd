@@ -141,7 +141,11 @@
         :class="{ 'content-expanded': isMobileView && !isSidebarVisible }"
       >
         <!-- Dashboard shown by default -->
-        <dashboard v-if="activeTab === 'dashboard'" :stats="stats" />
+        <dashboard
+          v-if="activeTab === 'dashboard'"
+          :stats="stats"
+          :chartData="chartData"
+        />
 
         <!-- Applications table -->
         <application
@@ -191,6 +195,13 @@ import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/css/index.css";
 
 const Router = useRouter();
+
+// Add chartData ref
+const chartData = ref({
+  userCounts: null,
+  courseBreakdown: null,
+  yearBreakdown: null,
+});
 
 const adminName = async () => {
   try {
@@ -273,7 +284,7 @@ const checkMobileView = () => {
   }
 };
 
-// Update the fetch functions to store the data
+// Update the fetch functions to store the data and bind chartData
 const fetchAll = async () => {
   try {
     const response = await api.get("/api/admin", {
@@ -284,6 +295,8 @@ const fetchAll = async () => {
         // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
     });
+
+    console.log("Response data:", response.data);
 
     // Map the response data to include gender and program/course
     usersFetch.value = response.data.users.map((user) => ({
@@ -300,7 +313,24 @@ const fetchAll = async () => {
       mentors: response.data.counts.approved_mentors || 0,
       applicants: response.data.counts.pending_mentors || 0,
     };
-  } catch (error) {}
+
+    // Bind chart data from the response payload
+    chartData.value = {
+      userCounts: response.data.counts || null,
+      courseBreakdown: response.data.course_breakdown || null,
+      yearBreakdown: response.data.year_breakdown || null,
+    };
+
+    console.log("Chart data bound:", chartData.value);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    // Reset chartData on error
+    chartData.value = {
+      userCounts: null,
+      courseBreakdown: null,
+      yearBreakdown: null,
+    };
+  }
 };
 
 const fetchApplicants = async () => {

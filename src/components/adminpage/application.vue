@@ -179,7 +179,7 @@
           <div class="applicant-profile">
             <div class="profile-image-container">
               <img
-                :src="currentApp.image"
+                :src="currentApp.image_url"
                 :alt="`Portrait of ${currentApp.applicant}`"
                 class="profile-image"
               />
@@ -758,7 +758,7 @@ const showCredentials = async (app) => {
         : "N/A",
       bio: data.info.bio || "No bio provided",
       experience: data.info.exp || "No experience provided",
-
+      image_url: data.image_url || "default-image-url",
       // Update the files property to use the credentials response
       files:
         credentialsResponse?.credentials?.map((cred) => ({
@@ -814,7 +814,9 @@ onMounted(async () => {
   width: 95%; /* Increased from 90% */
   margin: 0 auto;
   text-align: center;
-  height: calc(89vh - 120px); /* Set fixed height, considering some margin from top */
+  height: calc(
+    89vh - 120px
+  ); /* Set fixed height, considering some margin from top */
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -891,13 +893,13 @@ onMounted(async () => {
 }
 
 .table-scroll-container {
-  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
-  scrollbar-width: none;     /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
   overflow-y: auto;
 }
 
 .table-scroll-container::-webkit-scrollbar {
-  display: none;  /* Hide scrollbar for Chrome/Safari/Opera */
+  display: none; /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 .data-table thead th {
@@ -1244,7 +1246,7 @@ onMounted(async () => {
 
 /* Add box shadow to sticky header for better visual separation */
 .data-table th::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   right: 0;
@@ -1838,7 +1840,7 @@ onMounted(async () => {
     gap: 1rem;
   }
 
-  .detail-item, 
+  .detail-item,
   .detail-item2 {
     margin-bottom: 1rem;
   }
@@ -1867,13 +1869,13 @@ onMounted(async () => {
 
 /* Update the table container styles */
 .table-scroll-container {
-  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
-  scrollbar-width: none;     /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
   overflow-y: auto;
 }
 
 .table-scroll-container::-webkit-scrollbar {
-  display: none;  /* Hide scrollbar for Chrome/Safari/Opera */
+  display: none; /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 /* Update credentials modal styles */
@@ -1885,8 +1887,8 @@ onMounted(async () => {
 }
 
 /* Improve text wrapping and responsiveness */
-.detail-value, 
-.detail-value2, 
+.detail-value,
+.detail-value2,
 .info-value,
 .file-name {
   word-break: break-word;

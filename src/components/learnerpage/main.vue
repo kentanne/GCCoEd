@@ -81,11 +81,7 @@ const filteredUsers = computed(() => {
       <div v-for="user in filteredUsers" :key="user.id" class="user-card">
         <div class="upper-element">
           <img
-            :src="
-              user.image_id
-                ? `${baseURL}/api/image/${user.image_id}`
-                : 'https://placehold.co/600x400'
-            "
+            :src="user.image_url || 'https://placehold.co/600x400'"
             alt="profile-pic"
           />
           <h1>{{ user.userName }}</h1>
@@ -326,15 +322,15 @@ const filteredUsers = computed(() => {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
   }
-  
+
   .search-container {
     justify-content: center;
   }
-  
+
   .search-input {
     width: 200px;
   }
-  
+
   .search-input:focus {
     width: 250px;
   }
@@ -345,27 +341,26 @@ const filteredUsers = computed(() => {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 0.75rem;
   }
-  
+
   .user-card h1 {
     font-size: 0.9rem;
   }
-  
+
   .lower-element p {
     font-size: 0.75rem;
   }
-  
+
   .lower-element button {
     padding: 0.4rem 1rem;
     font-size: 0.75rem;
   }
-  
+
   .search-input {
     width: 180px;
   }
-  
+
   .search-input:focus {
     width: 200px;
   }
-
 }
 </style>

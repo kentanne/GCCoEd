@@ -87,11 +87,9 @@ const filteredUsers = computed(() => {
       <div v-for="user in filteredUsers" :key="user.id" class="user-card">
         <div class="upper-element">
           <img
-            :src="
-              `${baseURL}/api/image/` + user.image_id ||
-              'https://placehold.co/600x400'
-            "
+            :src="user.image_url || 'https://placehold.co/600x400'"
             alt="profile-pic"
+            @error="$event.target.src = 'https://placehold.co/600x400'"
           />
           <h1>{{ user.userName }}</h1>
         </div>
@@ -238,6 +236,12 @@ const filteredUsers = computed(() => {
   border-radius: 50%;
   border: 2px solid #f5f3f0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease;
+}
+
+.user-card img[src="https://placehold.co/600x400"]
+{
+  opacity: 0.7;
 }
 
 .user-card h1 {

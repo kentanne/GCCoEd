@@ -52,6 +52,7 @@ const getLearnerDets = async () => {
               subjects: JSON.parse(response.data.learn.subjects),
               learn_sty: JSON.parse(response.data.learn.learn_sty),
             },
+            image_url: response.data.image_url,
           };
         } else {
           throw new Error("Failed to fetch user details");
@@ -126,6 +127,7 @@ const mentorProfile = async () => {
             prefSessDur: item.mentor_infos.prefSessDur,
             teach_sty: JSON.parse(item.mentor_infos.teach_sty || "[]"),
             credentials: item.mentor_infos.credentials || [],
+            image_url: item.image_url || "https://placehold.co/600x400",
           }));
         }
       });
@@ -247,6 +249,7 @@ const userData = ref({
     goals: "",
     rating_ave: 0,
   },
+  image_url: null,
 });
 
 const schedForReview = ref([]);
@@ -469,10 +472,7 @@ onMounted(async () => {
       <div>
         <h1>Hi, Learner!</h1>
         <img
-          :src="
-            `${baseURL}/api/image/` + userData.learn.image ||
-            'https://placehold.co/600x400'
-          "
+          :src="userData.image_url || 'https://placehold.co/600x400'"
           alt="profile-pic"
         />
       </div>

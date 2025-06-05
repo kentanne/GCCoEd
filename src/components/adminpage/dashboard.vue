@@ -1,50 +1,95 @@
 <template>
-  <div class="dashboard-cards-container">
-    <div class="dashboard-cards">
-      <div class="dashboard-card learners">
-        <div class="card-bg-pattern"></div>
-        <div class="card-content">
-          <div class="card-header">
-            <div class="card-icon-wrapper">
-              <i class="card-icon fas fa-users"></i>
-            </div>
-            <h3 class="card-title">Total Learners</h3>
-          </div>
-          <p class="card-value">{{ stats.learners.toLocaleString() }}</p>
-          <div class="card-footer">
-            <!-- <button class="card-action">View Details</button> -->
-          </div>
+  <div class="dashboard-container">
+    <!-- Existing stats cards -->
+    <div class="stats-grid">
+      <div class="stat-card learners">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
+            />
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.learners }}</h3>
+          <p>Active Learners</p>
         </div>
       </div>
 
-      <div class="dashboard-card mentors">
-        <div class="card-bg-pattern"></div>
-        <div class="card-content">
-          <div class="card-header">
-            <div class="card-icon-wrapper">
-              <i class="card-icon fas fa-chalkboard-teacher"></i>
-            </div>
-            <h3 class="card-title">Total Mentors</h3>
-          </div>
-          <p class="card-value">{{ stats.mentors.toLocaleString() }}</p>
-          <div class="card-footer">
-            <!-- <button class="card-action">View Details</button> -->
-          </div>
+      <div class="stat-card mentors">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M16,4C18.11,4 19.81,5.69 19.81,7.8C19.81,9.91 18.11,11.6 16,11.6C13.89,11.6 12.19,9.91 12.19,7.8C12.19,5.69 13.89,4 16,4M16,13.4C18.67,13.4 24,14.73 24,17.4V20H8V17.4C8,14.73 13.33,13.4 16,13.4M8.5,8.5C8.5,9.33 7.83,10 7,10C6.17,10 5.5,9.33 5.5,8.5C5.5,7.67 6.17,7 7,7C7.83,7 8.5,7.67 8.5,8.5M9,13C9.65,13 10.2,13.33 10.41,13.79C9.16,14.46 8.5,15.27 8.5,16.25V18H0V16.25C0,14.23 4.5,13 9,13Z"
+            />
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.mentors }}</h3>
+          <p>Active Mentors</p>
         </div>
       </div>
 
-      <div class="dashboard-card applicants">
-        <div class="card-bg-pattern"></div>
-        <div class="card-content">
-          <div class="card-header">
-            <div class="card-icon-wrapper">
-              <i class="card-icon fas fa-file-alt"></i>
-            </div>
-            <h3 class="card-title">Total Applicants</h3>
+      <div class="stat-card applicants">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+            />
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.applicants }}</h3>
+          <p>Pending Applications</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-container">
+      <div class="charts-header">
+        <h2>Analytics Overview</h2>
+        <p>Visual representation of platform statistics</p>
+      </div>
+
+      <div class="charts-grid">
+        <!-- User Distribution Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>User Distribution</h3>
+            <span class="chart-subtitle">Breakdown by user type</span>
           </div>
-          <p class="card-value">{{ stats.applicants.toLocaleString() }}</p>
-          <div class="card-footer">
-            <!-- <button class="card-action">View Details</button> -->
+          <div class="chart-wrapper">
+            <canvas
+              ref="userDistributionChart"
+              width="400"
+              height="300"
+            ></canvas>
+          </div>
+        </div>
+
+        <!-- Course Distribution Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Program Distribution</h3>
+            <span class="chart-subtitle">Students per course program</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas ref="courseChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+
+        <!-- Year Level Distribution Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Year Level Distribution</h3>
+            <span class="chart-subtitle">Students by academic year</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas ref="yearChart" width="400" height="300"></canvas>
           </div>
         </div>
       </div>
@@ -52,222 +97,614 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    stats: {
-      type: Object,
-      required: true,
-      default: () => ({
-        learners: 0,
-        mentors: 0,
-        applicants: 0,
-      }),
-    },
+<script setup>
+import { ref, watch, onMounted, nextTick, onUnmounted } from "vue";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  DoughnutController,
+} from "chart.js";
+
+// Register Chart.js components for doughnut charts only
+ChartJS.register(ArcElement, Title, Tooltip, Legend, DoughnutController);
+
+// Props
+const props = defineProps({
+  stats: {
+    type: Object,
+    required: true,
+    default: () => ({
+      learners: 0,
+      mentors: 0,
+      applicants: 0,
+    }),
   },
+  chartData: {
+    type: Object,
+    required: true,
+    default: () => ({
+      userCounts: null,
+      courseBreakdown: null,
+      yearBreakdown: null,
+    }),
+  },
+});
+
+// Chart refs
+const userDistributionChart = ref(null);
+const courseChart = ref(null);
+const yearChart = ref(null);
+
+// Chart instances
+let userDistributionChartInstance = null;
+let courseChartInstance = null;
+let yearChartInstance = null;
+
+// Color palettes for different charts
+const userColors = {
+  backgroundColor: ["#22c55e", "#3b82f6", "#f97316"], // Green for learners, Blue for mentors, Orange for pending
+  borderColor: ["#16a34a", "#2563eb", "#ea580c"], // Darker shades for borders
 };
+
+const courseColors = {
+  backgroundColor: [
+    "#4361ee",
+    "#4895ef",
+    "#7209b7",
+    "#f72585",
+    "#4cc9f0",
+    "#7209b7",
+    "#f72585",
+    "#4895ef",
+    "#4361ee",
+    "#4cc9f0",
+  ],
+  borderColor: [
+    "#3f37c9",
+    "#4361ee",
+    "#6a1b9a",
+    "#d90429",
+    "#0077b6",
+    "#6a1b9a",
+    "#d90429",
+    "#4361ee",
+    "#3f37c9",
+    "#0077b6",
+  ],
+};
+
+const yearColors = {
+  backgroundColor: ["#7209b7", "#4361ee", "#4895ef", "#f72585", "#4cc9f0"],
+  borderColor: ["#6a1b9a", "#3f37c9", "#4361ee", "#d90429", "#0077b6"],
+};
+
+// Chart creation functions
+const createCharts = () => {
+  if (
+    props.chartData &&
+    Object.values(props.chartData).some((data) => data !== null)
+  ) {
+    createUserDistributionChart();
+    createCourseChart();
+    createYearChart();
+  }
+};
+
+const createUserDistributionChart = () => {
+  if (!userDistributionChart.value || !props.chartData.userCounts) return;
+
+  // Destroy existing chart if it exists
+  if (userDistributionChartInstance) {
+    userDistributionChartInstance.destroy();
+  }
+
+  const ctx = userDistributionChart.value.getContext("2d");
+  const counts = props.chartData.userCounts;
+
+  userDistributionChartInstance = new ChartJS(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Learners", "Approved Mentors", "Pending Applications"],
+      datasets: [
+        {
+          data: [
+            counts.learners,
+            counts.approved_mentors,
+            counts.pending_mentors,
+          ],
+          backgroundColor: [
+            "#22c55e", // Green for Learners
+            "#3b82f6", // Blue for Approved Mentors
+            "#f97316", // Orange for Pending Applications
+          ],
+          borderColor: [
+            "#16a34a", // Darker green border
+            "#2563eb", // Darker blue border
+            "#ea580c", // Darker orange border
+          ],
+          borderWidth: 2,
+          hoverOffset: 8,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "60%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            font: {
+              size: 12,
+              family: "Inter, sans-serif",
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff",
+          callbacks: {
+            label: function (context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.raw / total) * 100).toFixed(1);
+              return `${context.label}: ${context.raw} (${percentage}%)`;
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+const createCourseChart = () => {
+  if (!courseChart.value || !props.chartData.courseBreakdown) return;
+
+  // Destroy existing chart if it exists
+  if (courseChartInstance) {
+    courseChartInstance.destroy();
+  }
+
+  const ctx = courseChart.value.getContext("2d");
+  const courseData = props.chartData.courseBreakdown.data;
+
+  // Course cleaner function to extract abbreviations
+  const cleanCourseName = (courseName) => {
+    // Convert to uppercase for consistency
+    const upperCourse = courseName.toUpperCase();
+
+    // Extract abbreviation patterns
+    if (
+      upperCourse.includes("BSIT") ||
+      upperCourse.includes("BS IT") ||
+      upperCourse.includes("INFORMATION TECHNOLOGY")
+    ) {
+      return "BSIT";
+    } else if (
+      upperCourse.includes("BSCS") ||
+      upperCourse.includes("BS CS") ||
+      upperCourse.includes("COMPUTER SCIENCE")
+    ) {
+      return "BSCS";
+    } else if (
+      upperCourse.includes("BSEMC") ||
+      upperCourse.includes("BS EMC") ||
+      upperCourse.includes("ENTERTAINMENT") ||
+      upperCourse.includes("MULTIMEDIA")
+    ) {
+      return "BSEMC";
+    }
+
+    // If no match found, try to extract first letters after "BS"
+    const match = upperCourse.match(/BS\s*([A-Z]+)/);
+    if (match) {
+      return `BS${match[1]}`;
+    }
+
+    // Fallback: return first 5-6 characters if it looks like an abbreviation
+    if (upperCourse.length <= 8 && upperCourse.match(/^[A-Z\s]+$/)) {
+      return upperCourse.replace(/\s+/g, "");
+    }
+
+    // Last resort: return original but limit length
+    return courseName.length > 8
+      ? courseName.substring(0, 8).toUpperCase()
+      : courseName.toUpperCase();
+  };
+
+  // Clean and process the course data
+  const cleanedCourseData = {};
+  Object.entries(courseData).forEach(([course, count]) => {
+    const cleanedName = cleanCourseName(course);
+    if (cleanedCourseData[cleanedName]) {
+      cleanedCourseData[cleanedName] += count;
+    } else {
+      cleanedCourseData[cleanedName] = count;
+    }
+  });
+
+  // Define the expected course order for consistent coloring
+  const courseOrder = ["BSIT", "BSCS", "BSEMC"];
+
+  // Sort the data according to the defined order
+  const sortedLabels = [];
+  const sortedData = [];
+  const sortedColors = [];
+  const sortedBorderColors = [];
+
+  courseOrder.forEach((course, index) => {
+    if (cleanedCourseData[course] !== undefined) {
+      sortedLabels.push(course);
+      sortedData.push(cleanedCourseData[course]);
+      sortedColors.push(courseColors.backgroundColor[index]);
+      sortedBorderColors.push(courseColors.borderColor[index]);
+    }
+  });
+
+  // Add any other courses that don't match the main three
+  Object.entries(cleanedCourseData).forEach(([course, count]) => {
+    if (!courseOrder.includes(course)) {
+      sortedLabels.push(course);
+      sortedData.push(count);
+      // Use additional colors for unexpected courses
+      const colorIndex = sortedLabels.length - 1;
+      sortedColors.push(
+        courseColors.backgroundColor[
+          colorIndex % courseColors.backgroundColor.length
+        ]
+      );
+      sortedBorderColors.push(
+        courseColors.borderColor[colorIndex % courseColors.borderColor.length]
+      );
+    }
+  });
+
+  courseChartInstance = new ChartJS(ctx, {
+    type: "doughnut",
+    data: {
+      labels: sortedLabels,
+      datasets: [
+        {
+          data: sortedData,
+          backgroundColor: sortedColors,
+          borderColor: sortedBorderColors,
+          borderWidth: 2,
+          hoverOffset: 8,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "50%",
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            font: {
+              size: 12,
+              family: "Inter, sans-serif",
+            },
+            boxWidth: 15,
+            boxHeight: 15,
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff",
+          callbacks: {
+            title: function (context) {
+              return `Course: ${context[0].label}`;
+            },
+            label: function (context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.raw / total) * 100).toFixed(1);
+              return `Students: ${context.raw} (${percentage}%)`;
+            },
+          },
+        },
+      },
+      layout: {
+        padding: {
+          bottom: 10,
+        },
+      },
+    },
+  });
+};
+
+const createYearChart = () => {
+  if (!yearChart.value || !props.chartData.yearBreakdown) return;
+
+  // Destroy existing chart if it exists
+  if (yearChartInstance) {
+    yearChartInstance.destroy();
+  }
+
+  const ctx = yearChart.value.getContext("2d");
+  const yearData = props.chartData.yearBreakdown.data;
+
+  const labels = Object.keys(yearData);
+  const data = Object.values(yearData);
+
+  yearChartInstance = new ChartJS(ctx, {
+    type: "doughnut",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          data: data,
+          backgroundColor: yearColors.backgroundColor.slice(0, labels.length),
+          borderColor: yearColors.borderColor.slice(0, labels.length),
+          borderWidth: 2,
+          hoverOffset: 8,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "55%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            font: {
+              size: 12,
+              family: "Inter, sans-serif",
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff",
+          callbacks: {
+            title: function (context) {
+              return `Year Level: ${context[0].label}`;
+            },
+            label: function (context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.raw / total) * 100).toFixed(1);
+              return `Students: ${context.raw} (${percentage}%)`;
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+// Watch for chartData changes
+watch(
+  () => props.chartData,
+  async () => {
+    await nextTick();
+    createCharts();
+  },
+  { deep: true, immediate: true }
+);
+
+// Cleanup function
+const destroyCharts = () => {
+  if (userDistributionChartInstance) {
+    userDistributionChartInstance.destroy();
+    userDistributionChartInstance = null;
+  }
+  if (courseChartInstance) {
+    courseChartInstance.destroy();
+    courseChartInstance = null;
+  }
+  if (yearChartInstance) {
+    yearChartInstance.destroy();
+    yearChartInstance = null;
+  }
+};
+
+// Lifecycle hooks
+onMounted(async () => {
+  await nextTick();
+  createCharts();
+});
+
+onUnmounted(() => {
+  destroyCharts();
+});
 </script>
 
 <style scoped>
-.dashboard-cards-container {
-  padding: 2rem;
-  width: 100%;
-  height: calc(100vh - 80px);
-  max-height: 475px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem; /* Changed from 1rem to 4rem to move cards down */
+/* Keep all your existing styles */
+.dashboard-container {
+  padding: 0;
+  max-width: 100%;
 }
 
-.dashboard-cards {
+/* Existing stats grid styles */
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  width: 100%;
-  max-width: 1400px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
-.dashboard-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(11, 28, 59, 0.35);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  height: 320px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.card-bg-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(67, 97, 238, 0.03) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  opacity: 0.5;
-}
-
-.learners .card-bg-pattern {
-  background: linear-gradient(
-    135deg,
-    rgba(67, 97, 238, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-.mentors .card-bg-pattern {
-  background: linear-gradient(
-    135deg,
-    rgba(114, 9, 183, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-.applicants .card-bg-pattern {
-  background: linear-gradient(
-    135deg,
-    rgba(58, 12, 163, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
-.dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-}
-
-.card-content {
-  padding: 2rem;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 2;
-}
-
-.card-header {
+.stat-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 1.5rem;
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card-icon-wrapper {
-  width: 56px;
-  height: 56px;
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
-.learners .card-icon-wrapper {
-  background-color: rgba(67, 97, 238, 0.1);
-}
-.mentors .card-icon-wrapper {
-  background-color: rgba(114, 9, 183, 0.1);
-}
-.applicants .card-icon-wrapper {
-  background-color: rgba(58, 12, 163, 0.1);
+.stat-icon svg {
+  width: 28px;
+  height: 28px;
 }
 
-.card-icon {
-  font-size: 1.5rem;
+/* Add the missing stat-icon classes */
+.learners .stat-icon {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: var(--white);
 }
 
-.learners .card-icon {
-  color: #4361ee;
-}
-.mentors .card-icon {
-  color: #7209b7;
-}
-.applicants .card-icon {
-  color: #3a0ca3;
+.mentors .stat-icon {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: var(--white);
 }
 
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-light);
-  margin: 0;
+.applicants .stat-icon {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: var(--white);
 }
 
-.card-value {
-  font-size: 3.5rem;
+.stat-content h3 {
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text);
-  margin: 0 auto !important;
-  line-height: 1;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
+  margin-bottom: 0.25rem;
 }
 
-.card-footer {
-  margin-top: auto;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card-action {
-  background: rgba(0, 0, 0, 0.03);
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+.stat-content p {
+  color: var(--text-light);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.card-action:hover {
-  background: rgba(0, 0, 0, 0.05);
+/* Charts section styles */
+.charts-container {
+  margin-top: 2rem;
+}
+
+.charts-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.charts-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.charts-header p {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.chart-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.chart-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.chart-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.chart-subtitle {
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+  width: 100%;
 }
 
 /* Responsive adjustments */
-@media (max-width: 1200px) {
-  .dashboard-cards {
+@media (max-width: 768px) {
+  .charts-grid {
     grid-template-columns: 1fr;
-    max-width: 600px;
+    gap: 1.5rem;
   }
 
-  .dashboard-card {
-    height: 240px;
+  .chart-card {
+    padding: 1rem;
   }
 
-  .card-value {
-    font-size: 3rem;
+  .chart-wrapper {
+    height: 250px;
   }
-  .dashboard-cards-container {
-    margin-top: 8rem;
+
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
-  .dashboard-cards-container {
-    padding: 1.5rem;
+@media (max-width: 480px) {
+  .charts-header h2 {
+    font-size: 1.5rem;
   }
 
-  .dashboard-cards-container {
-    margin-top: 8rem;
-  }
-  .card-content {
-    padding: 1.5rem;
+  .chart-wrapper {
+    height: 200px;
   }
 
-  .card-value {
-    font-size: 2.5rem;
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .stat-content h3 {
+    font-size: 1.5rem;
   }
 }
 </style>

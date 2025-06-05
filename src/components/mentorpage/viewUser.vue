@@ -7,7 +7,6 @@ import Offer from "./offer.vue";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/css/index.css";
 
-
 const baseURL = api.defaults.baseURL;
 
 // Add loading state
@@ -65,6 +64,9 @@ const userInfo = async (id) => {
     profilePic.value = response.data.user_info.image;
     userSchoolId.value = response.data.user.id;
 
+    // Use the image_url from the API response
+    imageUrl.value = response.data.image_url;
+
     // Prepare data for offer component
     userDeetsForOffer.value = [
       userSchoolId.value, // userSchoolId
@@ -81,6 +83,7 @@ const userInfo = async (id) => {
       subjects.value, // userSubjects
     ];
   } catch (error) {
+    console.error("Error fetching user info:", error);
     return null;
   } finally {
     isLoading.value = false; // Stop loading
@@ -123,6 +126,7 @@ const availability = ref();
 const sessionDur = ref();
 const goal = ref();
 const profilePic = ref();
+const imageUrl = ref(); // Add this to store the Cloudinary image URL
 const showOfferModal = ref(false); // Add this with your other refs
 const showOffer = ref(false);
 const userDeetsForOffer = ref();
@@ -183,12 +187,10 @@ onMounted(() => {
       <div class="lower-upper">
         <div class="profile-image-container">
           <img
-            :src="
-              `${baseURL}/api/image/` + profilePic ||
-              'https://placehold.co/600x400'
-            "
+            :src="imageUrl || 'https://placehold.co/600x400'"
             alt="Profile Image"
             class="profile-image"
+            @error="$event.target.src = 'https://placehold.co/600x400'"
           />
         </div>
 
@@ -362,7 +364,7 @@ onMounted(() => {
   z-index: 100;
   margin-top: 3rem;
   left: 10rem;
-    overflow-y: auto; 
+  overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
@@ -383,7 +385,8 @@ onMounted(() => {
 }
 
 .no-scroll {
-  overflow: hidden !important;}
+  overflow: hidden !important;
+}
 
 .sticky-header {
   position: sticky;
@@ -634,7 +637,11 @@ onMounted(() => {
 .action-button {
   position: sticky;
   bottom: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 25%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 25%
+  );
   padding: 1.25rem;
   margin-top: 1rem;
   z-index: 150;
@@ -684,7 +691,6 @@ onMounted(() => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   margin: auto; /* Center the modal */
 }
-
 
 .confirmation-modal h3 {
   margin-top: 0;
@@ -848,7 +854,7 @@ onMounted(() => {
     width: 900px;
     height: 75vh;
   }
-  
+
   .confirmation-modal-overlay {
     left: 5rem;
   }
@@ -860,11 +866,11 @@ onMounted(() => {
     width: 850px;
     height: 70vh;
   }
-  
+
   .confirmation-modal-overlay {
     left: 3rem;
   }
-  
+
   .lower-upper {
     gap: 1.75rem;
   }
@@ -877,11 +883,11 @@ onMounted(() => {
     height: 70vh;
     margin-top: 1.5rem;
   }
-  
+
   .confirmation-modal-overlay {
     left: 1.5rem;
   }
-  
+
   .profile-image {
     width: 110px;
     height: 110px;
@@ -896,14 +902,14 @@ onMounted(() => {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .confirmation-modal-overlay {
     left: 50%;
     transform: translateX(-50%);
     margin-left: 0;
     width: 90vw;
   }
-  
+
   .details-section {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -919,36 +925,36 @@ onMounted(() => {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .confirmation-modal-overlay {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .lower-upper {
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .profile-information {
     text-align: center;
     width: 100%;
   }
-  
+
   .info-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .info-item {
     align-items: center;
   }
-  
+
   .info-value {
     margin-left: 0;
   }
-  
+
   .action-button {
     justify-content: center;
   }
@@ -963,33 +969,33 @@ onMounted(() => {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-image {
     width: 90px;
     height: 90px;
   }
-  
+
   .upper-element {
     padding: 1rem;
   }
-  
+
   .modal-title {
     font-size: 1.2rem;
   }
-  
+
   .section-title {
     font-size: 1rem;
   }
-  
+
   .confirmation-modal {
     padding: 1.5rem;
     width: 85%;
   }
-  
+
   .scrollable-content {
     padding: 0 1rem;
   }
@@ -1001,35 +1007,36 @@ onMounted(() => {
     width: 43vh;
     border-radius: 15px;
   }
-  
+
   .info-label,
   .info-value {
     font-size: 0.75rem;
   }
-  
+
   .action-button button {
     padding: 0.6rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .profile-image {
     width: 80px;
     height: 80px;
   }
-  
+
   .details-card,
   .bio-card {
     padding: 0.75rem;
   }
-  
+
   .confirmation-modal {
     width: 90%;
     padding: 1rem;
     margin-right: 2rem;
     margin-left: 2rem;
   }
-    .confirmation-modal p {
-font-size: 13px;
-text-align: center;  }
+  .confirmation-modal p {
+    font-size: 13px;
+    text-align: center;
+  }
 }
 </style>

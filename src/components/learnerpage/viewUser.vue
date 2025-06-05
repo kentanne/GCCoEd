@@ -32,10 +32,7 @@
         <div class="lower-upper">
           <div class="profile-image-container">
             <img
-              :src="
-                `${baseURL}/api/image/` + profilePic ||
-                'https://placehold.co/600x400'
-              "
+              :src="profilePic || 'https://placehold.co/600x400'"
               alt="profile-pic"
               class="profile-image"
             />
@@ -255,7 +252,8 @@ const userInfo = async (id) => {
         availability.value = response.data.user_info.availability;
         sessionDur.value = response.data.user_info.prefSessDur;
         goal.value = response.data.user_info.exp;
-        profilePic.value = response.data.user_info.image;
+        profilePic.value =
+          response.data.image_url || "https://placehold.co/600x400";
         userDeetsForSched.value = [
           mentor_no.value, // mentorNo
           name.value, // mentorName
@@ -810,7 +808,7 @@ onMounted(() => {
     width: 900px;
     height: 75vh;
   }
-  
+
   .confirmation-modal-overlay {
     left: 5rem;
   }
@@ -822,11 +820,11 @@ onMounted(() => {
     width: 850px;
     height: 70vh;
   }
-  
+
   .confirmation-modal-overlay {
     left: 3rem;
   }
-  
+
   .lower-upper {
     gap: 1.75rem;
   }
@@ -839,11 +837,11 @@ onMounted(() => {
     height: 70vh;
     margin-top: 1.5rem;
   }
-  
+
   .confirmation-modal-overlay {
     left: 1.5rem;
   }
-  
+
   .profile-image {
     width: 110px;
     height: 110px;
@@ -858,14 +856,14 @@ onMounted(() => {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .confirmation-modal-overlay {
     left: 50%;
     transform: translateX(-50%);
     margin-left: 0;
     width: 90vw;
   }
-  
+
   .details-section {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -881,36 +879,36 @@ onMounted(() => {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .confirmation-modal-overlay {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .lower-upper {
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .profile-information {
     text-align: center;
     width: 100%;
   }
-  
+
   .info-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .info-item {
     align-items: center;
   }
-  
+
   .info-value {
     margin-left: 0;
   }
-  
+
   .action-button {
     justify-content: center;
   }
@@ -925,33 +923,33 @@ onMounted(() => {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-image {
     width: 90px;
     height: 90px;
   }
-  
+
   .upper-element {
     padding: 1rem;
   }
-  
+
   .modal-title {
     font-size: 1.2rem;
   }
-  
+
   .section-title {
     font-size: 1rem;
   }
-  
+
   .confirmation-modal {
     padding: 1.5rem;
     width: 85%;
   }
-  
+
   .scrollable-content {
     padding: 0 1rem;
   }
@@ -963,35 +961,36 @@ onMounted(() => {
     width: 43vh;
     border-radius: 15px;
   }
-  
+
   .info-label,
   .info-value {
     font-size: 0.75rem;
   }
-  
+
   .action-button button {
     padding: 0.6rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .profile-image {
     width: 80px;
     height: 80px;
   }
-  
+
   .details-card,
   .bio-card {
     padding: 0.75rem;
   }
-  
+
   .confirmation-modal {
     width: 90%;
     padding: 1rem;
     margin-right: 2rem;
     margin-left: 2rem;
   }
-    .confirmation-modal p {
-font-size: 13px;
-text-align: center;  }
+  .confirmation-modal p {
+    font-size: 13px;
+    text-align: center;
+  }
 }
 </style>

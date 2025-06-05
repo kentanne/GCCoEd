@@ -121,7 +121,7 @@
           <div class="user-profile">
             <div class="profile-image-container">
               <img
-                :src="`${baseURL}/api/image/` + currentUser.image"
+                :src="currentUser.image_url"
                 :alt="`Portrait of ${currentUser.name}`"
                 class="profile-image"
               />
