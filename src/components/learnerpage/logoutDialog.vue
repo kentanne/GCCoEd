@@ -15,7 +15,7 @@ function getCookie(name) {
 
 const logOut = async () => {
   const response = await api
-    .post("/api/logout/web", {
+    .post("/api/logout", {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
@@ -154,7 +154,6 @@ const close = () => {
   font-size: 1rem;
 }
 
-
 @media (max-width: 768px) {
   .wrapper {
     height: auto;
@@ -199,7 +198,7 @@ const close = () => {
   .wrapper {
     padding: 10px;
     width: 250px;
-     margin-right: 30px; 
+    margin-right: 30px;
   }
 
   .lower-element h1 {

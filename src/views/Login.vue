@@ -60,13 +60,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
+import api, { setToken, setUserData } from "@/axios.js";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
-import api from "@/axios";
-import { createToast } from "mosha-vue-toastify";
-import "mosha-vue-toastify/dist/style.css";
 
 const router = useRouter();
 const email = ref("");
@@ -81,149 +79,53 @@ function setButtonActive(active) {
   }
 }
 
-function getCookie(name) {
-  try {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return decodeURIComponent(parts.pop().split(";").shift());
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
-
-async function csrf() {
-  try {
-    await api.get("/sanctum/csrf-cookie");
-    return true;
-  } catch (error) {
-    return false;
-  }
+function togglePasswordVisibility() {
+  passwordVisible.value = !passwordVisible.value;
 }
 
 async function login() {
-  if (isLoading.value) return; // Prevent multiple submissions
+  if (isLoading.value) return;
 
   isLoading.value = true;
 
   try {
-    const token = getCookie("XSRF-TOKEN");
-
     const loginData = {
       login: email.value,
       password: password.value,
     };
 
-    const response = await api.post("/api/login", loginData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.post("/api/login", loginData);
 
-    createToast("Login successful!", {
-      position: "bottom-right",
-      type: "success",
-      transition: "slide",
-      timeout: 2000,
-      showIcon: true,
-      toastBackgroundColor: "#319cb0",
-    });
+    if (response.status === 200) {
+      // Store the token
+      setToken(response.data.token);
 
-    switch (response.data.user_role) {
-      case null:
-        router.push("/signup");
-        break;
-      case "learner":
-        router.push("/learner");
-        break;
-      case "mentor":
-        router.push("/mentor");
-        break;
-      case "admin":
-        router.push("/admin");
-        break;
-      default:
-        break;
+      // Store user data properly
+      setUserData(response.data.user);
+
+      // Redirect based on user role
+      const userRole = response.data.user_role;
+      switch (userRole) {
+        case "learner":
+          router.push("/learner");
+          break;
+        case "mentor":
+          router.push("/mentor");
+          break;
+        case "admin":
+          router.push("/admin");
+          break;
+        default:
+          router.push("/signup");
+      }
     }
   } catch (error) {
-    // Check if it's a 403 error for unapproved mentor
-    if (error.response && error.response.status === 403) {
-      const errorData = error.response.data;
-
-      // Check if it's specifically a mentor approval issue
-      if (errorData.error === "Mentor account not approved yet") {
-        createToast(
-          errorData.message ||
-            "Your mentor application is still under review. You will receive an email once approved.",
-          {
-            position: "bottom-right",
-            type: "warning",
-            transition: "slide",
-            timeout: 5000,
-            showIcon: true,
-            toastBackgroundColor: "#f39c12",
-          }
-        );
-      } else {
-        // Other 403 errors (general unauthorized)
-        createToast("Access denied. Please check your credentials.", {
-          position: "bottom-right",
-          type: "error",
-          transition: "slide",
-          timeout: 3000,
-          showIcon: true,
-          toastBackgroundColor: "#e74c3c",
-        });
-      }
-    } else if (error.response && error.response.status === 401) {
-      // Invalid credentials
-      createToast("Invalid email or password. Please try again.", {
-        position: "bottom-right",
-        type: "error",
-        transition: "slide",
-        timeout: 3000,
-        showIcon: true,
-        toastBackgroundColor: "#e74c3c",
-      });
-    } else if (error.response && error.response.status === 429) {
-      // Too many attempts
-      createToast("Too many login attempts. Please try again later.", {
-        position: "bottom-right",
-        type: "error",
-        transition: "slide",
-        timeout: 3000,
-        showIcon: true,
-        toastBackgroundColor: "#e74c3c",
-      });
-    } else {
-      // Generic error for other cases
-      createToast("Login failed. Please try again.", {
-        position: "bottom-right",
-        type: "error",
-        transition: "slide",
-        timeout: 2000,
-        showIcon: true,
-        toastBackgroundColor: "#e74c3c",
-      });
-    }
+    console.error("Login failed:", error);
+    alert(error.response?.data?.message || "Login failed. Please try again.");
   } finally {
     isLoading.value = false;
-    setButtonActive(false);
   }
 }
-
-function togglePasswordVisibility() {
-  if (!isLoading.value) {
-    passwordVisible.value = !passwordVisible.value;
-  }
-}
-
-onMounted(async () => {
-  await csrf();
-});
 </script>
 
 <style scoped>

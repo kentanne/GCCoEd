@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
+import { getToken, removeToken, getUserData } from "@/axios.js";
 import Home from "../views/Home.vue";
 import LearnMore from "../views/LearnMore.vue";
 import Login from "../views/Login.vue";
@@ -12,11 +13,6 @@ import passwordReset from "@/components/password-reset.vue";
 import forgotPassword from "../views/forgotPassword.vue";
 import MentorInfoAlt from "../views/MentorInfoAlt.vue";
 import LearnerInfoAlt from "../views/LearnerInfoAlt.vue";
-import axios from "axios"; // Make sure axios is installed and imported
-import api from "@/axios.js";
-
-// Configure axios to always include credentials
-axios.defaults.withCredentials = true;
 
 const routes = [
   {
@@ -35,13 +31,13 @@ const routes = [
     path: "/login",
     name: "login",
     component: Login,
-    meta: { requiresAuth: false, redirectIfAuth: true },
+    meta: { requiresAuth: false },
   },
   {
     path: "/signup",
     name: "signup",
     component: Signup,
-    meta: { requiresAuth: false, redirectIfAuth: true },
+    meta: { requiresAuth: false },
   },
   {
     path: "/mentor-info",
@@ -107,100 +103,78 @@ const router = createRouter({
   },
 });
 
-// Function to check authentication status
-const checkAuth = async () => {
-  try {
-    // Get the authenticated user info from Laravel backend
-    const response = await api.get("/api/auth/check");
+// Fixed navigation guard
+router.beforeEach((to, from, next) => {
+  // Clean URL handling
+  if (window.location.pathname !== "/" || window.location.search !== "") {
+    const hashPart = window.location.hash;
+    const cleanUrl = window.location.origin + "/" + hashPart;
+    window.history.replaceState(null, "", cleanUrl);
+  }
 
-    if (response.data.authenticated) {
-      return {
-        isAuthenticated: true,
-        user: response.data.user,
-      };
-    } else {
-      return {
-        isAuthenticated: false,
-        user: null,
-      };
+  // Check if token exists in localStorage
+  const token = getToken();
+  const isAuthenticated = !!token;
+  const user = getUserData();
+
+  // Allow access to public routes (requiresAuth: false or undefined)
+  if (to.meta.requiresAuth === false || to.meta.requiresAuth === undefined) {
+    // If user is authenticated and trying to access login/signup, redirect to dashboard
+    if (isAuthenticated && (to.path === "/login" || to.path === "/signup")) {
+      if (user) {
+        redirectToRolePage(user, next);
+        return;
+      } else {
+        // Clear invalid token/data and allow access to login
+        removeToken();
+        next();
+        return;
+      }
     }
-  } catch (error) {
-    return {
-      isAuthenticated: false,
-      user: null,
-    };
-  }
-};
-
-// Helper function to redirect based on user role
-function redirectToRolePage(user, next) {
-  if (!user) {
-    next("/");
-    return;
-  }
-
-  // If user is logged in but has no role, redirect to signup
-  if (user.role === null || user.role === undefined) {
-    next("/signup");
-    return;
-  }
-
-  switch (user.role) {
-    case "admin":
-      next("/admin");
-      break;
-    case "mentor":
-      next("/mentor");
-      break;
-    case "learner":
-      next("/learner");
-      break;
-    default:
-      next("/");
-  }
-}
-
-// Navigation guard
-router.beforeEach(async (to, from, next) => {
-  const { isAuthenticated, user } = await checkAuth();
-
-  // If route requires authentication and user is not authenticated
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next("/login");
-    return;
-  }
-
-  // Special case: If user is authenticated with no role and trying to access signup page
-  // Allow them to stay on signup page to complete registration
-  if (isAuthenticated && user && !user.role && to.path === "/signup") {
+    // Allow access to public routes
     next();
     return;
   }
 
-  // If user is authenticated but trying to access login/signup pages
-  if (isAuthenticated && to.meta.redirectIfAuth) {
-    redirectToRolePage(user, next);
-    return;
-  }
-
-  // If route has role restriction and user doesn't have that role
-  if (to.meta.role && to.meta.role !== user?.role) {
-    if (isAuthenticated) {
-      redirectToRolePage(user, next);
-    } else {
+  // Handle routes that require authentication (requiresAuth: true)
+  if (to.meta.requiresAuth === true) {
+    if (!isAuthenticated) {
       next("/login");
+      return;
     }
-    return;
+
+    // Check if user data exists
+    if (!user) {
+      // No user data available, redirect to login
+      removeToken();
+      next("/login");
+      return;
+    }
+
+    // Check role-specific routes
+    if (to.meta.role && user.role !== to.meta.role) {
+      redirectToRolePage(user, next);
+      return;
+    }
   }
 
-  // For home page, check if user is authenticated and redirect to role page
-  if (to.path === "/" && isAuthenticated) {
-    redirectToRolePage(user, next);
-    return;
-  }
-
-  // For all other cases, continue navigation
   next();
 });
+
+function redirectToRolePage(user, next) {
+  switch (user.role) {
+    case "learner":
+      next("/learner");
+      break;
+    case "mentor":
+      next("/mentor");
+      break;
+    case "admin":
+      next("/admin");
+      break;
+    default:
+      next("/signup");
+  }
+}
 
 export default router;

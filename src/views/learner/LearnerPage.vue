@@ -3,14 +3,11 @@ import { ref, onMounted, computed, defineAsyncComponent } from "vue";
 import Information from "../../components/learnerpage/information.vue";
 import logoutDialog from "@/components/learnerpage/logoutDialog.vue";
 import { useRouter } from "vue-router";
-import api from "@/axios.js";
-import axios from "axios";
+import api, { removeToken } from "@/axios.js";
 import { createToast } from "mosha-vue-toastify";
 import "mosha-vue-toastify/dist/style.css";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/css/index.css";
-
-const baseURL = api.defaults.baseURL;
 
 const router = useRouter();
 
@@ -25,113 +22,124 @@ const stopLoading = () => {
   isLoading.value = false;
 };
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-  return null;
-}
-
 const getLearnerDets = async () => {
   try {
-    await api
-      .get("/api/learner/details", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+    const response = await api.get("/api/learner/details", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+      },
+    });
+
+    if (response.status === 200 && response.data) {
+      // Make sure learn object exists before trying to access its properties
+      const learn = response.data.learn || {};
+
+      userData.value = {
+        user: response.data.user || {},
+        learn: {
+          ...learn,
+          // Safely parse JSON with fallbacks
+          availability: JSON.parse(learn.availability || "[]"),
+          subjects: JSON.parse(learn.subjects || "[]"),
+          learn_sty: JSON.parse(learn.learn_sty || "[]"),
         },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          userData.value = {
-            user: response.data.user,
-            learn: {
-              ...response.data.learn,
-              availability: JSON.parse(response.data.learn.availability),
-              subjects: JSON.parse(response.data.learn.subjects),
-              learn_sty: JSON.parse(response.data.learn.learn_sty),
-            },
-            image_url: response.data.image_url,
-          };
-        } else {
-          throw new Error("Failed to fetch user details");
-        }
-      });
+        image_url: response.data.image_url || "https://placehold.co/600x400",
+      };
+    } else {
+      throw new Error("Invalid response format");
+    }
   } catch (error) {
-    return null;
+    console.error("Error fetching learner details:", error);
+    createToast("Failed to load learner details", {
+      position: "top-right",
+      type: "danger",
+      timeout: 3000,
+    });
+
+    // Initialize with default values to prevent further errors
+    userData.value = {
+      user: { id: null, name: "", email: "", role: "" },
+      learn: {
+        address: "",
+        year: "",
+        course: "",
+        availability: [],
+        prefSessDur: "",
+        bio: "",
+        subjects: [],
+        image: "",
+        phoneNum: "",
+        learn_sty: [],
+        goals: "",
+        rating_ave: 0,
+      },
+      image_url: "https://placehold.co/600x400",
+    };
   }
 };
 
 const sessionInfo = async () => {
   try {
-    const sessionDeets = await api
-      .get(`/api/learner/sched`, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        todaySchedule.value = response.data.schedules_today;
-        upcommingSchedule.value = response.data.upcoming_schedules;
-      });
+    const response = await api.get("/api/learner/sched");
+    todaySchedule.value = response.data.schedules_today || [];
+    upcommingSchedule.value = response.data.upcoming_schedules || [];
   } catch (error) {
-    return null;
+    console.error("Error fetching session info:", error);
+    createToast("Failed to load schedule information", {
+      position: "top-right",
+      type: "danger",
+      timeout: 3000,
+    });
   }
 };
 
 const sessionForReview = async () => {
   try {
-    const pastSessionDeets = await api
-      .get(`/api/learner/doneSched`, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        schedForReview.value = response.data.schedules_done;
-      });
+    const response = await api.get("/api/learner/doneSched");
+    schedForReview.value = response.data.schedules_done || [];
   } catch (error) {
-    return null;
+    console.error("Error fetching completed sessions:", error);
+    createToast("Failed to load completed sessions", {
+      position: "top-right",
+      type: "danger",
+      timeout: 3000,
+    });
   }
 };
 
 const mentorProfile = async () => {
   try {
-    await api
-      .get("/api/learner/users", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          users.value = response.data.map((item) => ({
-            id: item.mentor_infos.mentor_no,
-            userName: item.user.name,
-            yearLevel: item.mentor_infos.year,
-            course: item.mentor_infos.course,
-            image_id: item.mentor_infos.image,
-            proficiency: item.mentor_infos.proficiency,
-            subjects: JSON.parse(item.mentor_infos.subjects),
-            availability: JSON.parse(item.mentor_infos.availability),
-            rating_ave: item.mentor_infos.rating_ave || 0,
-            bio: item.mentor_infos.bio,
-            exp: item.mentor_infos.exp,
-            prefSessDur: item.mentor_infos.prefSessDur,
-            teach_sty: JSON.parse(item.mentor_infos.teach_sty || "[]"),
-            credentials: item.mentor_infos.credentials || [],
-            image_url: item.image_url || "https://placehold.co/600x400",
-          }));
-        }
-      });
-  } catch (error) {}
+    const response = await api.get("/api/learner/users");
+
+    if (response.status === 200) {
+      users.value = response.data.map((item) => ({
+        id: item.mentor_infos?.mentor_no || item.id,
+        userName: item.user?.name || "Unknown",
+        yearLevel: item.mentor_infos?.year || "",
+        course: item.mentor_infos?.course || "",
+        image_id: item.mentor_infos?.image || "",
+        proficiency: item.mentor_infos?.proficiency || "",
+        subjects: JSON.parse(item.mentor_infos?.subjects || "[]"),
+        availability: JSON.parse(item.mentor_infos?.availability || "[]"),
+        rating_ave: item.mentor_infos?.rating_ave || 0,
+        bio: item.mentor_infos?.bio || "",
+        exp: item.mentor_infos?.exp || "",
+        prefSessDur: item.mentor_infos?.prefSessDur || "",
+        teach_sty: JSON.parse(item.mentor_infos?.teach_sty || "[]"),
+        credentials: item.mentor_infos?.credentials || [],
+        image_url: item.image_url || "https://placehold.co/600x400",
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching mentors:", error);
+    createToast("Failed to load mentors", {
+      position: "top-right",
+      type: "danger",
+      timeout: 3000,
+    });
+  }
 };
 
 const registerMentorRole = async () => {
@@ -140,92 +148,67 @@ const registerMentorRole = async () => {
 
 const switchRole = async () => {
   try {
-    const response = await api
-      .post("/api/switch", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        createToast("Role switched!", {
-          position: "bottom-right",
-          type: "success",
-          transition: "slide",
-          timeout: 2000,
-          showIcon: true,
-          toastBackgroundColor: "#319cb0",
-        });
-        router.push("/login");
-      })
-      .catch((error) => {
-        createToast(
-          "Failed to switch role. Please try again or Register as Mentor.",
-          {
-            position: "bottom-right",
-            type: "error",
-            transition: "slide",
-            timeout: 2000,
-            showIcon: true,
-            toastBackgroundColor: "#e74c3c",
-          }
-        );
-      });
-  } catch (error) {
-    return null;
-  }
-};
+    const response = await api.post("/api/switch");
 
-const mentFiles = async () => {
-  try {
-    const response = await api
-      .get("/api/learner/mentFiles", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      })
-      .then((response) => {
-        return response.data;
+    if (response.status === 200) {
+      // Update token with the new one from response
+      if (response.data.token) {
+        localStorage.setItem("auth_token", response.data.token);
+      }
+
+      createToast("Role switched!", {
+        position: "bottom-right",
+        type: "success",
+        transition: "slide",
+        timeout: 2000,
+        showIcon: true,
+        toastBackgroundColor: "#319cb0",
       });
-    return response;
+
+      // Redirect to the appropriate page based on new role
+      const newRole = response.data.new_primary_role;
+      router.push(`/${newRole}`);
+    }
   } catch (error) {
-    return null;
+    console.error("Error switching role:", error);
+    createToast(
+      "Failed to switch role. Please try again or Register as Mentor.",
+      {
+        position: "bottom-right",
+        type: "error",
+        transition: "slide",
+        timeout: 2000,
+        showIcon: true,
+        toastBackgroundColor: "#e74c3c",
+      }
+    );
   }
 };
 
 const fetchMentFiles = async () => {
   try {
-    const response = await api.get("/api/learner/mentFiles", {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-      },
+    const response = await api.get("/api/learner/mentFiles");
+    mentorFiles.value = response.data || [];
+  } catch (error) {
+    console.error("Error fetching mentor files:", error);
+    createToast("Failed to load mentor files", {
+      position: "top-right",
+      type: "danger",
+      timeout: 3000,
     });
-    mentorFiles.value = response.data;
-  } catch (error) {}
+  }
 };
 
 const logout = async () => {
   try {
-    const response = await api.post(
-      "/api/logout/web",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
-        },
-      }
-    );
-  } catch (error) {}
+    await api.post("/api/logout");
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    // Always clean up locally regardless of server response
+    removeToken();
+    router.push("/login");
+  }
 };
 
 const userData = ref({
@@ -406,16 +389,16 @@ onMounted(async () => {
     checkMobileView();
     window.addEventListener("resize", checkMobileView);
 
-    // Use Promise.all to wait for all fetch operations to complete
-    await Promise.all([
+    // Execute all fetch operations and handle individual failures
+    await Promise.allSettled([
       getLearnerDets(),
       sessionInfo(),
       mentorProfile(),
       sessionForReview(),
       fetchMentFiles(),
-      mentFiles(),
     ]);
   } catch (error) {
+    console.error("Error during component initialization:", error);
     createToast("Error loading data. Please refresh the page.", {
       position: "top-right",
       type: "danger",
@@ -424,7 +407,6 @@ onMounted(async () => {
       showIcon: true,
     });
   } finally {
-    // Hide loading overlay when all operations are complete or if there's an error
     stopLoading();
   }
 });

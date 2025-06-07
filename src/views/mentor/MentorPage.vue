@@ -207,7 +207,7 @@ const switchRole = async () => {
 const logout = async () => {
   try {
     const response = await api.post(
-      "/api/logout/web",
+      "/api/logout",
       {},
       {
         withCredentials: true,
