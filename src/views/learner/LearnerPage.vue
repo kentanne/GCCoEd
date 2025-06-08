@@ -381,6 +381,14 @@ const checkMobileView = () => {
 
 // Update onMounted to include mobile view check
 onMounted(async () => {
+  console.log("LearnerPage: Starting component initialization...");
+  console.log("Environment:", import.meta.env.MODE);
+  console.log("API Base URL:", api.defaults.baseURL);
+  console.log(
+    "Auth Token:",
+    localStorage.getItem("auth_token") ? "Present" : "Missing"
+  );
+
   try {
     // Start loading before any fetch operations
     startLoading();
@@ -389,24 +397,147 @@ onMounted(async () => {
     checkMobileView();
     window.addEventListener("resize", checkMobileView);
 
+    console.log("LearnerPage: Executing API calls...");
+
     // Execute all fetch operations and handle individual failures
-    await Promise.allSettled([
-      getLearnerDets(),
-      sessionInfo(),
-      mentorProfile(),
-      sessionForReview(),
-      fetchMentFiles(),
+    const results = await Promise.allSettled([
+      getLearnerDets().catch((error) => {
+        console.error("getLearnerDets failed:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+            headers: error.config?.headers,
+          },
+        });
+        throw error;
+      }),
+      sessionInfo().catch((error) => {
+        console.error("sessionInfo failed:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+          },
+        });
+        throw error;
+      }),
+      mentorProfile().catch((error) => {
+        console.error("mentorProfile failed:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+          },
+        });
+        throw error;
+      }),
+      sessionForReview().catch((error) => {
+        console.error("sessionForReview failed:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+          },
+        });
+        throw error;
+      }),
+      fetchMentFiles().catch((error) => {
+        console.error("fetchMentFiles failed:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+          },
+        });
+        throw error;
+      }),
     ]);
-  } catch (error) {
-    console.error("Error during component initialization:", error);
-    createToast("Error loading data. Please refresh the page.", {
-      position: "top-right",
-      type: "danger",
-      transition: "slide",
-      timeout: 5000,
-      showIcon: true,
+
+    // Log results for debugging
+    results.forEach((result, index) => {
+      const functionNames = [
+        "getLearnerDets",
+        "sessionInfo",
+        "mentorProfile",
+        "sessionForReview",
+        "fetchMentFiles",
+      ];
+      if (result.status === "fulfilled") {
+        console.log(`✅ ${functionNames[index]} completed successfully`);
+      } else {
+        console.error(`❌ ${functionNames[index]} failed:`, result.reason);
+      }
     });
+
+    // Count failures
+    const failures = results.filter((result) => result.status === "rejected");
+    if (failures.length > 0) {
+      console.warn(
+        `⚠️ ${failures.length} out of ${results.length} API calls failed`
+      );
+
+      createToast(
+        `Warning: ${failures.length} data sources failed to load. Some features may not work properly.`,
+        {
+          position: "top-right",
+          type: "warning",
+          transition: "slide",
+          timeout: 5000,
+          showIcon: true,
+        }
+      );
+    } else {
+      console.log("🎉 All API calls completed successfully");
+    }
+  } catch (error) {
+    console.error("Critical error during component initialization:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      response: error.response
+        ? {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data,
+            headers: error.response.headers,
+          }
+        : null,
+      request: error.request
+        ? {
+            url: error.request.responseURL || error.config?.url,
+            method: error.config?.method,
+          }
+        : null,
+    });
+
+    createToast(
+      "Critical error loading data. Please check your connection and refresh the page.",
+      {
+        position: "top-right",
+        type: "danger",
+        transition: "slide",
+        timeout: 8000,
+        showIcon: true,
+      }
+    );
   } finally {
+    console.log("LearnerPage: Component initialization completed");
     stopLoading();
   }
 });
