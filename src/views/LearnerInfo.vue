@@ -1135,7 +1135,7 @@ export default {
           // this.$router.push('/');
         });
         setTimeout(() => {
-          this.$router.push("/login");
+          this.$router.push("/#/login");
         }, 2000);
       } catch (error) {
         createToast("Registration failed!", {

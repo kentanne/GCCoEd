@@ -5,19 +5,27 @@
       <span>GCCoEd</span>
     </div>
 
-    <button class="hamburger" @click="toggleMenu" aria-label="Toggle navigation">
-      <span :class="{'hamburger-line': true, 'active': isMenuOpen}"></span>
-      <span :class="{'hamburger-line': true, 'active': isMenuOpen}"></span>
-      <span :class="{'hamburger-line': true, 'active': isMenuOpen}"></span>
+    <button
+      class="hamburger"
+      @click="toggleMenu"
+      aria-label="Toggle navigation"
+    >
+      <span :class="{ 'hamburger-line': true, active: isMenuOpen }"></span>
+      <span :class="{ 'hamburger-line': true, active: isMenuOpen }"></span>
+      <span :class="{ 'hamburger-line': true, active: isMenuOpen }"></span>
     </button>
 
-    <nav :class="{'header-nav': true, 'active': isMenuOpen}">
+    <nav :class="{ 'header-nav': true, active: isMenuOpen }">
       <div class="nav-links">
-        <a 
-          v-for="link in links" 
-          :key="link.name" 
-          :href="link.href" 
-          :class="{'nav-link': true, 'active': activeLink === link.name, 'clicked': clickedLink === link.name}"
+        <a
+          v-for="link in links"
+          :key="link.name"
+          :href="link.href"
+          :class="{
+            'nav-link': true,
+            active: activeLink === link.name,
+            clicked: clickedLink === link.name,
+          }"
           @click="setActive(link.name)"
           @mousedown="clickedLink = link.name"
           @mouseup="clickedLink = null"
@@ -27,12 +35,15 @@
           <span class="link-underline"></span>
         </a>
       </div>
-      <button 
-        :class="{'nav-button': true, 'clicked': isLoginClicked}" 
+      <button
+        :class="{ 'nav-button': true, clicked: isLoginClicked }"
         @click="goToLogin"
       >
         <svg class="login-icon" viewBox="0 0 24 24" width="18" height="18">
-          <path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,6A2,2 0 0,0 10,8A2,2 0 0,0 12,10A2,2 0 0,0 14,8A2,2 0 0,0 12,6M12,13C14.67,13 20,14.33 20,17V20H4V17C4,14.33 9.33,13 12,13M12,14.9C9.03,14.9 5.9,16.36 5.9,17V18.1H18.1V17C18.1,16.36 14.97,14.9 12,14.9Z" />
+          <path
+            fill="currentColor"
+            d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,6A2,2 0 0,0 10,8A2,2 0 0,0 12,10A2,2 0 0,0 14,8A2,2 0 0,0 12,6M12,13C14.67,13 20,14.33 20,17V20H4V17C4,14.33 9.33,13 12,13M12,14.9C9.03,14.9 5.9,16.36 5.9,17V18.1H18.1V17C18.1,16.36 14.97,14.9 12,14.9Z"
+          />
         </svg>
         Login
       </button>
@@ -48,16 +59,16 @@ export default {
   data() {
     return {
       logo,
-      activeLink: '',
+      activeLink: "",
       isLoginClicked: false,
       isMenuOpen: false,
       clickedLink: null,
       links: [
-        { name: 'Home', href: '#home' },
-        { name: 'Roles', href: '#learners' },
-        { name: 'Overview', href: '#how-it-works' },
-        { name: 'Get Started', href: '#get-started' },
-      ]
+        { name: "Home", href: "#home" },
+        { name: "Roles", href: "#learners" },
+        { name: "Overview", href: "#how-it-works" },
+        { name: "Get Started", href: "#get-started" },
+      ],
     };
   },
   methods: {
@@ -70,25 +81,31 @@ export default {
     goToLogin() {
       this.isLoginClicked = true;
       this.closeMenu();
-      this.$router.push("/login");
+      this.$router.push("/#/login");
     },
     setActive(link) {
-      this.$router.push({ path: '/', hash: link.href });
+      this.$router.push({ path: "/", hash: link.href });
       this.activeLink = link.name;
       this.closeMenu();
     },
     handleScroll() {
-      const sections = this.links.map(link => document.querySelector(link.href));
+      const sections = this.links.map((link) =>
+        document.querySelector(link.href)
+      );
       const scrollPosition = window.scrollY + 200;
 
       sections.forEach((section, index) => {
-        if (section && section.offsetTop <= scrollPosition && (section.offsetTop + section.offsetHeight) > scrollPosition) {
+        if (
+          section &&
+          section.offsetTop <= scrollPosition &&
+          section.offsetTop + section.offsetHeight > scrollPosition
+        ) {
           this.activeLink = this.links[index].name;
         }
       });
     },
     checkActiveLink() {
-      if (this.$route.path === '/login') {
+      if (this.$route.path === "/login") {
         this.isLoginClicked = true;
       } else {
         this.isLoginClicked = false;
@@ -98,24 +115,24 @@ export default {
       if (!this.$el.contains(event.target) && this.isMenuOpen) {
         this.closeMenu();
       }
-    }
+    },
   },
   created() {
     this.checkActiveLink();
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll);
-    document.addEventListener('click', this.handleClickOutside);
+    window.addEventListener("scroll", this.handleScroll);
+    document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-    document.removeEventListener('click', this.handleClickOutside);
+    window.removeEventListener("scroll", this.handleScroll);
+    document.removeEventListener("click", this.handleClickOutside);
   },
   watch: {
-    '$route'(to) {
+    $route(to) {
       this.checkActiveLink();
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -196,14 +213,14 @@ header {
   top: 0;
   right: -120%;
   width: 90%;
-  height:100%;
+  height: 100%;
   background-color: rgb(220, 226, 230);
   border-radius: 25px 0 0 25px;
   padding: 6rem 1.5rem 2rem;
   transition: right 0.3s ease;
   z-index: 105;
   box-shadow: -8px 15px 25px rgba(96, 102, 147, 0.4),
-              -3px 0 10px rgba(0, 0, 0, 0.1);
+    -3px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-nav.active {
@@ -296,7 +313,7 @@ header {
   .hamburger {
     display: none;
   }
-  
+
   .header-nav {
     position: static;
     display: flex;
@@ -342,7 +359,6 @@ header {
 
   .header-logo {
     position: static;
-    
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { removeToken } from "@/axios.js";
 import axios from "axios";
 import api from "@/axios.js"; // Adjust the path as necessary
 import router from "@/router";
@@ -39,7 +40,7 @@ const logOut = async () => {
 
         emit("logout");
         removeToken();
-        router.push("/login");
+        router.push("/#/login");
       } else {
         createToast("Logout successful!", {
           position: "bottom-right",

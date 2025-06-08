@@ -1331,7 +1331,7 @@ export default {
       localStorage.clear();
 
       // Redirect to login instead of home
-      this.$router.push("/login");
+      this.$router.push("/#/login");
     },
 
     validateField(field, value) {

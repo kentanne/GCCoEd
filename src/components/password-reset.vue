@@ -127,7 +127,7 @@ const resetUserPass = async () => {
     if (response.status === 200) {
       success.value = "Password reset successfully! Redirecting to login...";
       setTimeout(() => {
-        router.push("/login");
+        router.push("/#/login");
       }, 2000);
     }
   } catch (error) {
