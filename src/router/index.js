@@ -135,9 +135,11 @@ router.beforeEach((to, from, next) => {
   }
 
   // Break potential redirection loops
+  // This is to prevent redirection loops when the user is trying to access signup page directly after logout, or from signup to home page
   if (
     (from.path === "/signup" && to.path === "/") ||
-    (from.path === "/" && to.path === "/signup")
+    (from.path === "/" && to.path === "/signup") ||
+    (isFromLogoutAction && to.path === "/signup")
   ) {
     if (isAuthenticated && !user?.role) {
       // We have auth but no role - this is a legitimate redirect to signup
