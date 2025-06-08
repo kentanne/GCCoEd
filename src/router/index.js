@@ -93,6 +93,7 @@ const routes = [
     component: LearnerInfoAlt,
     meta: { requiresAuth: false },
   },
+  { path: "/:pathMatch(.*)*", redirect: "/login" },
 ];
 
 const router = createRouter({
