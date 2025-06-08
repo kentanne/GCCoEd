@@ -105,9 +105,17 @@ const router = createRouter({
 
 // Enhanced navigation guard
 router.beforeEach((to, from, next) => {
-  // Clean URL handling
+  // Fix for direct navigation to non-hash URLs
+  const currentPath = window.location.pathname;
+  if (currentPath !== "/" && !window.location.hash) {
+    // User accessed a non-hash URL directly
+    window.location.replace(window.location.origin + "/#" + currentPath);
+    return; // Stop execution here as we're redirecting
+  }
+
+  // Clean URL handling - maintain hash while cleaning
   if (window.location.pathname !== "/" || window.location.search !== "") {
-    const hashPart = window.location.hash;
+    const hashPart = window.location.hash || "#/";
     const cleanUrl = window.location.origin + "/" + hashPart;
     window.history.replaceState(null, "", cleanUrl);
   }
