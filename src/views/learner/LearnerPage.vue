@@ -207,7 +207,7 @@ const logout = async () => {
   } finally {
     // Always clean up locally regardless of server response
     removeToken();
-    router.push("/#/login");
+    router.push("/login");
   }
 };
 
@@ -313,7 +313,7 @@ const handleLogout = () => {
   // alert("User logged out");
   confirmLogout.value = false;
   logout();
-  router.push("/#/login");
+  router.push("/login");
 };
 
 const createUser = (id, userName, yearLevel, rating = 4) => {

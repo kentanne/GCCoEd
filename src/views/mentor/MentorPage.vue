@@ -184,7 +184,7 @@ const switchRole = async () => {
           showIcon: true,
           toastBackgroundColor: "#319cb0",
         });
-        router.push("/#/login");
+        router.push("/login");
       })
       .catch((error) => {
         createToast(
@@ -212,7 +212,7 @@ const logout = async () => {
   } finally {
     // Always clean up locally regardless of server response
     removeToken();
-    router.push("/#/login");
+    router.push("/login");
   }
 };
 
@@ -336,7 +336,7 @@ const handleLogout = () => {
   // alert("User logged out");
   confirmLogout.value = false;
   logout();
-  router.push("/#/login");
+  router.push("/login");
 };
 
 const handleOfferConfirm = () => {

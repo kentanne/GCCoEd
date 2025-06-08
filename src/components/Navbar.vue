@@ -81,7 +81,7 @@ export default {
     goToLogin() {
       this.isLoginClicked = true;
       this.closeMenu();
-      this.$router.push("/#/login");
+      this.$router.push("/login");
     },
     setActive(link) {
       this.$router.push({ path: "/", hash: link.href });

@@ -40,7 +40,7 @@ const logOut = async () => {
 
         emit("logout");
         removeToken();
-        router.push("/#/login");
+        router.push("/login");
       } else {
         createToast("Logout successful!", {
           position: "bottom-right",

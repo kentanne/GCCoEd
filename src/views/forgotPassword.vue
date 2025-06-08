@@ -97,7 +97,7 @@ const handleStep2 = async () => {
     }
   } finally {
     loading.value = false;
-    router.push("/#/login");
+    router.push("login");
   }
 };
 </script>
