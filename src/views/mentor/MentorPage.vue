@@ -206,18 +206,14 @@ const switchRole = async () => {
 
 const logout = async () => {
   try {
-    const response = await api.post(
-      "/api/logout",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }
-    );
-  } catch (error) {}
+    await api.post("/api/logout");
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    // Always clean up locally regardless of server response
+    removeToken();
+    router.push("/login");
+  }
 };
 
 const userData = ref({

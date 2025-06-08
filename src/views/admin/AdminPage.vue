@@ -372,6 +372,7 @@ const logout = async () => {
             showIcon: true,
             toastBackgroundColor: "#319cb0",
           });
+          removeToken();
           Router.push("/login");
         } else {
           createToast("Logout failed!", {

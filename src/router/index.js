@@ -103,7 +103,7 @@ const router = createRouter({
   },
 });
 
-// Fixed navigation guard
+// Enhanced navigation guard
 router.beforeEach((to, from, next) => {
   // Clean URL handling
   if (window.location.pathname !== "/" || window.location.search !== "") {
@@ -117,63 +117,102 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!token;
   const user = getUserData();
 
-  // Allow access to public routes (requiresAuth: false or undefined)
-  if (to.meta.requiresAuth === false || to.meta.requiresAuth === undefined) {
-    // If user is authenticated and trying to access login/signup, redirect to dashboard
-    if (isAuthenticated && (to.path === "/login" || to.path === "/signup")) {
-      if (user) {
-        redirectToRolePage(user, next);
-        return;
+  // Check if the user is trying to access login page directly after logout
+  // This is important to prevent redirection loops after logout
+  const isFromLogoutAction =
+    from.path !== "/" &&
+    from.path !== "/login" &&
+    to.path === "/login" &&
+    !isAuthenticated;
+
+  // Always allow access to login page
+  if (to.path === "/login") {
+    if (isAuthenticated && user?.role) {
+      // If authenticated with role, redirect to appropriate page
+      return redirectToRolePage(user, next);
+    }
+    return next(); // Allow access to login if not authenticated
+  }
+
+  // Break potential redirection loops
+  if (
+    (from.path === "/signup" && to.path === "/") ||
+    (from.path === "/" && to.path === "/signup")
+  ) {
+    if (isAuthenticated && !user?.role) {
+      // We have auth but no role - this is a legitimate redirect to signup
+      // Add a special flag to prevent further loops
+      if (to.query.roleSetup) {
+        // Already has flag, just proceed to prevent loops
+        return next();
       } else {
-        // Clear invalid token/data and allow access to login
-        removeToken();
-        next();
-        return;
+        // Add flag and proceed to signup
+        return next({ path: "/signup", query: { roleSetup: "true" } });
       }
     }
+  }
+
+  // Case 1: Public routes (login, signup, info pages, etc.)
+  if (to.meta.requiresAuth === false || to.meta.requiresAuth === undefined) {
+    if (isAuthenticated && user?.role && to.path === "/signup") {
+      // Authenticated users with roles shouldn't access signup
+      return redirectToRolePage(user, next);
+    }
+
+    // If trying to access home page after logout, redirect to login instead
+    if (to.path === "/" && from.path === "/login" && !isAuthenticated) {
+      return next("/login");
+    }
+
     // Allow access to public routes
-    next();
-    return;
+    return next();
   }
 
-  // Handle routes that require authentication (requiresAuth: true)
-  if (to.meta.requiresAuth === true) {
-    if (!isAuthenticated) {
-      next("/login");
-      return;
-    }
-
-    // Check if user data exists
-    if (!user) {
-      // No user data available, redirect to login
-      removeToken();
-      next("/login");
-      return;
-    }
-
-    // Check role-specific routes
-    if (to.meta.role && user.role !== to.meta.role) {
-      redirectToRolePage(user, next);
-      return;
-    }
+  // Case 2: Protected routes
+  if (!isAuthenticated) {
+    // No token, go to login
+    return next("/login");
   }
 
+  // Token exists but no valid user data
+  if (!user) {
+    // Invalid token scenario
+    removeToken();
+    return next("/login");
+  }
+
+  // User has token but no role - send to signup for role selection
+  if (!user.role && to.meta.requiresAuth) {
+    return next({ path: "/signup", query: { roleSetup: "true" } });
+  }
+
+  // Check if user has the required role for the route
+  if (to.meta.role && user.role !== to.meta.role) {
+    // User trying to access wrong role page, redirect to their correct page
+    return redirectToRolePage(user, next);
+  }
+
+  // All checks passed, proceed
   next();
 });
 
 function redirectToRolePage(user, next) {
+  if (!user || !user.role) {
+    // User has no role, send to signup with special flag
+    return next({ path: "/signup", query: { roleSetup: "true" } });
+  }
+
   switch (user.role) {
     case "learner":
-      next("/learner");
-      break;
+      return next("/learner");
     case "mentor":
-      next("/mentor");
-      break;
+      return next("/mentor");
     case "admin":
-      next("/admin");
-      break;
+      return next("/admin");
     default:
-      next("/signup");
+      // Invalid role, clear token and send to signup
+      removeToken();
+      return next("/login");
   }
 }
 

@@ -38,6 +38,7 @@ const logOut = async () => {
         });
 
         emit("logout");
+        removeToken();
         router.push("/login");
       } else {
         createToast("Logout successful!", {

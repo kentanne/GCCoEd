@@ -65,6 +65,8 @@ import { useRouter } from "vue-router";
 import api, { setToken, setUserData } from "@/axios.js";
 import Navbar from "@/components/Navbar.vue";
 import logo from "@/assets/logo_gccoed.png";
+import { createToast } from "mosha-vue-toastify";
+import "mosha-vue-toastify/dist/style.css";
 
 const router = useRouter();
 const email = ref("");
@@ -94,34 +96,66 @@ async function login() {
       password: password.value,
     };
 
-    const response = await api.post("/api/login", loginData);
+    const response = await api
+      .post("/api/login", loginData)
+      .then((res) => {
+        if (res.status === 200) {
+          setToken(res.data.token);
 
-    if (response.status === 200) {
-      // Store the token
-      setToken(response.data.token);
+          // Store user data properly
+          setUserData(res.data.user);
 
-      // Store user data properly
-      setUserData(response.data.user);
+          createToast("Login successful!", {
+            position: "bottom-right",
+            type: "success",
+            transition: "slide",
+            timeout: 2000,
+            showIcon: true,
+            toastBackgroundColor: "#319cb0",
+          });
 
-      // Redirect based on user role
-      const userRole = response.data.user_role;
-      switch (userRole) {
-        case "learner":
-          router.push("/learner");
-          break;
-        case "mentor":
-          router.push("/mentor");
-          break;
-        case "admin":
-          router.push("/admin");
-          break;
-        default:
-          router.push("/signup");
-      }
-    }
-  } catch (error) {
-    console.error("Login failed:", error);
-    alert(error.response?.data?.message || "Login failed. Please try again.");
+          // Redirect based on user role
+          const userRole = res.data.user_role;
+          switch (userRole) {
+            case "learner":
+              router.push("/learner");
+              break;
+            case "mentor":
+              router.push("/mentor");
+              break;
+            case "admin":
+              router.push("/admin");
+              break;
+            default:
+              router.push("/signup");
+          }
+        } else {
+          throw new Error("Login failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Login error:", error);
+        createToast("Login failed. Please try again.", {
+          position: "bottom-right",
+          type: "error",
+          transition: "slide",
+          timeout: 2000,
+          showIcon: true,
+          toastBackgroundColor: "#ff4d4d",
+        });
+        throw error;
+      });
+  } catch (e) {
+    // console.error("Login failed:", error);
+    // createToast("Login failed. Please try again.", {
+    //   position: "bottom-right",
+    //   type: "error",
+    //   transition: "slide",
+    //   timeout: 2000,
+    //   showIcon: true,
+    //   toastBackgroundColor: "#ff4d4d",
+    // });
+    // alert(error.response?.data?.message || "Login failed. Please try again.");
   } finally {
     isLoading.value = false;
   }
