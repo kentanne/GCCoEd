@@ -24,7 +24,6 @@ const uploadFiles = async () => {
     });
     const response = await api
       .post("/api/mentor/file/upload", formData, {
-        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
           // "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
@@ -772,6 +771,5 @@ onMounted(() => {
   .file-type {
     font-size: 0.7rem;
   }
-
 }
 </style>

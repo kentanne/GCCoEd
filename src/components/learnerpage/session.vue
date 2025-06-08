@@ -41,7 +41,6 @@ function getCookie(name) {
 const cancelSession = async (item) => {
   try {
     const response = await api.post("/api/send/session/cancel/" + item.id, {
-      withCredentials: true,
       header: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -154,7 +153,6 @@ onUnmounted(() => {
 const previewFile = (fileId) => {
   const response = api
     .get("/api/preview/file/" + fileId, {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -171,7 +169,7 @@ const downloadFile = async (fileId, fileName) => {
   api
     .get("/api/download/file/" + fileId, {
       responseType: "blob",
-      withCredentials: true,
+
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

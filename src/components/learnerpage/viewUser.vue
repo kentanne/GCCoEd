@@ -230,7 +230,6 @@ const userInfo = async (id) => {
 
     const userDeets = await api
       .get(`/api/learner/users/${id}`, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

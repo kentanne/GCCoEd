@@ -40,7 +40,6 @@ const loggedUserDets = async () => {
   try {
     await api
       .get("/api/mentor/details", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -73,7 +72,6 @@ const learnersProfile = async () => {
   try {
     const response = await api
       .get("/api/mentor/users", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -96,7 +94,6 @@ const sessionInfo = async () => {
   try {
     const sessionDeets = await api
       .get(`/api/mentor/schedule`, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -115,7 +112,6 @@ const getFeedbacks = async () => {
   try {
     const response = await api
       .get("/api/mentor/getFeedback", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -133,7 +129,6 @@ const getFiles = async () => {
   try {
     const response = await api
       .get("/api/mentor/files", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -151,7 +146,6 @@ const registerLearnerRole = async () => {
   try {
     const response = await api
       .post("/api/set/2nd_role", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -169,7 +163,6 @@ const switchRole = async () => {
   try {
     const response = await api
       .post("/api/switch", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

@@ -40,7 +40,6 @@ const userInfo = async (id) => {
     isLoading.value = true;
 
     const response = await api.get(`/api/mentor/users/${id}`, {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

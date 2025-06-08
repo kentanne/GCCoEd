@@ -1230,7 +1230,6 @@ export default {
             "/api/set/2nd_role",
             {},
             {
-              withCredentials: true,
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
@@ -1300,7 +1299,6 @@ export default {
         try {
           const response = await api
             .post("/api/set/2nd_role", {
-              withCredentials: true,
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",

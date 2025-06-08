@@ -65,7 +65,6 @@ const saveChanges = async () => {
 
   try {
     const response = await api.patch("/api/mentor/edit", combinedData, {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

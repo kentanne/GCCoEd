@@ -126,7 +126,6 @@ const confirmSchedule = async () => {
 
     const response = await api
       .post("/api/learner/scheduleCreate", scheduleData, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

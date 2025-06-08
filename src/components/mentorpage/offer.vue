@@ -133,7 +133,6 @@ const confirmSchedule = async () => {
   try {
     const response = await api
       .post("/api/mentor/send-offer", scheduleData, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

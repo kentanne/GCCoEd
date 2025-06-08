@@ -67,7 +67,6 @@ const handleStep2 = async () => {
   try {
     await api
       .post("/api/forgot-password", verificationData.value, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

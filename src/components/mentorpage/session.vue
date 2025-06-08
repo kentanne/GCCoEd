@@ -47,7 +47,6 @@ const sendReminder = async (item) => {
   try {
     const response = await api
       .post("/api/send/session/reminder/" + item.id, {
-        withCredentials: true,
         header: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -85,7 +84,6 @@ const cancelSession = async (item) => {
   try {
     const response = await api
       .post("/api/send/session/cancel/" + item.id, {
-        withCredentials: true,
         header: {
           "Content-Type": "application/json",
           Accept: "application/json",

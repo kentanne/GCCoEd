@@ -207,7 +207,6 @@ const adminName = async () => {
   try {
     const response = await api
       .get("/api/admin/profile", {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -288,7 +287,6 @@ const checkMobileView = () => {
 const fetchAll = async () => {
   try {
     const response = await api.get("/api/admin", {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -336,7 +334,6 @@ const fetchAll = async () => {
 const fetchApplicants = async () => {
   try {
     const response = await api.get("/api/admin/applicants", {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -354,7 +351,6 @@ const logout = async () => {
         "/api/logout",
         {},
         {
-          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

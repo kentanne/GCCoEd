@@ -17,7 +17,6 @@ function getCookie(name) {
 const logOut = async () => {
   const response = await api
     .post("/api/logout", {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

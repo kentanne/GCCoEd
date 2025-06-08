@@ -70,9 +70,7 @@ function getCookie(name) {
 
 const csrf = async () => {
   try {
-    await api.get("/sanctum/csrf-cookie", {
-      withCredentials: true,
-    });
+    await api.get("/sanctum/csrf-cookie", {});
     return true;
   } catch (error) {
     return false;
@@ -97,7 +95,6 @@ const resetUserPass = async () => {
 
     const response = await api
       .patch("/api/reset-password", newPass, {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

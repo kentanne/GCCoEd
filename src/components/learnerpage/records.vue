@@ -53,7 +53,6 @@ const sendFeedback = async (record) => {
         rating: tempRating.value,
       },
       {
-        withCredentials: true,
         headers: {
           "X-CSRFToken": getCookie("csrftoken"),
           "Content-Type": "application/json",
@@ -314,19 +313,19 @@ onMounted(async () => {
             </div>
           </div>
 
-<div class="modal-footer">
-  <div class="footer-actions">
-    <button class="footer-btn back small-text" @click="closeFeedback">
-      <i class="fas fa-arrow-left"></i> Back to Records
-    </button>
-    <button 
-      v-if="!recordView.has_feedback" 
-      @click="sendFeedback(recordView)" 
-      class="footer-btn submit small-text"
-      :disabled="tempRating === 0"
-    >
-      <i class="fas fa-paper-plane"></i> Submit Feedback
-    </button>
+          <div class="modal-footer">
+            <div class="footer-actions">
+              <button class="footer-btn back small-text" @click="closeFeedback">
+                <i class="fas fa-arrow-left"></i> Back to Records
+              </button>
+              <button
+                v-if="!recordView.has_feedback"
+                @click="sendFeedback(recordView)"
+                class="footer-btn submit small-text"
+                :disabled="tempRating === 0"
+              >
+                <i class="fas fa-paper-plane"></i> Submit Feedback
+              </button>
             </div>
           </div>
         </div>
@@ -467,11 +466,11 @@ onMounted(async () => {
   background-color: rgba(59, 154, 169, 0.05);
 }
 
-.data-table th:nth-child(2),  
-.data-table td:nth-child(2) { 
-  width: 250px; 
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  width: 250px;
   max-width: 250px;
-  min-width: 80px; 
+  min-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -905,6 +904,4 @@ onMounted(async () => {
     justify-content: center;
   }
 }
-
-
 </style>

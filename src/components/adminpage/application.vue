@@ -383,7 +383,6 @@ const approve = async (id) => {
       `/api/admin/mentor/approve/${id}`,
       {},
       {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -425,7 +424,6 @@ const reject = async (id) => {
       `/api/admin/mentor/reject/${id}`,
       {},
       {
-        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -481,7 +479,6 @@ const getApplicantDetails = async (applicantId) => {
 const getApplicantCreds = async (applicationId) => {
   try {
     const response = await api.get("/api/admin/cred/" + applicationId, {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

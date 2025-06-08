@@ -799,7 +799,6 @@ const saveChanges = async () => {
 
   try {
     const response = await api.patch("/api/learner/edit", combinedData, {
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
