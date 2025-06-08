@@ -44,7 +44,7 @@
         <div class="profile-meta">
           <h1 class="profile-name">{{ adminNameValue }}</h1>
           <p class="profile-title">
-            College of Computer Science | Program Coordinator
+            College of Computer Studies | Program Coordinator
           </p>
           <!-- <p class="profile-details">
             BS Information Technology • College of Computer Studies
