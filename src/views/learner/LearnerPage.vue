@@ -199,17 +199,17 @@ const fetchMentFiles = async () => {
   }
 };
 
-const logout = async () => {
-  try {
-    await api.post("/api/logout");
-  } catch (error) {
-    console.error("Logout error:", error);
-  } finally {
-    // Always clean up locally regardless of server response
-    removeToken();
-    router.push("/login");
-  }
-};
+// const logout = async () => {
+//   try {
+//     await api.post("/api/logout");
+//   } catch (error) {
+//     console.error("Logout error:", error);
+//   } finally {
+//     // Always clean up locally regardless of server response
+//     removeToken();
+//     router.push("/login");
+//   }
+// };
 
 const userData = ref({
   user: {
