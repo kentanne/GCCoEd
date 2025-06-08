@@ -560,9 +560,9 @@ onMounted(async () => {
       <div>
         <h1>Hi, Mentor!</h1>
         <img
-          :src="userData.image_url || 'http://placehold.co/600x400'"
+          :src="userData.image_url || 'https://placehold.co/600x400'"
           alt="profile-pic"
-          @error="$event.target.src = 'http://placehold.co/600x400'"
+          @error="$event.target.src = 'https://placehold.co/600x400'"
         />
       </div>
       <div>
