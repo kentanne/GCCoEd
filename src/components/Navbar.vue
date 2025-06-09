@@ -116,6 +116,9 @@ export default {
         this.closeMenu();
       }
     },
+    navigateToSection(sectionId) {
+      this.$root.$emit("navigate-to-section", sectionId);
+    },
   },
   created() {
     this.checkActiveLink();

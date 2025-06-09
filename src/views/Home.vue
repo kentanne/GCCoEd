@@ -170,6 +170,45 @@ export default {
     goToSignup() {
       this.$router.push("/login");
     },
+    scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const navbarHeight = 80;
+        const targetPosition = element.offsetTop - navbarHeight;
+
+        this.smoothScrollTo(targetPosition, 1000); // 1000ms duration
+      }
+    },
+    smoothScrollTo(targetPosition, duration) {
+      const startPosition = window.pageYOffset;
+      const distance = targetPosition - startPosition;
+      let startTime = null;
+
+      const animation = (currentTime) => {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const run = this.ease(timeElapsed, startPosition, distance, duration);
+        window.scrollTo(0, run);
+        if (timeElapsed < duration) requestAnimationFrame(animation);
+      };
+
+      requestAnimationFrame(animation);
+    },
+    ease(t, b, c, d) {
+      // Easing function for smooth animation
+      t /= d / 2;
+      if (t < 1) return (c / 2) * t * t + b;
+      t--;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
+    },
+  },
+  mounted() {
+    // Listen for navigation events from the Navbar component
+    this.$root.$on("navigate-to-section", this.scrollToSection);
+  },
+  beforeDestroy() {
+    // Clean up the event listener
+    this.$root.$off("navigate-to-section", this.scrollToSection);
   },
 };
 </script>
@@ -177,10 +216,33 @@ export default {
 <style scoped>
 @import "@/assets/homestyles.css";
 
+/* Enhanced smooth scrolling */
+* {
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 /* Additional styles for FontAwesome icons */
 .benefit-icon {
   color: #31b046;
   margin-right: 0.5rem;
   font-size: 1rem;
+}
+
+/* Ensure sections have proper spacing for smooth navigation */
+.content-section,
+.how-it-works,
+.join-section,
+.intro-section {
+  scroll-margin-top: 100px; /* Increased offset for better positioning */
+  padding-top: 20px; /* Add some padding to prevent content from being hidden */
+}
+
+/* Ensure smooth transitions for all scrollable elements */
+.home-container {
+  scroll-behavior: smooth;
 }
 </style>
