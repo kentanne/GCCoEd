@@ -13,7 +13,6 @@
           <div class="input-field">
             <label>DOMAIN EMAIL</label>
             <div class="input-with-icon">
-              <i class="fas fa-user"></i>
               <input
                 type="text"
                 v-model="email"
@@ -21,22 +20,23 @@
                 :disabled="isLoading"
                 required
               />
+              <font-awesome-icon :icon="['fas', 'user']" class="input-icon" />
             </div>
           </div>
           <div class="input-field">
             <label>PASSWORD</label>
             <div class="input-with-icon">
-              <i
-                class="fas"
-                :class="passwordVisible ? 'fa-eye' : 'fa-eye-slash'"
-                @click="togglePasswordVisibility"
-              ></i>
               <input
                 :type="passwordVisible ? 'text' : 'password'"
                 v-model="password"
                 placeholder="Enter your password"
                 :disabled="isLoading"
                 required
+              />
+              <font-awesome-icon
+                :icon="['fas', passwordVisible ? 'eye' : 'eye-slash']"
+                @click="togglePasswordVisibility"
+                class="input-icon password-toggle"
               />
             </div>
             <p class="switch-link">
@@ -288,26 +288,20 @@ form {
   cursor: not-allowed;
 }
 
-.input-with-icon i {
+.input-icon {
   position: absolute;
   top: 50%;
+  right: 15px;
   transform: translateY(-50%);
   color: rgba(165, 161, 161, 0.9);
+  font-size: 16px;
 }
 
-.input-with-icon .fa-user,
-.input-with-icon .fa-eye,
-.input-with-icon .fa-eye-slash {
-  right: 15px;
-  left: auto;
-}
-
-.input-with-icon .fa-eye,
-.input-with-icon .fa-eye-slash {
+.input-icon.password-toggle {
   cursor: pointer;
 }
 
-.input-with-icon .fa-user {
+.input-icon:not(.password-toggle) {
   cursor: default;
 }
 

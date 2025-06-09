@@ -11,11 +11,13 @@ import {
   faBook,
   faCalendar,
   faCalendarAlt,
+  faCheckCircle,
   faClock,
   faCommentDots,
   faEllipsisH,
   faEnvelope,
   faEye,
+  faEyeSlash,
   faFileArrowUp,
   faFileLines,
   faLifeRing,
@@ -37,6 +39,7 @@ library.add(
   faEllipsisH,
   faUser,
   faCalendarAlt,
+  faCheckCircle,
   faClock,
   faMapMarkerAlt,
   faEnvelope,
@@ -50,12 +53,10 @@ library.add(
   faRightFromBracket,
   faLink,
   faEye,
+  faEyeSlash,
   faFile,
   faDownload
 );
-
-// import App from "./App.vue";
-// import router from "./router";
 
 const app = createApp(App);
 

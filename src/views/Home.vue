@@ -10,31 +10,40 @@
         </div>
       </div>
     </main>
-    
+
     <section id="learners" class="content-section learners-section">
       <div class="content-box learners-content-box">
         <h2 class="learners-heading">LEARNERS</h2>
         <p class="learner-text">
           As a learner, you get the chance to boost your knowledge and sharpen
-          your skills in subjects that matter to you. Whether you're prepping for
-          exams, struggling with tricky topics, or just eager to learn more, our
-          platform connects you with mentors who can help. It's all about learning at
-          your own pace, with flexible and personalized support to help you reach
-          your academic goals.
+          your skills in subjects that matter to you. Whether you're prepping
+          for exams, struggling with tricky topics, or just eager to learn more,
+          our platform connects you with mentors who can help. It's all about
+          learning at your own pace, with flexible and personalized support to
+          help you reach your academic goals.
         </p>
       </div>
-      <img class="section-image learners-image" src="@/assets/learners.png" alt="Learners Illustration" />
+      <img
+        class="section-image learners-image"
+        src="@/assets/learners.png"
+        alt="Learners Illustration"
+      />
     </section>
     <section id="mentors" class="content-section mentors-section">
-      <img class="section-image mentors-image" src="@/assets/mentors.png" alt="Mentors Illustration" />
+      <img
+        class="section-image mentors-image"
+        src="@/assets/mentors.png"
+        alt="Mentors Illustration"
+      />
       <div class="content-box mentor-content-box">
         <h2 class="mentors-heading">MENTORS</h2>
         <p>
-          Being a mentor is more than just sharing what you know, it's about helping
-          others grow. By guiding fellow students through their academic hurdles,
-          you strengthen your own understanding while making a positive
-          difference. It's a fulfilling way to develop leadership skills, improve
-          communication, and contribute to a supportive student community.
+          Being a mentor is more than just sharing what you know, it's about
+          helping others grow. By guiding fellow students through their academic
+          hurdles, you strengthen your own understanding while making a positive
+          difference. It's a fulfilling way to develop leadership skills,
+          improve communication, and contribute to a supportive student
+          community.
         </p>
       </div>
     </section>
@@ -45,53 +54,98 @@
           <div class="step">
             <img src="@/assets/icon1.png" alt="Find a Mentor or Learner" />
             <h3>Find a Mentor or Learner</h3>
-            <p>Search and filter peers based on subjects, expertise, availability, and ratings.</p>
+            <p>
+              Search and filter peers based on subjects, expertise,
+              availability, and ratings.
+            </p>
           </div>
           <div class="step">
-            <img src="@/assets/icon2.png" alt="Check Profiles & Qualifications" />
+            <img
+              src="@/assets/icon2.png"
+              alt="Check Profiles & Qualifications"
+            />
             <h3>Check Profiles & Qualifications</h3>
-            <p>View mentor and learner profiles, including expertise, experience, and session availability.</p>
+            <p>
+              View mentor and learner profiles, including expertise, experience,
+              and session availability.
+            </p>
           </div>
           <div class="step">
             <img src="@/assets/icon3.png" alt="Learn & Teach" />
             <h3>Learn & Teach</h3>
-            <p>Expand your knowledge or share your expertise by joining peer-assisted sessions.</p>
+            <p>
+              Expand your knowledge or share your expertise by joining
+              peer-assisted sessions.
+            </p>
           </div>
         </div>
         <div class="row">
           <div class="step">
             <img src="@/assets/icon4.png" alt="Schedule Your Session" />
             <h3>Schedule Your Session</h3>
-            <p>Book a tutoring session at a time that works best for both you and your peer.</p>
+            <p>
+              Book a tutoring session at a time that works best for both you and
+              your peer.
+            </p>
           </div>
           <div class="step">
             <img src="@/assets/icon5.png" alt="Get Notified" />
             <h3>Get Notified</h3>
-            <p>Receive email reminders for upcoming sessions, booking changes, or cancellations.</p>
+            <p>
+              Receive email reminders for upcoming sessions, booking changes, or
+              cancellations.
+            </p>
           </div>
           <div class="step">
             <img src="@/assets/icon6.png" alt="Rate & Review" />
             <h3>Rate & Review</h3>
-            <p>Provide feedback on completed sessions to help improve the learning experience for others.</p>
+            <p>
+              Provide feedback on completed sessions to help improve the
+              learning experience for others.
+            </p>
           </div>
         </div>
       </div>
       <button class="learn-more-btn" @click="goToLearnMore">LEARN MORE</button>
     </section>
-<section class="join-section" id="get-started">
-  <div class="get-started-card">
-    <h2 class="get-started-title">Ready to Get Started?</h2>
-    <div class="get-started-content">
-      <ul class="benefits-list">
-        <li><i class="fas fa-check-circle"></i> Connect with mentors in various subjects</li>
-        <li><i class="fas fa-check-circle"></i> Share your knowledge as a mentor</li>
-        <li><i class="fas fa-check-circle"></i> Flexible scheduling for sessions</li>
-        <li><i class="fas fa-check-circle"></i> Join our supportive learning community</li>
-      </ul>
-      <button class="signup-btn" @click="goToSignup">JOIN NOW</button>
-    </div>
-  </div>
-</section> 
+    <section class="join-section" id="get-started">
+      <div class="get-started-card">
+        <h2 class="get-started-title">Ready to Get Started?</h2>
+        <div class="get-started-content">
+          <ul class="benefits-list">
+            <li>
+              <font-awesome-icon
+                :icon="['fas', 'check-circle']"
+                class="benefit-icon"
+              />
+              Connect with mentors in various subjects
+            </li>
+            <li>
+              <font-awesome-icon
+                :icon="['fas', 'check-circle']"
+                class="benefit-icon"
+              />
+              Share your knowledge as a mentor
+            </li>
+            <li>
+              <font-awesome-icon
+                :icon="['fas', 'check-circle']"
+                class="benefit-icon"
+              />
+              Flexible scheduling for sessions
+            </li>
+            <li>
+              <font-awesome-icon
+                :icon="['fas', 'check-circle']"
+                class="benefit-icon"
+              />
+              Join our supportive learning community
+            </li>
+          </ul>
+          <button class="signup-btn" @click="goToSignup">JOIN NOW</button>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -111,16 +165,22 @@ export default {
   },
   methods: {
     goToLearnMore() {
-      this.$router.push('/learn-more');
+      this.$router.push("/learn-more");
     },
     goToSignup() {
-      this.$router.push('/login');
-    }
-  }
+      this.$router.push("/login");
+    },
+  },
 };
-
 </script>
 
 <style scoped>
 @import "@/assets/homestyles.css";
+
+/* Additional styles for FontAwesome icons */
+.benefit-icon {
+  color: #31b046;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
 </style>
