@@ -50,10 +50,7 @@
 
     <!-- Charts Section -->
     <div class="charts-container">
-      <div class="charts-header">
-        <h2>Analytics Overview</h2>
-        <p>Visual representation of platform statistics</p>
-      </div>
+      <div class="charts-header"></div>
 
       <div class="charts-grid">
         <!-- User Distribution Chart -->
@@ -525,16 +522,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Keep all your existing styles */
 .dashboard-container {
-  padding: 0;
+  padding: 1rem;
   max-width: 100%;
+  margin: 0 auto;
 }
 
-/* Existing stats grid styles */
+/* Stats grid - fully responsive */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
@@ -546,14 +543,15 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--border);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 100px;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .stat-icon {
@@ -571,7 +569,6 @@ onUnmounted(() => {
   height: 28px;
 }
 
-/* Add the missing stat-icon classes */
 .learners .stat-icon {
   background: linear-gradient(135deg, #22c55e, #16a34a);
   color: var(--white);
@@ -587,17 +584,24 @@ onUnmounted(() => {
   color: var(--white);
 }
 
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
 .stat-content h3 {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 0.25rem;
+  line-height: 1.2;
 }
 
 .stat-content p {
   color: var(--text-light);
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
   font-weight: 500;
+  line-height: 1.3;
 }
 
 /* Charts section styles */
@@ -608,10 +612,11 @@ onUnmounted(() => {
 .charts-header {
   text-align: center;
   margin-bottom: 2.5rem;
+  padding: 0 1rem;
 }
 
 .charts-header h2 {
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 0.5rem;
@@ -619,27 +624,30 @@ onUnmounted(() => {
 
 .charts-header p {
   color: var(--text-light);
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
+  align-items: start;
 }
 
 .chart-card {
   background: var(--white);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--border);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .chart-header {
@@ -648,15 +656,17 @@ onUnmounted(() => {
 }
 
 .chart-header h3 {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 3vw, 1.25rem);
   font-weight: 600;
   color: var(--text);
   margin-bottom: 0.25rem;
+  line-height: 1.3;
 }
 
 .chart-subtitle {
   color: var(--text-light);
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  line-height: 1.4;
 }
 
 .chart-wrapper {
@@ -665,37 +675,112 @@ onUnmounted(() => {
   width: 100%;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Large Desktop (1200px+) */
+@media (min-width: 1200px) {
+  .dashboard-container {
+    padding: 2rem;
+    max-width: 1400px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+
+  .chart-wrapper {
+    height: 350px;
+  }
+}
+
+/* Desktop (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet Landscape (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .dashboard-container {
+    padding: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .chart-wrapper {
+    height: 280px;
+  }
+}
+
+/* Tablet Portrait (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
   .charts-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
   .chart-card {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .chart-wrapper {
     height: 250px;
   }
+}
+
+/* Mobile Large (480px - 575px) */
+@media (min-width: 480px) and (max-width: 575px) {
+  .dashboard-container {
+    padding: 0.75rem;
+  }
 
   .stats-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .charts-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .chart-wrapper {
-    height: 200px;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .stat-card {
     padding: 1rem;
+    flex-direction: row;
+    text-align: left;
   }
 
   .stat-icon {
@@ -703,8 +788,158 @@ onUnmounted(() => {
     height: 50px;
   }
 
-  .stat-content h3 {
-    font-size: 1.5rem;
+  .stat-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+
+  .chart-wrapper {
+    height: 220px;
+  }
+
+  .charts-header {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Mobile Small (320px - 479px) */
+@media (max-width: 479px) {
+  .dashboard-container {
+    padding: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 0.875rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    min-height: 120px;
+  }
+
+  .stat-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .stat-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-card {
+    padding: 0.875rem;
+  }
+
+  .chart-wrapper {
+    height: 200px;
+  }
+
+  .chart-header {
+    margin-bottom: 1rem;
+  }
+
+  .charts-header {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Extra Small Mobile (max 319px) */
+@media (max-width: 319px) {
+  .dashboard-container {
+    padding: 0.25rem;
+  }
+
+  .stat-card {
+    padding: 0.75rem;
+    min-height: 100px;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .chart-wrapper {
+    height: 180px;
+  }
+
+  .chart-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 1rem;
+  }
+
+  .stat-card {
+    padding: 0.75rem;
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .chart-wrapper {
+    height: 150px;
+  }
+
+  .charts-header {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .dashboard-container {
+    padding: 0;
+  }
+
+  .stat-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+
+  .chart-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
