@@ -20,13 +20,13 @@
         <a
           v-for="link in links"
           :key="link.name"
-          :href="link.href"
+          href="#"
           :class="{
             'nav-link': true,
             active: activeLink === link.name,
             clicked: clickedLink === link.name,
           }"
-          @click="setActive(link.name)"
+          @click.prevent="setActive(link)"
           @mousedown="clickedLink = link.name"
           @mouseup="clickedLink = null"
           @mouseleave="clickedLink = null"
@@ -81,10 +81,46 @@ export default {
     goToLogin() {
       this.isLoginClicked = true;
       this.closeMenu();
-      this.$router.push("/login");
+      // Use named route instead of path
+      this.$router.push({ name: "login" }).catch((err) => {
+        console.error("Navigation error:", err);
+      });
     },
     setActive(link) {
-      this.$router.push({ path: "/", hash: link.href });
+      // Check if we're currently on a non-home page
+      if (this.$route.path !== "/") {
+        // First navigate to home, then scroll to section
+        this.$router.push("/").then(() => {
+          this.$nextTick(() => {
+            // Use hash navigation for scrolling after route change
+            if (link.href.startsWith("#")) {
+              const element = document.querySelector(link.href);
+              if (element) {
+                const navbarHeight = 80; // Adjust based on your navbar height
+                const targetPosition = element.offsetTop - navbarHeight;
+                window.scrollTo({
+                  top: targetPosition,
+                  behavior: "smooth",
+                });
+              }
+            }
+          });
+        });
+      } else {
+        // We're already on home page, just scroll to section
+        if (link.href.startsWith("#")) {
+          const element = document.querySelector(link.href);
+          if (element) {
+            const navbarHeight = 80; // Adjust based on your navbar height
+            const targetPosition = element.offsetTop - navbarHeight;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: "smooth",
+            });
+          }
+        }
+      }
+
       this.activeLink = link.name;
       this.closeMenu();
     },
@@ -115,9 +151,6 @@ export default {
       if (!this.$el.contains(event.target) && this.isMenuOpen) {
         this.closeMenu();
       }
-    },
-    navigateToSection(sectionId) {
-      this.$root.$emit("navigate-to-section", sectionId);
     },
   },
   created() {

@@ -118,81 +118,78 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!token;
   const user = getUserData();
 
-  // Check if the user is trying to access login page directly after logout
-  // This is important to prevent redirection loops after logout
-  const isFromLogoutAction =
-    from.path !== "/" &&
-    from.path !== "/login" &&
-    to.path === "/login" &&
-    !isAuthenticated;
+  // Always allow access to public routes first
+  const publicRoutes = [
+    "/",
+    "/login",
+    "/signup",
+    "/learn-more",
+    "/mentor-info",
+    "/learner-info",
+    "/reset-password",
+    "/forgot-password",
+    "/mentor-info/alt",
+    "/learner-info/alt",
+  ];
 
-  // Always allow access to login page
-  if (to.path === "/login") {
-    if (isAuthenticated && user?.role) {
-      // If authenticated with role, redirect to appropriate page
+  const isPublicRoute = publicRoutes.includes(to.path);
+
+  // Handle authenticated users trying to access login/signup
+  if (isAuthenticated && user?.role) {
+    if (to.path === "/login" || to.path === "/signup") {
+      // Redirect authenticated users with roles away from login/signup
       return redirectToRolePage(user, next);
     }
-    return next(); // Allow access to login if not authenticated
   }
 
-  // Break potential redirection loops
-  // This is to prevent redirection loops when the user is trying to access signup page directly after logout, or from signup to home page
-  if (
-    (from.path === "/signup" && to.path === "/") ||
-    (from.path === "/" && to.path === "/signup") ||
-    (isFromLogoutAction && to.path === "/signup")
-  ) {
-    if (isAuthenticated && !user?.role) {
-      // We have auth but no role - this is a legitimate redirect to signup
-      // Add a special flag to prevent further loops
-      if (to.query.roleSetup) {
-        // Already has flag, just proceed to prevent loops
-        return next();
-      } else {
-        // Add flag and proceed to signup
+  // Handle authenticated users without roles
+  if (isAuthenticated && !user?.role) {
+    // User has token but no role - send to signup for role selection
+    // But allow them to access other public pages for navigation
+    if (to.path === "/signup" || isPublicRoute) {
+      // Add roleSetup flag only for signup to indicate they need to set their role
+      if (to.path === "/signup" && !to.query.roleSetup) {
         return next({ path: "/signup", query: { roleSetup: "true" } });
       }
+      return next();
+    }
+    // If trying to access protected route without role, send to signup
+    if (to.meta.requiresAuth) {
+      return next({ path: "/signup", query: { roleSetup: "true" } });
     }
   }
 
-  // Case 1: Public routes (login, signup, info pages, etc.)
-  if (to.meta.requiresAuth === false || to.meta.requiresAuth === undefined) {
-    if (isAuthenticated && user?.role && to.path === "/signup") {
-      // Authenticated users with roles shouldn't access signup
-      return redirectToRolePage(user, next);
+  // Handle public routes for unauthenticated users
+  if (isPublicRoute) {
+    // Force router to properly update the URL hash for navigation consistency
+    if (to.path !== from.path) {
+      // This ensures the URL hash is properly updated when navigating between public routes
+      next();
+    } else {
+      next();
     }
+    return;
+  }
 
-    // If trying to access home page after logout, redirect to login instead
-    if (to.path === "/" && from.path === "/login" && !isAuthenticated) {
+  // Handle protected routes
+  if (to.meta.requiresAuth) {
+    if (!isAuthenticated) {
+      // No token, go to login
       return next("/login");
     }
 
-    // Allow access to public routes
-    return next();
-  }
+    // Token exists but no valid user data
+    if (!user) {
+      // Invalid token scenario
+      removeToken();
+      return next("/login");
+    }
 
-  // Case 2: Protected routes
-  if (!isAuthenticated) {
-    // No token, go to login
-    return next("/login");
-  }
-
-  // Token exists but no valid user data
-  if (!user) {
-    // Invalid token scenario
-    removeToken();
-    return next("/login");
-  }
-
-  // User has token but no role - send to signup for role selection
-  if (!user.role && to.meta.requiresAuth) {
-    return next({ path: "/signup", query: { roleSetup: "true" } });
-  }
-
-  // Check if user has the required role for the route
-  if (to.meta.role && user.role !== to.meta.role) {
-    // User trying to access wrong role page, redirect to their correct page
-    return redirectToRolePage(user, next);
+    // Check if user has the required role for the route
+    if (to.meta.role && user.role !== to.meta.role) {
+      // User trying to access wrong role page, redirect to their correct page
+      return redirectToRolePage(user, next);
+    }
   }
 
   // All checks passed, proceed
